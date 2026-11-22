@@ -3,7 +3,8 @@ package com.ragagent.session.controller;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.web.ApiResult;
-import com.ragagent.framework.web.ServletSseSink;
+import com.ragagent.framework.web.EmitterSseSink;
+import com.ragagent.framework.web.SseEndpoints;
 import com.ragagent.llm.api.SearchResult;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
 import com.ragagent.session.qa.QaEntryRunner;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 /**
@@ -82,19 +84,42 @@ public class KnowledgeQaController {
     // ── 端点 ──────────────────────────────────────────────────────────────────
 
     @PostMapping("/api/v1/knowledge-chat/{sessionId}")
-    public void knowledgeQA(@PathVariable("sessionId") String rawSessionId,
+    public SseEmitter knowledgeQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
-            HttpServletResponse response) throws IOException {
-        qaEntryRunner.runKnowledgeQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
+            HttpServletResponse response) {
+        SseEmitter emitter = SseEndpoints.newStream();
+        EmitterSseSink sink = new EmitterSseSink(emitter, response);
+        QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareKnowledgeQA(rawSessionId, rawBody, resourceUrls);
+        Thread.ofVirtual().name("qa-knowledge-sse").start(() -> {
+            try {
+                qaEntryRunner.runPrepared(prepared, sink);
+                sink.complete();
+            } catch (IOException e) {
+                // 客户端已走：写失败按流收束处理，不触发错误派发
+                sink.complete();
+            }
+        });
+        return emitter;
     }
 
     @PostMapping("/api/v1/agent-chat/{sessionId}")
-    public void agentQA(@PathVariable("sessionId") String rawSessionId,
+    public SseEmitter agentQA(@PathVariable("sessionId") String rawSessionId,
             @RequestBody(required = false) String rawBody,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
-            HttpServletResponse response) throws IOException {
-        qaEntryRunner.runAgentQA(rawSessionId, rawBody, resourceUrls, new ServletSseSink(response));
+            HttpServletResponse response) {
+        SseEmitter emitter = SseEndpoints.newStream();
+        EmitterSseSink sink = new EmitterSseSink(emitter, response);
+        QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareAgentQA(rawSessionId, rawBody, resourceUrls);
+        Thread.ofVirtual().name("qa-agent-sse").start(() -> {
+            try {
+                qaEntryRunner.runPrepared(prepared, sink);
+                sink.complete();
+            } catch (IOException e) {
+                sink.complete();
+            }
+        });
+        return emitter;
     }
 
     @PostMapping("/api/v1/knowledge-search")

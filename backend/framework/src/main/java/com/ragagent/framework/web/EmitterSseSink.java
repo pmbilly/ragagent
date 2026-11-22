@@ -1,6 +1,6 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.framework.web;
 
-import com.ragagent.framework.vocabulary.SseSink;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -15,13 +15,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public final class EmitterSseSink implements SseSink {
 
     private final SseEmitter emitter;
+    private final HttpServletResponse response;
+    private boolean headersSet;
 
-    public EmitterSseSink(SseEmitter emitter) {
+    public EmitterSseSink(SseEmitter emitter, HttpServletResponse response) {
         this.emitter = emitter;
+        this.response = response;
     }
 
     @Override
     public void send(String eventName, String json) throws IOException {
+        if (!headersSet) {
+            // 兜底：正常路径控制器 prelude 成功后已设（幂等）；漏设时首帧前仍正确
+            SseContract.setSSEHeaders(response);
+            headersSet = true;
+        }
         try {
             emitter.send(SseEmitter.event().name(eventName).data(json));
         } catch (IOException e) {
@@ -30,5 +38,19 @@ public final class EmitterSseSink implements SseSink {
             // emitter 已 complete/超时后 send 抛 IllegalStateException——按"客户端已走"的写失败语义上抛
             throw new IOException("sse emitter send failed: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void complete() {
+        try {
+            emitter.complete();
+        } catch (RuntimeException ignored) {
+            // 已完成/超时后 complete 是幂等噪音
+        }
+    }
+
+    @Override
+    public void completeError(Throwable t) {
+        emitter.completeWithError(t);
     }
 }

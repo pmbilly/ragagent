@@ -1,6 +1,6 @@
 package com.ragagent.session.service.sse;
 
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelruntime.stream.StreamEvent;

@@ -15,7 +15,7 @@ import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantContextSnapshot;
 import com.ragagent.framework.tenant.TenantScope;
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.modelruntime.stream.StreamManager;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionLookupScope;

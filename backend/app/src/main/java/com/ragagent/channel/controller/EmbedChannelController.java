@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * embed 渠道 HTTP 层（管理面/公开面路由）。
@@ -195,19 +196,21 @@ final FileProxyPort fileProxyService;
 
 
     @PostMapping("/api/v1/embed/{channelId}/knowledge-chat/{sessionId}")
-    public void knowledgeChat(@PathVariable("sessionId") String sessionId,
-                              @RequestBody(required = false) String rawBody,
-                              @RequestParam(name = "resource_urls", required = false) String resourceUrls,
-                              jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-        delegateOps.knowledgeChat(sessionId, rawBody, resourceUrls, response);
+    public SseEmitter knowledgeChat(
+            @PathVariable("sessionId") String sessionId,
+            @RequestBody(required = false) String rawBody,
+            @RequestParam(name = "resource_urls", required = false) String resourceUrls,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        return delegateOps.knowledgeChat(sessionId, rawBody, resourceUrls, response);
     }
 
     @PostMapping("/api/v1/embed/{channelId}/agent-chat/{sessionId}")
-    public void agentChat(@PathVariable("sessionId") String sessionId,
-                          @RequestBody(required = false) String rawBody,
-                          @RequestParam(name = "resource_urls", required = false) String resourceUrls,
-                          jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-        delegateOps.agentChat(sessionId, rawBody, resourceUrls, response);
+    public SseEmitter agentChat(
+            @PathVariable("sessionId") String sessionId,
+            @RequestBody(required = false) String rawBody,
+            @RequestParam(name = "resource_urls", required = false) String resourceUrls,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        return delegateOps.agentChat(sessionId, rawBody, resourceUrls, response);
     }
 
     @GetMapping("/api/v1/embed/{channelId}/files")

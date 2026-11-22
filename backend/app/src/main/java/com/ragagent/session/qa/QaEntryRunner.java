@@ -4,7 +4,7 @@ import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.framework.tenant.TenantContext;
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.service.AgentResolver;
 import com.ragagent.session.service.QaSupport.QaMode;
@@ -43,12 +43,51 @@ public final class QaEntryRunner {
     }
 
     /** knowledge-chat 入口：绑定 → 解析 → NORMAL 模式执行。 */
+
+    /** 预备态：bind/parse/模式判定完成（在请求线程同步完成，校验错误以 BizException 400/404 落 JSON）。 */
+    public record PreparedQa(QaRequestContext reqCtx, QaMode mode, boolean generateTitle) {
+    }
+
+    /** knowledge-chat 的同步预备段（校验在调用线程）。 */
+    public PreparedQa prepareKnowledgeQA(String rawSessionId, String rawBody, String resourceUrls) {
+        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
+        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolver, currentTenant());
+        return new PreparedQa(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle);
+    }
+
+    /** agent-chat 的同步预备段（含 agent 模式判定）。 */
+    public PreparedQa prepareAgentQA(String rawSessionId, String rawBody, String resourceUrls) {
+        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
+        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolver, currentTenant());
+        QaRequestContext reqCtx = parsed.reqCtx();
+
+        // agent 模式判定：customAgent.agent_mode > request.agent_enabled
+        boolean agentModeEnabled = request.agentEnabled;
+        if (reqCtx.agentConfig != null) {
+            agentModeEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
+        }
+        if (agentModeEnabled && reqCtx.agentConfig == null) {
+            throw BizException.badRequest("agent_id is required when agent mode is enabled");
+        }
+        if (agentModeEnabled) {
+            return new PreparedQa(reqCtx, QaMode.AGENT, true);
+        }
+        return new PreparedQa(reqCtx, QaMode.NORMAL, !request.disableTitle);
+    }
+
+    /** 执行预备好的 QA（可在虚拟线程上运行；流泵与收尾归 {@code TurnStreamPump} 链）。 */
+    public void runPrepared(PreparedQa prepared, SseSink sink) throws IOException {
+        executor.executeQA(prepared.reqCtx(), prepared.mode(), prepared.generateTitle(), sink);
+    }
+
+    /** knowledge-chat 入口：bind/parse 同步 + 执行（兼容旧调用形态）。 */
     public void runKnowledgeQA(String rawSessionId, String rawBody, String resourceUrls,
             SseSink sink) throws IOException {
         CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
         ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolver, currentTenant());
         executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, sink);
     }
+
 
     /** agent-chat 入口：agent 模式判定（customAgent.agent_mode &gt; request.agent_enabled）后分派。 */
     public void runAgentQA(String rawSessionId, String rawBody, String resourceUrls,

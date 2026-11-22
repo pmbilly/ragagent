@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-346 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+345 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -139,7 +139,6 @@
 | `:backend` | `com.ragagent.framework.text` | 平台文本与标记卫生面（原 text + html 两包合并）：契约文本原语、繁简转换、 请求语言解析、HTML→Markdown 转换、实体表与转义、路径/文件名/无效字符清洗、 退化检测与码点序比较。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
-| `:backend` | `com.ragagent.framework.vocabulary` | 跨引擎形状的最后一站（终态 1 类）：SseSink——SSE 帧出口接口，被 framework/web/ServletSseSink 实现；随 SseEmitter 替换批（蓝图 5.6.6）一并消亡。 |
 | `:backend` | `com.ragagent.framework.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.framework.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:backend` | `com.ragagent.framework.web.health` | 平台健康检查面。 |
@@ -299,7 +298,7 @@
 | `:backend` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
 | `:backend` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:backend` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |
-| `:backend` | `com.ragagent.session.controller.sse` | 会话 · SSE 传输面：SseContract（头部契约）与 SseFrameWriter （Servlet 直写 + 帧组装）。 |
+| `:backend` | `com.ragagent.session.controller.sse` | 会话 · SSE 传输面：SseContract（头部契约）与 JsonSseFrameSink （Servlet 直写 + 帧组装）。 |
 | `:backend` | `com.ragagent.session.conversation` | 会话与消息生命周期：会话/消息读写、消息检索、停止会话与 SSE 流桥 （AgentStreamBridge / AgentStreamEmitter）。 |
 | `:backend` | `com.ragagent.session.domain` | 会话域实体（留存面；已切出三簇：conversation/（会话与分页）、 document/（临时文档）、message/（消息族 + artifact 版本化））。 |
 | `:backend` | `com.ragagent.session.domain.conversation` | 会话实体面（由 session.domain 切出，对齐方案）： Session 及其列表/分页/状态（SessionListItem / SessionListQuery / SessionPage |

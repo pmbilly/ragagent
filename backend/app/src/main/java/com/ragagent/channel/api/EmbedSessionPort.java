@@ -1,6 +1,6 @@
 package com.ragagent.channel.api;
 
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.web.SseSink;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,6 +19,10 @@ import java.util.List;
 public interface EmbedSessionPort {
 
     /** 知识问答通道（SSE 帧经 sink 写出）。 */
+    /** 载荷校验（请求线程同步调用；校验错误以 BizException 落普通 JSON，不进流）。 */
+    default void validateChat(String patchedBody) {
+    }
+
     void knowledgeQa(String sessionId, String rawBody, String resourceUrls, SseSink sink)
             throws IOException;
 

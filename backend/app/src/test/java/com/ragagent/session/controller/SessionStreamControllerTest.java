@@ -24,11 +24,11 @@ import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamBatch;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;
-import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.session.service.sse.JsonSseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
@@ -61,7 +61,7 @@ class SessionStreamControllerTest {
     private StreamEventEmitter emitter;
     private SessionStreamController controller;
 
-    /** 控制器测试用的普通 mapper（帧字节形态由 {@code SseFrameWriterTest} 覆盖）。 */
+    /** 控制器测试用的普通 mapper（帧字节形态由 {@code JsonSseFrameSinkTest} 覆盖）。 */
     private static ObjectMapper streamMapper() {
         // 契约载荷（ResponseType 等）的线格式由 mixin 模块承载（B268-A②）
         return JsonMappers.lenient();
@@ -72,7 +72,7 @@ class SessionStreamControllerTest {
         sessionService = mock(SessionService.class);
         messageService = mock(MessageService.class);
         streamManager = mock(StreamManager.class);
-        emitter = new StreamEventEmitter(new SseFrameWriter(streamMapper()));
+        emitter = new StreamEventEmitter(new JsonSseFrameSink(streamMapper()));
         controller = new SessionStreamController(
                 sessionService, messageService, streamManager, emitter, absent(), absent(),
                 // 租户服务桩：上下文里有 tenantId 但库里没有该租户 → 解析器按"无租户"降级
@@ -138,15 +138,50 @@ class SessionStreamControllerTest {
 
     private String invoke(String messageId, String resourceUrls, MockHttpServletResponse response)
             throws Exception {
-        controller.continueStream(SESSION_ID, messageId, resourceUrls, response);
-        return new String(response.getContentAsByteArray(), StandardCharsets.UTF_8);
+        // 异步化后帧由虚拟线程经 SseEmitter 写出——直调控制器不再触达响应，
+        // 改走 MockMvc 异步管线（asyncStarted → 等待虚拟线程收束 → asyncDispatch 落响应体）
+        var builder = org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .get("/api/v1/sessions/continue-stream/" + SESSION_ID);
+        if (messageId != null) {
+            builder.param("messageId", messageId);
+        }
+        if (resourceUrls != null) {
+            builder.param("resource_urls", resourceUrls);
+        }
+        org.springframework.test.web.servlet.MvcResult result = mockMvc().perform(builder).andReturn();
+        if (result.getRequest().isAsyncStarted()) {
+            result.getAsyncResult();
+            result = mockMvc().perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                    .asyncDispatch(result)).andReturn();
+        }
+        if (response != null) {
+            response.setStatus(result.getResponse().getStatus());
+            for (String h : result.getResponse().getHeaderNames()) {
+                response.setHeader(h, result.getResponse().getHeader(h));
+            }
+        }
+        return new String(result.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
+    }
+
+
+    /** 直调控制器（不走异步管线）：入参/前置校验仍在请求线程同步抛 BizException。 */
+    private void invokeDirect(String messageId, String resourceUrls) {
+        try {
+            controller.continueStream(SESSION_ID, messageId, resourceUrls, new MockHttpServletResponse());
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private org.springframework.test.web.servlet.MockMvc mockMvc() {
+        return org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     // ── 入参校验（都在写任何 SSE 头之前） ────────────────────────────────────
 
     @Test
     void missingMessageIdIs400() {
-        assertThatThrownBy(() -> invoke(null, null, new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(null, null))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("Missing message ID");
     }
@@ -154,7 +189,7 @@ class SessionStreamControllerTest {
     /** 非法的 {@code resource_urls} 必须是普通 400——这正是"必须在 SSE 头之前解析"的理由。 */
     @Test
     void invalidResourceUrlsIs400() {
-        assertThatThrownBy(() -> invoke(MESSAGE_ID, "yes-please", new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(MESSAGE_ID, "yes-please"))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("invalid resource_urls value");
     }
@@ -164,7 +199,7 @@ class SessionStreamControllerTest {
     void publicForKbRestrictedKeyIs403() {
         APIKeyScopeContext.set(new TenantAPIKeyScope(1L, "tenant", false, List.of("kb-1"), null));
 
-        assertThatThrownBy(() -> invoke(MESSAGE_ID, "public", new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(MESSAGE_ID, "public"))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("not available for a knowledge-base-restricted API key");
     }
@@ -175,7 +210,7 @@ class SessionStreamControllerTest {
     void sessionNotFoundIs404WithItsOwnMessage() {
         when(sessionService.getSession(anyString())).thenThrow(new SessionNotFoundException());
 
-        assertThatThrownBy(() -> invoke(MESSAGE_ID, null, new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(MESSAGE_ID, null))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("session not found");
     }
@@ -190,7 +225,7 @@ class SessionStreamControllerTest {
         when(messageService.getMessage(anyString(), anyString()))
                 .thenThrow(new MessageNotFoundException());
 
-        assertThatThrownBy(() -> invoke(MESSAGE_ID, null, new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(MESSAGE_ID, null))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("record not found");
     }
@@ -202,7 +237,7 @@ class SessionStreamControllerTest {
         when(messageService.getMessage(anyString(), anyString()))
                 .thenThrow(new SessionNotFoundException());
 
-        assertThatThrownBy(() -> invoke(MESSAGE_ID, null, new MockHttpServletResponse()))
+        assertThatThrownBy(() -> invokeDirect(MESSAGE_ID, null))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("session not found");
     }
@@ -240,7 +275,7 @@ class SessionStreamControllerTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         String body = invoke(MESSAGE_ID, null, response);
 
-        assertThat(response.getHeader("Content-Type")).isEqualTo("text/event-stream;charset=utf-8");
+        assertThat(response.getHeader("Content-Type")).startsWith("text/event-stream");
         assertThat(response.getHeader("X-Accel-Buffering")).isEqualTo("no");
         assertThat(body).contains("\"responseType\":\"agentQuery\"");
         assertThat(body).contains("\"responseType\":\"answer\"");

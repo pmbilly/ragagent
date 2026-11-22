@@ -6,16 +6,17 @@ import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResult;
-import com.ragagent.framework.web.ServletSseSink;
+import com.ragagent.framework.web.EmitterSseSink;
+import com.ragagent.framework.web.SseContract;
+import com.ragagent.framework.web.SseEndpoints;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamBatch;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;
-import com.ragagent.session.controller.sse.SseContract;
-import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.service.TurnLifecycle;
+import com.ragagent.session.service.sse.JsonSseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
 import com.ragagent.session.support.MessageNotFoundException;
 import com.ragagent.session.support.SessionNotFoundException;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * 继续接收活跃流。
@@ -64,7 +66,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <h2>⚠️ 客户端断开检测的局限</h2>
  * <p>阻塞式 Servlet 拿不到连接断开的即时通知（要拿到得走 {@code AsyncContext} + 容器钩子，
  * 而那条路要求过滤器链声明 {@code asyncSupported}，风险高于收益）。
- * 这里改用<b>写失败</b>检测：{@link SseFrameWriter#write} 抛 {@link IOException}
+ * 这里改用<b>写失败</b>检测：{@link JsonSseFrameSink#write} 抛 {@link IOException}
  * 即视为断开。</p>
  * <p>后果是<b>延迟</b>而非<b>错误</b>：客户端在流中途断线时，要等下一次有事件可写
  * 才会发现（活跃生成下就是下一个分片，亚秒级）；只有"流完全停滞"这种情形会多挂一会儿。
@@ -158,7 +160,7 @@ public class SessionStreamController {
     // ── 端点 ───────────────────────────────────────────────────────────────
 
     @GetMapping("/api/v1/sessions/continue-stream/{sessionId}")
-    public void continueStream(
+    public SseEmitter continueStream(
             @PathVariable("sessionId") String rawSessionId,
             @RequestParam(value = "messageId", required = false) String rawMessageId,
             @RequestParam(value = Mode.QUERY_PARAM, required = false) String resourceUrls,
@@ -208,7 +210,7 @@ public class SessionStreamController {
                 // 防御分支：仓储查不到时抛异常，正常不可达；保留作兜底落点。
                 log.debug("Incomplete message not found, session ID: {}, message ID: {}", sessionId, messageId);
                 writeJsonError(response, 404, "Incomplete message not found");
-                return;
+                return null;
             }
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
@@ -235,144 +237,161 @@ public class SessionStreamController {
         if (events.isEmpty()) {
             log.warn("No events found in stream, session ID: {}, message ID: {}", sessionId, messageId);
             writeJsonError(response, 404, "No stream events found");
-            return;
+            return null;
         }
 
         log.info("Preparing to replay {} events and continue streaming, session ID: {}, message ID: {}",
                 events.size(), sessionId, messageId);
 
-        // 到这里才开始写 SSE —— 前面任何一步失败都还能落成普通 JSON 错误
-        SseContract.setSSEHeaders(response);
-        SseFrameWriter.applyRenderedContentType(response);
-
+        // 到这里才开始写 SSE —— 前面任何一步失败都还能落成普通 JSON 错误（未见帧时可正常错误派发）
+        SseEmitter sse = SseEndpoints.newStream();
+        EmitterSseSink sink = new EmitterSseSink(sse, response);
+        SseEndpoints.setHeaders(response);
         AtomicBoolean clientGone = new AtomicBoolean(false);
-        StreamEventEmitter.ClientState client = clientGone::get;
+        sse.onCompletion(() -> clientGone.set(true));
+        sse.onTimeout(() -> clientGone.set(true));
+        sse.onError(t -> clientGone.set(true));
+        Thread.ofVirtual().name("continue-stream").start(() -> {
+            StreamEventEmitter.ClientState client = clientGone::get;
+            try {
 
-        // 流是否已经结束（回放里出现 complete）
-        boolean streamCompleted = false;
-        for (StreamEvent evt : events) {
-            if (evt.getType() == ResponseType.COMPLETE) {
-                streamCompleted = true;
-                break;
-            }
-        }
-
-        try {
+            // 流是否已经结束（回放里出现 complete）
+            boolean streamCompleted = false;
             for (StreamEvent evt : events) {
-                emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
-            }
-        } catch (IOException e) {
-            clientGone.set(true);
-            log.debug("Client connection closed during replay");
-            return;
-        }
-
-        if (streamCompleted) {
-            log.info("Stream already completed, session ID: {}, message ID: {}", sessionId, messageId);
-            SseContract.sendCompletionEvent(response, requestId);
-            return;
-        }
-
-        // 继续轮询新事件
-        int currentOffset = batch.nextOffset();
-        long deadline = System.currentTimeMillis() + MAX_STREAM_DURATION_MILLIS;
-        while (System.currentTimeMillis() < deadline) {
-            try {
-                Thread.sleep(POLL_INTERVAL_MILLIS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-            if (clientGone.get()) {
-                log.debug("Client connection closed");
-                return;
-            }
-
-            StreamBatch next;
-            try {
-                next = streamManager.getEvents(sessionId, messageId, currentOffset);
-            } catch (RuntimeException e) {
-                // 读事件失败：把扣留缓冲里还剩的吐出去，然后收工
-                log.error("Failed to get new events", e);
-                try {
-                    emitter.flushHeldStreamContent(new ServletSseSink(response), requestId, resourceRewriter, client);
-                } catch (IOException ignored) {
-                    // 客户端已经走了——没有别人可发
+                if (evt.getType() == ResponseType.COMPLETE) {
+                    streamCompleted = true;
+                    break;
                 }
-                return;
             }
 
-            boolean completedNow = false;
             try {
-                for (StreamEvent evt : next.events()) {
-                    if (evt.getType() == ResponseType.COMPLETE) {
-                        completedNow = true;
-                    }
-                    emitter.emitStreamEvent(new ServletSseSink(response), evt, requestId, resourceRewriter, client);
-                    if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
-                        // ERROR+done 是终态元素：错误帧已写出，不再轮询
-                        log.info("Stream terminated with error, session ID: {}, message ID: {}",
-                                sessionId, messageId);
-                        return;
-                    }
+                for (StreamEvent evt : events) {
+                    emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
                 }
             } catch (IOException e) {
                 clientGone.set(true);
-                log.debug("Client connection closed while streaming");
+                log.debug("Client connection closed during replay");
                 return;
             }
 
-            currentOffset = next.nextOffset();
-
-            if (completedNow) {
-                log.info("Stream completed, session ID: {}, message ID: {}", sessionId, messageId);
-                SseContract.sendCompletionEvent(response, requestId);
+            if (streamCompleted) {
+                log.info("Stream already completed, session ID: {}, message ID: {}", sessionId, messageId);
+                SseContract.sendCompletionEvent(sink, requestId);
                 return;
             }
-        }
-        log.warn("Stream polling exceeded max duration, session ID: {}, message ID: {}", sessionId, messageId);
+
+            // 继续轮询新事件
+            int currentOffset = batch.nextOffset();
+            long deadline = System.currentTimeMillis() + MAX_STREAM_DURATION_MILLIS;
+            while (System.currentTimeMillis() < deadline) {
+                try {
+                    Thread.sleep(POLL_INTERVAL_MILLIS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                if (clientGone.get()) {
+                    log.debug("Client connection closed");
+                    return;
+                }
+
+                StreamBatch next;
+                try {
+                    next = streamManager.getEvents(sessionId, messageId, currentOffset);
+                } catch (RuntimeException e) {
+                    // 读事件失败：把扣留缓冲里还剩的吐出去，然后收工
+                    log.error("Failed to get new events", e);
+                    try {
+                        emitter.flushHeldStreamContent(sink, requestId, resourceRewriter, client);
+                    } catch (IOException ignored) {
+                        // 客户端已经走了——没有别人可发
+                    }
+                    return;
+                }
+
+                boolean completedNow = false;
+                try {
+                    for (StreamEvent evt : next.events()) {
+                        if (evt.getType() == ResponseType.COMPLETE) {
+                            completedNow = true;
+                        }
+                        emitter.emitStreamEvent(sink, evt, requestId, resourceRewriter, client);
+                        if (TurnLifecycle.isTerminalEvent(evt) && evt.getType() != ResponseType.COMPLETE) {
+                            // ERROR+done 是终态元素：错误帧已写出，不再轮询
+                            log.info("Stream terminated with error, session ID: {}, message ID: {}",
+                                    sessionId, messageId);
+                            return;
+                        }
+                    }
+                } catch (IOException e) {
+                    clientGone.set(true);
+                    log.debug("Client connection closed while streaming");
+                    return;
+                }
+
+                currentOffset = next.nextOffset();
+
+                if (completedNow) {
+                    log.info("Stream completed, session ID: {}, message ID: {}", sessionId, messageId);
+                    SseContract.sendCompletionEvent(sink, requestId);
+                    return;
+                }
+            }
+            log.warn("Stream polling exceeded max duration, session ID: {}, message ID: {}", sessionId, messageId);
+            flushHeldQuietly(emitter, sink, requestId, resourceRewriter, client);
+            } finally {
+                // 早退（complete/断连/超时）与正常结束统一收束；幂等
+                SseEndpoints.completeQuietly(sse);
+            }
+        });
+        return sse;
+    }
+
+    /** 扣留缓冲兜底刷出（轮询失败/超时路径）；写失败按"客户端已走"静默。 */
+    private void flushHeldQuietly(StreamEventEmitter emitter, EmitterSseSink sink,
+            String requestId, StreamRewriter resourceRewriter, StreamEventEmitter.ClientState client) {
         try {
-            emitter.flushHeldStreamContent(new ServletSseSink(response), requestId, resourceRewriter, client);
+            emitter.flushHeldStreamContent(sink, requestId, resourceRewriter, client);
         } catch (IOException ignored) {
             // 客户端已断开
         }
     }
 
-    // ── 辅助 ───────────────────────────────────────────────────────────────
+        // ── 辅助 ───────────────────────────────────────────────────────────────
 
-    /**
-     * SSE 起流前的 JSON 错误体：{@code {"error":"…"}}（与全局纯字符串错误形态同族）。
-     *
-     * <p>只能在 SSE 头写出**之前**调用：一旦开始流就不可能退回 JSON 了。</p>
-     */
-    static void writeJsonError(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        response.setContentType("application/json; charset=utf-8");
-        String body = "{\"error\":\"" + escapeJsonString(message) + "\"}";
-        response.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
-        response.getOutputStream().flush();
-    }
+        /**
+         * SSE 起流前的 JSON 错误体：{@code {"error":"…"}}（与全局纯字符串错误形态同族）。
+         *
+         * <p>只能在 SSE 头写出**之前**调用：一旦开始流就不可能退回 JSON 了。</p>
+         */
+        static void writeJsonError(HttpServletResponse response, int status, String message) throws IOException {
+            response.setStatus(status);
+            response.setContentType("application/json; charset=utf-8");
+            String body = "{\"error\":\"" + escapeJsonString(message) + "\"}";
+            response.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
+            response.getOutputStream().flush();
+        }
 
 
-    private static String escapeJsonString(String s) {
-        StringBuilder out = new StringBuilder(s.length() + 8);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> out.append("\\\"");
-                case '\\' -> out.append("\\\\");
-                case '\n' -> out.append("\\n");
-                case '\r' -> out.append("\\r");
-                case '\t' -> out.append("\\t");
-                default -> {
-                    if (c < 32) {
-                        out.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        out.append(c);
+        private static String escapeJsonString(String s) {
+            StringBuilder out = new StringBuilder(s.length() + 8);
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                switch (c) {
+                    case '"' -> out.append("\\\"");
+                    case '\\' -> out.append("\\\\");
+                    case '\n' -> out.append("\\n");
+                    case '\r' -> out.append("\\r");
+                    case '\t' -> out.append("\\t");
+                    default -> {
+                        if (c < 32) {
+                            out.append(String.format("\\u%04x", (int) c));
+                        } else {
+                            out.append(c);
+                        }
                     }
                 }
             }
+            return out.toString();
         }
-        return out.toString();
     }
-}

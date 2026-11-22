@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.framework.web;
 
 import java.io.IOException;
 
@@ -14,4 +14,13 @@ public interface SseSink {
 
     /** 写一帧（事件名 + 已序列化 JSON）并 flush。 */
     void send(String eventName, String json) throws IOException;
+
+    /** 流收尾（幂等；servlet 直写实现为空操作）。 */
+    default void complete() {
+    }
+
+    /** 以错误收尾（异步错误派发渲染错误体；幂等）。 */
+    default void completeError(Throwable t) {
+        complete();
+    }
 }

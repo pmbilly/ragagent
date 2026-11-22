@@ -1,5 +1,5 @@
 /**
- * 会话 · SSE 传输面：{@code SseContract}（头部契约）与 {@code SseFrameWriter}
+ * 会话 · SSE 传输面：{@code SseContract}（头部契约）与 {@code JsonSseFrameSink}
  * （Servlet 直写 + 帧组装）。
  *
  * <p>传输无关的事件→响应组装在 {@code session.service.sse}

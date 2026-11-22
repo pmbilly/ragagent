@@ -1,6 +1,5 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.framework.web;
 
-import com.ragagent.framework.vocabulary.SseSink;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**

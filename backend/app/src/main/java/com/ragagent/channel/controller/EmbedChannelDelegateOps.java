@@ -10,12 +10,14 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.web.ApiResponse;
-import com.ragagent.framework.web.ServletSseSink;
+import com.ragagent.framework.web.EmitterSseSink;
+import com.ragagent.framework.web.SseEndpoints;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * embed 委托协作者（自 {@link EmbedChannelController} 拆出的
@@ -34,37 +36,40 @@ final class EmbedChannelDelegateOps {
     // ── QA / 文件代理委托 ──
 
     /** patch 后委托 KnowledgeQA。 */
-    public void knowledgeChat(@PathVariable("sessionId") String sessionId,
-                              @RequestBody(required = false) String rawBody,
-                              @RequestParam(name = "resource_urls", required = false) String resourceUrls,
-                              jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-        delegateEmbedChat(sessionId, rawBody, resourceUrls, false, response);
+    public SseEmitter knowledgeChat(
+            @PathVariable("sessionId") String sessionId,
+            @RequestBody(required = false) String rawBody,
+            @RequestParam(name = "resource_urls", required = false) String resourceUrls,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        SseEmitter emitter =
+                SseEndpoints.newStream();
+        EmitterSseSink sink = new EmitterSseSink(emitter, response);
+        // 同步 prelude（渠道解析 request0()/会话/patch）在请求线程——校验错误落普通 JSON；
+        // port 实现（session 侧）内部做 bind/parse 同步校验并起虚拟线程执行（身份快照在 port 侧捕获）。
+        EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
+        ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
+        String patched = patchEmbedChatPayload(rawBody, ch, false);
+        // 校验经 port 契约（400 契约在请求线程落成 JSON；头由 sink 首帧前兜底，避免 preset Content-Type 卡死异常渲染）
+        ctrl.sessionPort.validateChat(patched);
+        ctrl.sessionPort.knowledgeQa(LogSanitizer.sanitize(sessionId), patched, resourceUrls, sink);
+        return emitter;
     }
 
     /** patch 后按渠道 agent 分派 AgentQA/KnowledgeQA。 */
-    public void agentChat(@PathVariable("sessionId") String sessionId,
-                          @RequestBody(required = false) String rawBody,
-                          @RequestParam(name = "resource_urls", required = false) String resourceUrls,
-                          jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
-        delegateEmbedChat(sessionId, rawBody, resourceUrls, true, response);
-    }
-
-    /**
-     * 委托聊天主链：渠道 → ensureSession →
-     * patchEmbedChatPayload → 委托。quick-answer 内建 agent 恒走 KnowledgeQA。
-     */
-    private void delegateEmbedChat(String sessionId, String rawBody, String resourceUrls,
-            boolean agentMode, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+    public SseEmitter agentChat(
+            @PathVariable("sessionId") String sessionId,
+            @RequestBody(required = false) String rawBody,
+            @RequestParam(name = "resource_urls", required = false) String resourceUrls,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        SseEmitter emitter = SseEndpoints.newStream();
+        EmitterSseSink sink = new EmitterSseSink(emitter, response);
+        // 同步 prelude 在请求线程；port 实现内部做 bind/parse/模式判定并起虚拟线程执行。
         EmbedChannelEntity ch = EmbedChannelRows.channel(EmbedChannelController.request0());
         ctrl.ensureSession(LogSanitizer.sanitize(sessionId));
-        String patched = patchEmbedChatPayload(rawBody, ch, agentMode);
-        if (agentMode && !"builtin-quick-answer".equals(ch.getAgentId())) {
-            ctrl.sessionPort.agentQa(LogSanitizer.sanitize(sessionId), patched,
-                    resourceUrls, new ServletSseSink(response));
-            return;
-        }
-        ctrl.sessionPort.knowledgeQa(LogSanitizer.sanitize(sessionId), patched,
-                resourceUrls, new ServletSseSink(response));
+        String patched = patchEmbedChatPayload(rawBody, ch, true);
+        ctrl.sessionPort.validateChat(patched);
+        ctrl.sessionPort.agentQa(LogSanitizer.sanitize(sessionId), patched, resourceUrls, sink);
+        return emitter;
     }
 
     /**

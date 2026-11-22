@@ -105,6 +105,20 @@ class W5dTerminalEmbedContractTest {
         return Files.readString(golden(name), StandardCharsets.UTF_8);
     }
 
+    /** SSE 异步端点收束：等虚拟线程 complete/completeWithError 后派发（错误经处理链落 JSON）。 */
+    private MvcResult settleAsync(MvcResult r) {
+        try {
+            if (r.getRequest().isAsyncStarted()) {
+                // completeWithError 的异常由 asyncDispatch 触发异常解析器渲染（getAsyncResult 会直接重抛）
+                r = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .asyncDispatch(r)).andReturn();
+            }
+            return r;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private String raw(MvcResult r) {
         return new String(r.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
     }
@@ -116,7 +130,7 @@ class W5dTerminalEmbedContractTest {
                 int colon = header.indexOf(':');
                 builder.header(header.substring(0, colon).trim(), header.substring(colon + 1).trim());
             }
-            return mockMvc.perform(builder).andReturn();
+            return settleAsync(mockMvc.perform(builder).andReturn());
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -132,7 +146,7 @@ class W5dTerminalEmbedContractTest {
                 int colon = header.indexOf(':');
                 builder.header(header.substring(0, colon).trim(), header.substring(colon + 1).trim());
             }
-            return mockMvc.perform(builder).andReturn();
+            return settleAsync(mockMvc.perform(builder).andReturn());
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

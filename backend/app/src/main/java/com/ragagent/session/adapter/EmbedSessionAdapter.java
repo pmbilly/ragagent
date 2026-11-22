@@ -8,13 +8,16 @@ import com.ragagent.channel.api.MessageView;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.session.conversation.MessageHistoryService;
 import com.ragagent.session.conversation.SessionStopService;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.domain.message.MessageSuggestionSet;
 import com.ragagent.session.dto.StopSessionRequest;
 import com.ragagent.session.qa.QaEntryRunner;
+import com.ragagent.session.qa.QaRequestBinder;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 import java.io.IOException;
 import java.util.List;
@@ -49,15 +52,50 @@ public class EmbedSessionAdapter implements EmbedSessionPort {
     }
 
     @Override
+    public void validateChat(String patchedBody) {
+        QaRequestBinder.bindQaRequest(patchedBody);
+    }
+
+    @Override
     public void knowledgeQa(String sessionId, String rawBody, String resourceUrls,
             SseSink sink) throws IOException {
-        qaEntryRunner.runKnowledgeQA(sessionId, rawBody, resourceUrls, sink);
+        // bind/parse 在调用线程同步完成（校验错误以 BizException 落普通 JSON）；
+        // 执行在虚拟线程并携带身份快照（TenantContext 是 ThreadLocal，不随线程走）。
+        QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareKnowledgeQA(sessionId, rawBody, resourceUrls);
+        TenantContextSnapshot identity =
+                TenantContextSnapshot.capture();
+        Thread.ofVirtual().name("embed-knowledge-sse").start(() ->
+                TenantScope.run(identity, () -> {
+                    try {
+                        qaEntryRunner.runPrepared(prepared, sink);
+                        sink.complete();
+                    } catch (IOException e) {
+                        // 客户端已走：写失败按流收束
+                        sink.complete();
+                    } catch (RuntimeException e) {
+                        sink.completeError(e);
+                    }
+                }));
     }
 
     @Override
     public void agentQa(String sessionId, String rawBody, String resourceUrls,
             SseSink sink) throws IOException {
-        qaEntryRunner.runAgentQA(sessionId, rawBody, resourceUrls, sink);
+        QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareAgentQA(sessionId, rawBody, resourceUrls);
+        TenantContextSnapshot identity =
+                TenantContextSnapshot.capture();
+        Thread.ofVirtual().name("embed-agent-sse").start(() ->
+                TenantScope.run(identity, () -> {
+                    try {
+                        qaEntryRunner.runPrepared(prepared, sink);
+                        sink.complete();
+                    } catch (IOException e) {
+                        // 客户端已走：写失败按流收束
+                        sink.complete();
+                    } catch (RuntimeException e) {
+                        sink.completeError(e);
+                    }
+                }));
     }
 
     @Override

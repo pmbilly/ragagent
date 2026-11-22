@@ -20,7 +20,7 @@ class VocabularyManifestTest {
 
     /** vocabulary 白名单（终态 8）：MessageView 簇已迁 channel/api 与 agentengine/api（channel 合并批）；余下为晶格孤儿（双引擎消费）与待解钉件。 */
     private static final List<String> VOCABULARY_ALLOW =
-            List.of("SseSink");
+            List.of();
 
     /** tenant 白名单：请求级租户上下文（原 access 包并入）+ 租户配置载荷与 API Key 模型（RbacInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
     private static final List<String> TENANT_ALLOW =
@@ -31,6 +31,9 @@ class VocabularyManifestTest {
 
     private static List<String> mainClasses(String pkg) {
         Path dir = Path.of("src/main/java/com/ragagent/framework/" + pkg);
+        if (!Files.isDirectory(dir)) {
+            return List.of(); // 包已删除（vocabulary 归零）——目录不存在等价于无成员
+        }
         try (Stream<Path> files = Files.list(dir)) {
             return files
                     .map(p -> p.getFileName().toString())

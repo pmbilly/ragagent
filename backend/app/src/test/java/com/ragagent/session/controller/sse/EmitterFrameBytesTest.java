@@ -36,6 +36,12 @@ class EmitterFrameBytesTest {
             emitter.complete();
             return emitter;
         }
+
+        /** 探针：SseEmitter 返回类型的 handler 同步抛 BizException——advice 是否解析？ */
+        @GetMapping(path = "/probe-throw", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+        SseEmitter probeThrow() {
+            throw com.ragagent.framework.error.BizException.badRequest("probe-400");
+        }
     }
 
     @Test

@@ -12,15 +12,15 @@ import static org.mockito.Mockito.when;
 import com.ragagent.framework.event.EventBusFactory;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SseSink;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamBatch;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;
-import com.ragagent.session.controller.sse.SseFrameWriter;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.service.QaSupport.SseStreamContext;
+import com.ragagent.session.service.sse.JsonSseFrameSink;
 import com.ragagent.session.service.sse.StreamEventEmitter;
 import com.ragagent.storage.support.StreamRewriter;
 import java.time.OffsetDateTime;
@@ -48,7 +48,7 @@ class QaSseOrchestratorTest {
     @BeforeEach
     void setUp() {
         streamManager = mock(StreamManager.class);
-        SseFrameWriter frameWriter = new SseFrameWriter(JsonMappers.lenient());
+        JsonSseFrameSink frameWriter = new JsonSseFrameSink(JsonMappers.lenient());
         orchestrator = new QaSseOrchestrator(
                 streamManager,
                 new StreamEventEmitter(frameWriter),

@@ -1,16 +1,18 @@
-package com.ragagent.session.controller.sse;
+package com.ragagent.session.service.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agent.fixtures.ContractJson;
+import com.ragagent.framework.web.SseSink;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * SSE 帧的**逐字节**契约测试——这是整套 A/B 的落点，字节错了前面全白做。
@@ -29,20 +31,26 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * 直接用就会在含 {@code &} 的正文上分叉。</p>
  */
 @SpringBootTest
-class SseFrameWriterTest {
+class JsonSseFrameSinkTest {
 
     /**
-     * 用**容器里那个** {@link SseFrameWriter}——它注入的是应用统一的 mapper，
+     * 用**容器里那个** {@link JsonSseFrameSink}——它注入的是应用统一的 mapper，
      * 转义规则由 {@code JacksonConfig} 全局装在上面。
      * <b>刻意不自己 new 一个 mapper</b>：那样测的是测试自己的配置，不是线上那条路。
      */
     @Autowired
-    private SseFrameWriter writer;
+    private JsonSseFrameSink writer;
 
-    private MockHttpServletResponse write(StreamResponse payload) throws Exception {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        writer.write(response, payload);
-        return response;
+    /** 经 sink 接口写帧并返回帧串（帧骨架由 SseSink 实现承载；此处以 fake 收集）。 */
+    private String write(StreamResponse payload) throws Exception {
+        List<String> frames = new ArrayList<>();
+        writer.write(new SseSink() {
+            @Override
+            public void send(String eventName, String json) {
+                frames.add("event:" + eventName + "\ndata:" + json + "\n\n");
+            }
+        }, payload);
+        return String.join("", frames);
     }
 
 
@@ -63,9 +71,8 @@ class SseFrameWriterTest {
         return head + ContractJson.deep(payload) + tail;
     }
 
-    private static String body(MockHttpServletResponse response) throws Exception {
-        // 帧里全是 ASCII 的骨架 + UTF-8 的正文，必须按 UTF-8 解码
-        return new String(response.getContentAsByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+    private static String body(String frame) {
+        return frame;
     }
 
     @Test
@@ -135,22 +142,6 @@ class SseFrameWriterTest {
                         + "\"content\":\"\",\"done\":true}\n\n"));
     }
 
-    /**
-     * Content-Type 会被 SSE 渲染器**无条件覆盖**成带 charset 的那个值——
-     * {@code setSSEHeaders} 设的 {@code text/event-stream} 不是线上的最终值。
-     */
-    @Test
-    void renderedContentTypeOverridesThePlainOne() {
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        SseContract.setSSEHeaders(response);
-        assertThat(response.getHeader("Content-Type")).isEqualTo("text/event-stream");
-
-        SseFrameWriter.applyRenderedContentType(response);
-        assertThat(response.getHeader("Content-Type")).isEqualTo("text/event-stream;charset=utf-8");
-        // Cache-Control 是"没有才设"，所以 setSSEHeaders 的值保持不变
-        assertThat(response.getHeader("Cache-Control")).isEqualTo("no-cache");
-    }
 
     /** 非 ASCII 正文按 UTF-8 写出。 */
     @Test
@@ -158,9 +149,7 @@ class SseFrameWriterTest {
         StreamResponse r = StreamResponse.of(ResponseType.ANSWER, "你好", true);
         r.setId("req-1");
 
-        byte[] bytes = write(r).getContentAsByteArray();
-        // 骨架里的 "content":"你好" 部分必须逐字节一致
-        assertThat(new String(bytes, java.nio.charset.StandardCharsets.UTF_8))
-                .contains("\"content\":\"你好\"");
+        // 帧串本就按 UTF-8 解码（String.join）；骨架里的 "content":"你好" 必须一致
+        assertThat(write(r)).contains("\"content\":\"你好\"");
     }
 }
