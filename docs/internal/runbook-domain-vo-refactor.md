@@ -52,6 +52,8 @@ controller/vo/<域>RespVo.java     一个源 record 对应一个 VO，组件声�
 assembler/<域>Assembler.java      toVo(源) + 泛型 toVoList(list, mapper) + toVoPage(page, mapper)
 ```
 
+生成前先看域内是否已有同形状 VO（如单字段 `taskId` 的 `TaskIdRespVo`）：**直接复用，不造重复 record**。
+
 生成后必须检查三件事：
 
 1. **嵌套类型也要 VO 化**——若 VO 里出现 `List<SomeDomainDto>`，说明生成器只抄了外壳
@@ -99,6 +101,7 @@ mvn -B clean verify
 | 8 | 生成类名大小写 | `KBCloneProgress` 生成成 `KbCloneProgressRespVo` | 引用处按生成结果写 |
 | 9 | 内联全限定名 | 全闸门才红（`check-fully-qualified-names.py`） | 快闸已含此检查，import 后用短名 |
 | 10 | 分页包裹差一层 | 金片红，响应多/少一层嵌套 | `PageResult.of(items, total, page, pageSize)` 四项都要传 |
+| 11 | 嵌套字段 null 语义被改写 | 金片红：可空列表由 `null` 变 `[]` | 装配器对**可空嵌套列表**保持 `null` 透传；只有端点级"空列表兜底"才用 `List.of()` |
 
 ## 5. 高风险改造：先建影子控制器
 
@@ -132,13 +135,23 @@ assertEquals(0, context.getBeanNamesForType(旧控制器.class).length);
 
 ## 7. 参考实现
 
-`knowledge` 域的最终形态：
+`knowledge` 域的最终形态（2026-11-23 实测）：
 
 ```text
 backend/app/src/main/java/com/ragagent/knowledge/
 ├── controller/        8 个控制器，69 端点全部返回 VO
-├── controller/vo/     17 个 VO
-└── assembler/         3 个装配器（FaqEntry / Chunk / Knowledge）
+├── controller/vo/     23 个 VO
+└── assembler/         5 个装配器（FaqEntry / FaqExport / FaqImport / Chunk / Knowledge）
 ```
+
+按本手册推进的其他域（2026-11-23）：
+
+| 域 | VO | 装配器 | VO 化端点 | 备注 |
+|---|---|---|---|---|
+| `favorite` | 1 | 1 | 1（另 2 个是空体） | 最小样板 |
+| `memory` | 6 | 1 | 7 | 含泛型分页壳 `MemoryListRespVo<T>`；导出空 `items` 必须保持 null |
+| `storage` | 4 | 2 | 6 | 另 5 个是空体 / `Map` / 文件流，按 §2 不动 |
+
+已知盲区：本手册 §3.1 的 grep 只抓 `ResponseEntity<...>` / `ApiResponse<...>`，**裸返回类型会漏**（`memory` 的 `MemoryListResponse<T>`、`MemoryTopicView` 等就是这样漏掉的）。侦察时补一条：`grep -E "public [A-Z][A-Za-z]+<" 控制器`。
 
 对照提交：`refactor(faq)` / `refactor(chunk)` / `refactor(knowledge)` 系列。

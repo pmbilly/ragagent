@@ -1,7 +1,8 @@
 package com.ragagent.favorite.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.favorite.dto.FavoriteResponse;
+import com.ragagent.favorite.assembler.FavoriteAssembler;
+import com.ragagent.favorite.controller.vo.FavoriteRespVo;
 import com.ragagent.favorite.service.UserResourceFavoriteService;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
@@ -60,11 +61,10 @@ public class UserFavoriteController {
 
  /** 列表 = 裸数组；?type= 缺失/非法 → 400（空串不命中白名单）。 */
     @GetMapping("/api/v1/user/favorites")
-    public ResponseEntity<List<FavoriteResponse>> listFavorites(@RequestParam(required = false) String type) {
+    public ResponseEntity<List<FavoriteRespVo>> listFavorites(@RequestParam(required = false) String type) {
         String userId = favoriteUserId();
         Long tenantId = favoriteTenantId();
-        return ResponseEntity.ok(service.list(userId, tenantId, type).stream()
-                .map(FavoriteResponse::from).toList());
+        return ResponseEntity.ok(FavoriteAssembler.toVoList(service.list(userId, tenantId, type)));
     }
 
     /** 添加收藏：body 是 {type,id}；创建成功 **201 + 外壳体**（绑定文案见类注释）。 */

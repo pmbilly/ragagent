@@ -6,13 +6,18 @@ import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
+import com.ragagent.memory.assembler.MemoryAssembler;
 import com.ragagent.memory.config.MemorySettings;
+import com.ragagent.memory.controller.vo.MemoryConsolidationRespVo;
+import com.ragagent.memory.controller.vo.MemoryDocRespVo;
+import com.ragagent.memory.controller.vo.MemoryExportRespVo;
+import com.ragagent.memory.controller.vo.MemoryItemRespVo;
+import com.ragagent.memory.controller.vo.MemoryListRespVo;
+import com.ragagent.memory.controller.vo.MemoryTopicRespVo;
 import com.ragagent.memory.dto.CreateMemoryItemRequest;
-import com.ragagent.memory.dto.MemoryConsolidationResult;
 import com.ragagent.memory.dto.MemoryDocView;
 import com.ragagent.memory.dto.MemoryExportResponse;
 import com.ragagent.memory.dto.MemoryItemResponse;
-import com.ragagent.memory.dto.MemoryListResponse;
 import com.ragagent.memory.dto.MemoryTopicView;
 import com.ragagent.memory.dto.UpdateMemoryItemRequest;
 import com.ragagent.memory.dto.UpdateMemorySettingsRequest;
@@ -164,7 +169,7 @@ public class MemoryController {
      * {@code items:null} 仍是两种形态，别统一（两条路径的既有差别）。</p>
      */
     @GetMapping("/api/v1/memory/items")
-    public MemoryListResponse<MemoryItemResponse> listItems(
+    public MemoryListRespVo<MemoryItemRespVo> listItems(
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
@@ -179,7 +184,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to list memories");
         }
-        return pageBody(page, paging);
+        return MemoryAssembler.toListVo(page, MemoryAssembler::toItemVo, paging[0], paging[1]);
     }
 
     /**
@@ -198,11 +203,11 @@ public class MemoryController {
 
     /** 创建条目：<b>201</b> + 裸条目。 */
     @PostMapping("/api/v1/memory/items")
-    public ResponseEntity<MemoryItemResponse> createItem(@RequestBody @Valid CreateMemoryItemRequest req) {
-        MemoryItemResponse item;
+    public ResponseEntity<MemoryItemRespVo> createItem(@RequestBody @Valid CreateMemoryItemRequest req) {
+        MemoryItemRespVo item;
         try {
-            item = memoryService.createItemView(
-                    orEmpty(req.kind()), orEmpty(req.content()), orZero(req.importance()));
+            item = MemoryAssembler.toItemVo(memoryService.createItemView(
+                    orEmpty(req.kind()), orEmpty(req.content()), orZero(req.importance())));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to create memory");
         }
@@ -211,11 +216,12 @@ public class MemoryController {
 
     /** 编辑条目：200 + 裸条目。 */
     @PutMapping("/api/v1/memory/items/{id}")
-    public MemoryItemResponse updateItem(
+    public MemoryItemRespVo updateItem(
             @PathVariable("id") String id,
             @RequestBody @Valid UpdateMemoryItemRequest req) {
         try {
-            return memoryService.updateItemView(id, orEmpty(req.content()), orZero(req.importance()));
+            return MemoryAssembler.toItemVo(
+                    memoryService.updateItemView(id, orEmpty(req.content()), orZero(req.importance())));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to update memory");
         }
@@ -234,9 +240,9 @@ public class MemoryController {
 
     /** 接受一条待确认的推断条目：200 + 裸条目。 */
     @PostMapping("/api/v1/memory/items/{id}/confirm")
-    public MemoryItemResponse confirmItem(@PathVariable("id") String id) {
+    public MemoryItemRespVo confirmItem(@PathVariable("id") String id) {
         try {
-            return memoryService.confirmItemView(id);
+            return MemoryAssembler.toItemVo(memoryService.confirmItemView(id));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to confirm memory");
         }
@@ -280,7 +286,7 @@ public class MemoryController {
 
     /** 列出话题计数：{@code {items,page,pageSize,total}}。 */
     @GetMapping("/api/v1/memory/topics")
-    public MemoryListResponse<MemoryTopicView> listTopics(
+    public MemoryListRespVo<MemoryTopicRespVo> listTopics(
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
         int[] paging = listPaging(limit, offset);
@@ -290,7 +296,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to list topics");
         }
-        return pageBody(page, paging);
+        return MemoryAssembler.toListVo(page, MemoryAssembler::toTopicVo, paging[0], paging[1]);
     }
 
     /**
@@ -300,9 +306,9 @@ public class MemoryController {
  * 故按 的单资源形态返 200 + 裸条目（不套 的 201）。</p>
  */
     @PostMapping("/api/v1/memory/topics/{id}/promote")
-    public MemoryItemResponse promoteTopic(@PathVariable("id") String id) {
+    public MemoryItemRespVo promoteTopic(@PathVariable("id") String id) {
         try {
-            return memoryService.promoteTopicView(id);
+            return MemoryAssembler.toItemVo(memoryService.promoteTopicView(id));
         } catch (RuntimeException e) {
             throw fail(e, "Failed to promote topic");
         }
@@ -323,7 +329,7 @@ public class MemoryController {
 
     /** 列出文档亲和度：{@code {items,page,pageSize,total}}。 */
     @GetMapping("/api/v1/memory/documents")
-    public MemoryListResponse<MemoryDocView> listDocuments(
+    public MemoryListRespVo<MemoryDocRespVo> listDocuments(
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "offset", required = false) String offset) {
         int[] paging = listPaging(limit, offset);
@@ -333,7 +339,7 @@ public class MemoryController {
         } catch (RuntimeException e) {
             throw fail(e, "Failed to list documents");
         }
-        return pageBody(page, paging);
+        return MemoryAssembler.toListVo(page, MemoryAssembler::toDocVo, paging[0], paging[1]);
     }
 
     /** 删除一个文档检索信号：<b>204</b>。 */
@@ -376,7 +382,7 @@ public class MemoryController {
      * 能触发，所以实践中恒为 false——但要说出来，而不是让一个残缺的文件看起来完整。</p>
      */
     @GetMapping("/api/v1/memory/export")
-    public ResponseEntity<MemoryExportResponse> export() {
+    public ResponseEntity<MemoryExportRespVo> export() {
         List<MemoryItemResponse> items = null;
         long total = 0;
         while (true) {
@@ -403,8 +409,8 @@ public class MemoryController {
                 break;
             }
         }
-        MemoryExportResponse body =
-                new MemoryExportResponse(items, total, itemCount(items) < total);
+        MemoryExportRespVo body =
+                MemoryAssembler.toExportVo(new MemoryExportResponse(items, total, itemCount(items) < total));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"weknora-memories.json\"")
@@ -423,32 +429,15 @@ public class MemoryController {
 
     /** 立刻整理一次调用者的记忆仓库：200 + 裸结果对象。 */
     @PostMapping("/api/v1/memory/consolidate")
-    public MemoryConsolidationResult consolidate() {
+    public MemoryConsolidationRespVo consolidate() {
         try {
-            return consolidationService.consolidateNow();
+            return MemoryAssembler.toConsolidationVo(consolidationService.consolidateNow());
         } catch (RuntimeException e) {
             throw fail(e, "Failed to consolidate memories");
         }
     }
 
     // ── 工具方法 ──
-
-    /**
- * {@code {items, page, pageSize, total}}——三个列表端点的响应（分页形态）。
- *
- * <p>{@code items} 直接透传 service 的 {@code Page.items()}：
- * 空时是 {@code []} 而不是 {@code null}。</p>
- *
- * <p>{@code page} 由 offset/limit 换算（{@code offset / limit + 1}，整数除法），
- * {@code pageSize} 就是容错后的 limit——请求侧仍只有 limit/offset 两个参数。</p>
- *
- * @param paging {@link #listPaging} 的返回值：{limit, offset}
- */
-    private static <T> MemoryListResponse<T> pageBody(PageResult<T> page, int[] paging) {
-        int limit = paging[0];
-        int offset = paging[1];
-        return new MemoryListResponse<>(page.items(), offset / limit + 1L, limit, page.total());
-    }
 
     /**
      * 容错分页：{@code limit} 非法、≤0 或 &gt;200

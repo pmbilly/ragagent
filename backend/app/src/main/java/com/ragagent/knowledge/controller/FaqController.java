@@ -10,7 +10,10 @@ import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.NonNullBody;
 import com.ragagent.knowledge.assembler.FaqEntryAssembler;
 import com.ragagent.knowledge.assembler.FaqExportAssembler;
+import com.ragagent.knowledge.assembler.FaqImportAssembler;
 import com.ragagent.knowledge.controller.vo.FaqEntryRespVo;
+import com.ragagent.knowledge.controller.vo.FaqImportProgressRespVo;
+import com.ragagent.knowledge.controller.vo.TaskIdRespVo;
 import com.ragagent.knowledge.dto.doc.UpdateLastImportDisplayStatusRequest;
 import com.ragagent.knowledge.dto.faq.AddSimilarQuestionsRequest;
 import com.ragagent.knowledge.dto.faq.FaqBatchUpsertPayload;
@@ -18,9 +21,7 @@ import com.ragagent.knowledge.dto.faq.FaqDeleteRequest;
 import com.ragagent.knowledge.dto.faq.FaqEntryFieldsBatchUpdate;
 import com.ragagent.knowledge.dto.faq.FaqEntryPayload;
 import com.ragagent.knowledge.dto.faq.FaqEntryTagBatchRequest;
-import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.dto.faq.FaqSearchRequest;
-import com.ragagent.knowledge.dto.faq.FaqTaskStartResponse;
 import com.ragagent.knowledge.service.access.ChunkAccessGuard;
 import com.ragagent.knowledge.service.faq.FaqEntryCommandService;
 import com.ragagent.knowledge.service.faq.FaqEntryQueryService;
@@ -139,23 +140,23 @@ public class FaqController {
 
     /** 导入进度轮询面（前端 3 秒轮询依赖 404 语义与 data 内 camelCase 字段形状）。 */
     @GetMapping("/api/v1/faq/import/progress/{taskId}")
-    public ResponseEntity<FaqImportProgress> getImportProgress(
+    public ResponseEntity<FaqImportProgressRespVo> getImportProgress(
             @PathVariable("taskId") String taskId) {
         String task = LogSanitizer.sanitize(taskId);
         requireTaskProgressTenant(task);
-        return ResponseEntity.ok(faqImport.getImportProgress(task));
+        return ResponseEntity.ok(FaqImportAssembler.toVo(faqImport.getImportProgress(task)));
     }
 
     // ── 写 ──
 
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/entries")
-    public ResponseEntity<FaqTaskStartResponse> upsertEntries(
+    public ResponseEntity<TaskIdRespVo> upsertEntries(
             @PathVariable("id") String id,
             @Valid @NonNullBody @RequestBody FaqBatchUpsertPayload req) {
         String kbId = LogSanitizer.sanitize(id);
         requireKbWrite(kbId);
         String taskId = faqImport.upsertEntries(kbId, req);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new FaqTaskStartResponse(taskId));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new TaskIdRespVo(taskId));
     }
 
     @PostMapping("/api/v1/knowledge-bases/{id}/faq/entry")

@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 234 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 141 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 126 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 270 | 1893 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 276 | 1916 | 51 |
 
 ## 17 个业务域（domains）
 
@@ -26,14 +26,14 @@
 | `channel` | `com.ragagent.channel` | 142 | 3 |
 | `config` | `com.ragagent.config` | 26 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
-| `favorite` | `com.ragagent.favorite` | 13 | 1 |
+| `favorite` | `com.ragagent.favorite` | 17 | 1 |
 | `initialization` | `com.ragagent.initialization` | 11 | 1 |
-| `knowledge` | `com.ragagent.knowledge` | 557 | 9 |
+| `knowledge` | `com.ragagent.knowledge` | 559 | 9 |
 | `mcp` | `com.ragagent.mcp` | 176 | 4 |
-| `memory` | `com.ragagent.memory` | 101 | 1 |
+| `memory` | `com.ragagent.memory` | 110 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 215 | 8 |
-| `storage` | `com.ragagent.storage` | 95 | 3 |
+| `storage` | `com.ragagent.storage` | 103 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 63 | 3 |
 
@@ -61,5 +61,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：345 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：351 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

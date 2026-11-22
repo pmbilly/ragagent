@@ -7,9 +7,10 @@ import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.storage.api.StorageConnectivityPort;
-import com.ragagent.storage.dto.StorageEngineDtos;
+import com.ragagent.storage.assembler.StorageEngineAssembler;
+import com.ragagent.storage.controller.vo.StorageCheckRespVo;
+import com.ragagent.storage.controller.vo.StorageEngineStatusRespVo;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,18 +39,12 @@ public class StorageEngineController {
     }
 
     @GetMapping("/engine-status")
-    public ResponseEntity<StorageEngineDtos.StorageEngineStatusResponse> storageEngineStatus() {
-        var status = storageProbe.status(currentTenantId());
-        List<StorageEngineDtos.StorageEngineStatusItem> engines = status.engines().stream()
-                .map(e -> new StorageEngineDtos.StorageEngineStatusItem(
-                        e.provider(), e.allowed(), e.configured(), e.description()))
-                .toList();
-        return ResponseEntity.ok(new StorageEngineDtos.StorageEngineStatusResponse(
-                engines, status.allowedProviders(), status.minioEnvAvailable()));
+    public ResponseEntity<StorageEngineStatusRespVo> storageEngineStatus() {
+        return ResponseEntity.ok(StorageEngineAssembler.toStatusVo(storageProbe.status(currentTenantId())));
     }
 
     @PostMapping("/engine-check")
-    public ResponseEntity<StorageEngineDtos.StorageCheckResponse> storageEngineCheck(
+    public ResponseEntity<StorageCheckRespVo> storageEngineCheck(
             @RequestBody(required = false) String rawBody) {
         JsonNode body = parseBody(rawBody);
         if (body == null) {
@@ -61,8 +56,7 @@ public class StorageEngineController {
         }
         JsonNode cfg = body.get(provider);
         var outcome = storageProbe.check(provider, configMap(cfg), currentTenantId());
-        return ResponseEntity.ok(
-                new StorageEngineDtos.StorageCheckResponse(outcome.ok(), outcome.message(), false));
+        return ResponseEntity.ok(StorageEngineAssembler.toCheckVo(outcome, false));
     }
 
     /** ShouldBindJSON 等价：解析失败（含 EOF）→ null，调用方落各自的 400 文案。 */

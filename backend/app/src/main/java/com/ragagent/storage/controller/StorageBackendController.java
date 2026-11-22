@@ -8,13 +8,15 @@ import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.RequestFields;
+import com.ragagent.storage.assembler.StorageBackendAssembler;
 import com.ragagent.storage.config.StorageAllowList;
+import com.ragagent.storage.controller.vo.StorageBackendListRespVo;
+import com.ragagent.storage.controller.vo.StorageBackendRespVo;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.service.StorageBackendReadService;
 import com.ragagent.storage.service.StorageBackendService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -81,46 +83,45 @@ public class StorageBackendController {
 
     /** 创建后端：201 + 裸资源。 */
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody(required = false) String rawBody) {
+    public ResponseEntity<StorageBackendRespVo> create(@RequestBody(required = false) String rawBody) {
         long tenantId = tenantId();
         StorageBackendRequest req = bind(rawBody);
-        return ResponseEntity.status(HttpStatus.CREATED).body(readService.createResponse(
-                tenantId, req.name(), req.provider(), req.config(), req.status()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(StorageBackendAssembler.toVo(
+                readService.createResponse(
+                        tenantId, req.name(), req.provider(), req.config(), req.status())));
     }
 
     /** 列表 = {items, defaultStorageBackendId}（游标外的附加字段形态）。 */
     @GetMapping
-    public ResponseEntity<?> list() {
+    public ResponseEntity<StorageBackendListRespVo> list() {
         long tenantId = tenantId();
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("items", readService.listResponses(tenantId));
-        body.put("defaultStorageBackendId",
-                tenantId == 0 ? null : service.tenantDefaultBackendId(tenantId));
-        return ResponseEntity.ok(body);
+        return ResponseEntity.ok(new StorageBackendListRespVo(
+                StorageBackendAssembler.toVoList(readService.listResponses(tenantId)),
+                tenantId == 0 ? null : service.tenantDefaultBackendId(tenantId)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable("id") String id) {
+    public ResponseEntity<StorageBackendRespVo> get(@PathVariable("id") String id) {
         long tenantId = tenantId();
-        Object backend = readService.getResponse(tenantId, id);
+        var backend = readService.getResponse(tenantId, id);
         if (backend == null) {
             throw BizException.notFound("storage backend not found");
         }
-        return ResponseEntity.ok(backend);
+        return ResponseEntity.ok(StorageBackendAssembler.toVo(backend));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") String id,
+    public ResponseEntity<StorageBackendRespVo> update(@PathVariable("id") String id,
             @RequestBody(required = false) String rawBody) {
         long tenantId = tenantId();
         // 先绑定请求体再进 service（未知 id + 坏 body → 400，非 404）
         StorageBackendRequest req = bind(rawBody);
-        Object updated = readService.updateResponse(
+        var updated = readService.updateResponse(
                 tenantId, id, req.name(), req.provider(), req.config(), req.status());
         if (updated == null) {
             throw BizException.notFound("storage backend not found");
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(StorageBackendAssembler.toVo(updated));
     }
 
     @DeleteMapping("/{id}")

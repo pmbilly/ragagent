@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-345 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+351 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -114,7 +114,9 @@
 | `:backend` | `com.ragagent.embedding` | 嵌入向量 provider 客户端（库式域，无 HTTP 面）：com.ragagent.embedding.EmbedderFactory 选择器、 EmbeddingHttp/ProviderJson 传输与编码、池化与失败降级。 |
 | `:backend` | `com.ragagent.embedding.provider` | 嵌入 provider 的**具体实现**（各家 HTTP 调用与响应解析）：OpenAI / AzureOpenAI / Gemini / Jina / Nvidia / Ollama / Aliy |
 | `:backend` | `com.ragagent.favorite` | 收藏域：用户对资源的收藏闭环（controller/service/mapper/domain 各一，最小完整域）。 |
+| `:backend` | `com.ragagent.favorite.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.favorite.controller` | 收藏 · HTTP 层：UserFavoriteController。 |
+| `:backend` | `com.ragagent.favorite.controller.vo` | 收藏模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.favorite.domain` | 收藏 · 领域模型：UserResourceFavorite。 |
 | `:backend` | `com.ragagent.favorite.dto` | 收藏 · 传输形状：用户资源收藏的响应视图。 |
 | `:backend` | `com.ragagent.favorite.mapper` | 收藏 · 映射：UserResourceFavoriteMapper。 |
@@ -240,8 +242,10 @@
 | `:backend` | `com.ragagent.memory` | 记忆域：用户长期记忆的抽取、去重与合并、检索与生命周期（租约、墓碑、容量）。 |
 | `:backend` | `com.ragagent.memory.adapter` | 记忆 · 端口实现：MemoryPipelineAdapter。 |
 | `:backend` | `com.ragagent.memory.api` | 记忆 · 对外入口：MemoryAccess（session 等跨域消费方经此读记忆）。 |
+| `:backend` | `com.ragagent.memory.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.memory.config` | 记忆 · 配置值：MemorySettings（记忆开关、阈值与策略）。 |
 | `:backend` | `com.ragagent.memory.controller` | 记忆 · HTTP 层：MemoryController。 |
+| `:backend` | `com.ragagent.memory.controller.vo` | 记忆模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.memory.domain` | 记忆域实体（留存面）：抽取会话/批次/失败/状态（MemoryExtraction*）、 渲染与投影（MemoryRender / MemoryDocView / MemoryTopicView / |
 | `:backend` | `com.ragagent.memory.domain.item` | 记忆条目面（拆自 memory.domain，对齐方案 的 domain.item/）： MemoryItem（可检索的条目）、MemoryItemEmbedding（其向量）、 MemoryTombstone（删除墓碑）。 |
 | `:backend` | `com.ragagent.memory.domain.scope` | 记忆范围面（拆自 memory.domain，对齐方案 的 domain.scope/）： MemoryScope（作用域）、MemorySettings（开关与阈值）、 MemorySubject 与缺失异常。 |
@@ -320,8 +324,10 @@
 | `:backend` | `com.ragagent.storage` | 存储后端域：存储后端配置与凭据（对外 /api/v1/storage-backends）与文件服务 （传输、解析、文件解析器）。 |
 | `:backend` | `com.ragagent.storage.adapter` | 存储 · 端口实现：StorageBackendPortAdapter / ProviderFileStoreAdapter / GlobalFileServiceAdapter / ResourceCatalogAdapter。 |
 | `:backend` | `com.ragagent.storage.api` | storage 域对外契约。 |
+| `:backend` | `com.ragagent.storage.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.storage.config` | 存储 · 配置：LocalStorageEnvProperties / ResourceUrlModeProperties / StorageProviderEnv。 |
 | `:backend` | `com.ragagent.storage.controller` | 存储 · HTTP 层：StorageBackendController / FileProxyController。 |
+| `:backend` | `com.ragagent.storage.controller.vo` | 存储模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.storage.domain` | 存储 · 领域模型：StoredResource / StorageBackend。 |
 | `:backend` | `com.ragagent.storage.dto` | 存储 · 数据传输：StorageBackendResponse / StorageConfig。 |
 | `:backend` | `com.ragagent.storage.fileserve` | 存储 · 文件服务：ProviderFileContentService / BackendScopedFileService / LocalFileContentService…。 |
