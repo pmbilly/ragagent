@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-348 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+346 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -134,8 +134,6 @@
 | `:backend` | `com.ragagent.framework.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
 | `:backend` | `com.ragagent.framework.security` | 平台安全面：加密（AES）、SSRF 守卫/白名单、输入与日志净化、IP 分类、用户名查找。 |
 | `:backend` | `com.ragagent.framework.storage.config` | 存储启动期环境快照与上传上限：framework 侧消费（llm 图片解析兜底、URL 抓取限额）与 app 侧装配共用。 |
-| `:backend` | `com.ragagent.framework.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
-| `:backend` | `com.ragagent.framework.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |
 | `:backend` | `com.ragagent.framework.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
 | `:backend` | `com.ragagent.framework.tenant` | 多租户与访问控制（基础设施）：请求级租户上下文（TenantContext 及其跨线程作用域）、租户角色、租户配置读取面、API Key 作用域。 |
 | `:backend` | `com.ragagent.framework.text` | 平台文本与标记卫生面（原 text + html 两包合并）：契约文本原语、繁简转换、 请求语言解析、HTML→Markdown 转换、实体表与转义、路径/文件名/无效字符清洗、 退化检测与码点序比较。 |
