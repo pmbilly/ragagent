@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.datasource.domain.DataSource;
 import com.ragagent.datasource.domain.DataSourceConfig;
 import com.ragagent.datasource.domain.SyncLog;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.Map;
 

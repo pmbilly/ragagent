@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.NonNullBody;

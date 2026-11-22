@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tracing.langfuse;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

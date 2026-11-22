@@ -2,7 +2,7 @@ package com.ragagent.knowledge.service.chunk;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantScopes;
+import com.ragagent.framework.tenant.TenantScopes;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.knowledge.api.ExtractPrompts;

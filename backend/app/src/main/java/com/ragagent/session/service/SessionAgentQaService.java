@@ -8,7 +8,7 @@ import com.ragagent.agentengine.api.ErrorData;
 import com.ragagent.agentmanagement.service.config.AgentConfigJson;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.LlmChatClient;

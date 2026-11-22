@@ -1,6 +1,6 @@
 package com.ragagent.framework.tracing.langfuse;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager.TraceOptions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

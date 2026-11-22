@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.session.rag.PipelineState;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;

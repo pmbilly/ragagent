@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -3,7 +3,7 @@ package com.ragagent.session.qa;
 import com.ragagent.agentengine.api.AgentToolCallData;
 import com.ragagent.agentengine.api.AgentToolResultData;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;

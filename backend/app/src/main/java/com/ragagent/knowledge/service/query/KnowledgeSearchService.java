@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.query;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.dto.KnowledgeSearchScope;

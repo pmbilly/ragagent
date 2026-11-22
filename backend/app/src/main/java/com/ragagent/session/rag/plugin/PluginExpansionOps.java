@@ -1,7 +1,7 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.knowledge.api.SearchTarget;

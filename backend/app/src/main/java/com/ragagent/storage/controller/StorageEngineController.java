@@ -1,10 +1,10 @@
 package com.ragagent.storage.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.storage.api.StorageConnectivityPort;
 import com.ragagent.storage.dto.StorageEngineDtos;

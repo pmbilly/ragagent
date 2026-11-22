@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.mcp.domain.McpOAuthToken;
 import com.ragagent.mcp.domain.McpPrincipal;
 import com.ragagent.mcp.oauth.error.OAuthReauthorizationRequiredException;

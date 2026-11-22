@@ -7,10 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusException;
 import com.ragagent.framework.event.EventHandler;
+import com.ragagent.framework.event.EventType;
+import com.ragagent.framework.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

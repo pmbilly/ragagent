@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tenant;
 
 
 /**

@@ -11,8 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ragagent.agentengine.api.AgentLookup;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.domain.document.TemporaryDocument;

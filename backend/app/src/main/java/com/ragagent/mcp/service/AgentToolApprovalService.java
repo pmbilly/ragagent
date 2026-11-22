@@ -2,9 +2,9 @@ package com.ragagent.mcp.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;

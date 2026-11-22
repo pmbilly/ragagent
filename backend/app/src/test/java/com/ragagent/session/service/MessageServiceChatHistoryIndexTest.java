@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ragagent.auth.service.TenantService;
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeRowView;
 import com.ragagent.llm.api.ModelRuntime;

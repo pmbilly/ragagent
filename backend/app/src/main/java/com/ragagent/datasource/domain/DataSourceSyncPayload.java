@@ -3,8 +3,8 @@ package com.ragagent.datasource.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TracingContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 
 /**
  * 一次数据源同步任务的载荷。

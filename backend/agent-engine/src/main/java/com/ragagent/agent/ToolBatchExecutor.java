@@ -1,10 +1,10 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.tool.ExecutionPolicy;
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ToolCall;

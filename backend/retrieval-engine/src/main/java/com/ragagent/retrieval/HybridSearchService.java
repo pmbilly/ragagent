@@ -1,9 +1,6 @@
 package com.ragagent.retrieval;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.config.RetrievalDriverProperties;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
@@ -11,6 +8,9 @@ import com.ragagent.framework.error.ErrorCode;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantContext;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.tracing.langfuse.LangfuseManager;
 import com.ragagent.framework.tracing.langfuse.Span;
 import com.ragagent.framework.vocabulary.SearchResult;

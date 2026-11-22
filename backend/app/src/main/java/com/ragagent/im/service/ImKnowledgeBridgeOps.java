@@ -1,6 +1,6 @@
 package com.ragagent.im.service;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.im.domain.ImChannelEntity;
 import com.ragagent.im.runtime.ImCommandSet;
 import com.ragagent.im.runtime.ImFormat;

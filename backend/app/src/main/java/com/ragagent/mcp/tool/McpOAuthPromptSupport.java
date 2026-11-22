@@ -4,7 +4,7 @@ import com.ragagent.agentengine.api.ToolCancellation;
 import com.ragagent.agentengine.api.ToolExecContext;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.jsonbind.ToolJson;
 import com.ragagent.mcp.api.MCPOAuthRequiredData;
 import com.ragagent.mcp.approval.Cancellation;

@@ -1,6 +1,5 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.storage.support.FileResolverFactory;
@@ -14,6 +13,7 @@ import com.ragagent.framework.storage.support.StorageBackendResolver;
 import com.ragagent.framework.storage.support.StreamRewriter;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.ServletSseSink;
 import com.ragagent.llm.api.ResponseType;

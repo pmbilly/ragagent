@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 import java.util.ArrayList;
 import java.util.HashSet;

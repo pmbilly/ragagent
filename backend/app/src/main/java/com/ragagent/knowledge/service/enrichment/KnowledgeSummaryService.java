@@ -2,10 +2,10 @@ package com.ragagent.knowledge.service.enrichment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.AgentPromptPlaceholders;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.ConversationProperties;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;

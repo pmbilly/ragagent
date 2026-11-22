@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.task;
 
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TenantScopes;
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tenant.TenantContext;
+import com.ragagent.framework.tenant.TenantScopes;
 import com.ragagent.framework.tracing.langfuse.LangfuseTaskScope;
 import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

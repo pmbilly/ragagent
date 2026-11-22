@@ -1,6 +1,6 @@
 package com.ragagent.framework.web;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

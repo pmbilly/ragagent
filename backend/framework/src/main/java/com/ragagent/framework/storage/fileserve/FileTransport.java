@@ -1,7 +1,7 @@
 package com.ragagent.framework.storage.fileserve;
 
-import com.ragagent.framework.html.ContentTypeByFilename;
 import com.ragagent.framework.storage.support.SeekableSource;
+import com.ragagent.framework.text.ContentTypeByFilename;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

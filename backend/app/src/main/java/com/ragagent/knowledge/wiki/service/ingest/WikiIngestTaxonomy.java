@@ -2,8 +2,8 @@ package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.html.CodePointOrder;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.text.CodePointOrder;
 import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;

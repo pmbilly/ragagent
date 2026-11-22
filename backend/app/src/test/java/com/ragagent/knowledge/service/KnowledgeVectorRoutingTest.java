@@ -3,7 +3,7 @@ package com.ragagent.knowledge.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.TestSchema;
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;
 import com.ragagent.knowledge.mapper.KnowledgeBaseMapper;

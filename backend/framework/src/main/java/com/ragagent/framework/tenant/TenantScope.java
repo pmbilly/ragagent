@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tenant;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;

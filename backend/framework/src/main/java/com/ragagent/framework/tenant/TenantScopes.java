@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tenant;
 
 /**
  * 租户作用域：把 {@link TenantContext} 从"请求线程专用"扩展为<b>跨线程可显式携带</b>的会话。

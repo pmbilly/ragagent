@@ -7,10 +7,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.config.RetrievalDriverProperties;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.llm.api.EmbeddingPort;
 import com.ragagent.retrieval.api.ChunkFacts;

@@ -1,9 +1,9 @@
 package com.ragagent.session.conversation;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import com.ragagent.modelruntime.stream.StreamManager;

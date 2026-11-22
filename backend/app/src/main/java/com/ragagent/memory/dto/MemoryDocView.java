@@ -1,6 +1,6 @@
 package com.ragagent.memory.dto;
 
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 
 /**

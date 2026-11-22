@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.access;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

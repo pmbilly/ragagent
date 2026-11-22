@@ -1,7 +1,7 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.auth.api.MemoryKeys;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import com.ragagent.memory.api.MessageTranscriptPort;
 import com.ragagent.memory.api.SessionMessageView;
 import com.ragagent.memory.domain.MemoryExtractionSession;

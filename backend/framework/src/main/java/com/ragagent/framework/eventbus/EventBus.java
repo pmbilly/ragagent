@@ -1,11 +1,11 @@
 package com.ragagent.framework.eventbus;
 
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusException;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.event.EventHandler;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

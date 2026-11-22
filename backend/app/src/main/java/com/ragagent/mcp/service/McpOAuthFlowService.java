@@ -1,10 +1,10 @@
 package com.ragagent.mcp.service;
 
 import com.ragagent.agentengine.api.McpApprovalOps;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;

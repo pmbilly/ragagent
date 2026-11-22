@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.service.management;
 
 import com.ragagent.auth.api.TenantStorageQuotaPort;
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.api.KnowledgeIngest;
 import com.ragagent.knowledge.domain.Knowledge;
 import com.ragagent.knowledge.domain.KnowledgeBase;

@@ -1,9 +1,9 @@
 package com.ragagent.session.attachment;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tenant.TenantConfigLookup;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.api.DocReaderParsePort;
 import com.ragagent.knowledge.api.DocumentChunkingPort;
 import com.ragagent.knowledge.api.ImageRefRewriter;

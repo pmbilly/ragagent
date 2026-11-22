@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.client;
 
 import com.google.protobuf.ByteString;
-import com.ragagent.framework.html.ParserFileNameSanitizer;
+import com.ragagent.framework.text.ParserFileNameSanitizer;
 import com.ragagent.knowledge.config.DocReaderProperties;
 import docreader.DocReaderGrpc;
 import docreader.Docreader;

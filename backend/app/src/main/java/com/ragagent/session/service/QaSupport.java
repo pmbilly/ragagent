@@ -2,9 +2,9 @@ package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.AgentLookup;
 import com.ragagent.agentengine.api.SteerSink;
-import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.event.EventBusInterface;
 import com.ragagent.framework.storage.support.StreamRewriter;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
 import com.ragagent.framework.vocabulary.MentionedItem;
 import com.ragagent.framework.vocabulary.MessageAttachment;
 import com.ragagent.framework.vocabulary.SuggestionAttribution;

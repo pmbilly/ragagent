@@ -34,6 +34,7 @@
     "framework/tracing/langfuse/LangfuseHttpInterceptor.java": "framework/tracing/langfuse",
     "framework/tracing/langfuse/LangfuseTaskScope.java": "framework/tracing/langfuse",
     "framework/tracing/langfuse/LangfuseTokenUsage.java": "framework/tracing/langfuse",
+    "framework/tracing/langfuse/TracingContext.java": "framework/tracing/langfuse",
     "im/channel/dingtalk/DingtalkCallbackParser.java": "im/",
     "im/channel/dingtalk/DingtalkStreamClient.java": "im/",
     "im/channel/feishu/FeishuCallbackOps.java": "im/",

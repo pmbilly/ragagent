@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * HTML → Markdown 转换失败。

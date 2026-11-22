@@ -1,4 +1,4 @@
-package com.ragagent.framework.eventbus;
+package com.ragagent.framework.event;
 
 /**
  * 事件类型常量。
@@ -9,7 +9,7 @@ package com.ragagent.framework.eventbus;
  * （toolCall / toolResult / reflection / references / error / toolApprovalRequired / ...）
  * 由接线层 {@code AgentStreamBridge} 负责两边映射，不要假设取值逐字相同。</p>
  *
- * <p>事件类型同时是 {@link EventBus} 的订阅键
+ * <p>事件类型同时是 {@code EventBus}（eventbus 实现包） 的订阅键
  * 与 {@code Event#getType()} 的取值。不要在别处散写字面量——这里是唯一权威。</p>
  */
 public final class EventType {

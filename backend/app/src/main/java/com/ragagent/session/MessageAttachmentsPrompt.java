@@ -1,6 +1,6 @@
 package com.ragagent.session;
 
-import com.ragagent.framework.html.HtmlText;
+import com.ragagent.framework.text.HtmlText;
 import java.util.List;
 
 /**

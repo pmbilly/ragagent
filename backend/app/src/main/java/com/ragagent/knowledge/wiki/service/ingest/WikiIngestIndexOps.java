@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.html.CodePointOrder;
+import com.ragagent.framework.text.CodePointOrder;
 import com.ragagent.framework.text.Whitespace;
 import com.ragagent.knowledge.wiki.WikiConstants;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;

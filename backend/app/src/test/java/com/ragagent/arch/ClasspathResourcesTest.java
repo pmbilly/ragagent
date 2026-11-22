@@ -64,12 +64,12 @@ class ClasspathResourcesTest {
                 "fallback", "generate_summary", "generate_session_title", "rewrite",
                 "graph_extraction", "generate_questions", "keywords_extraction", "intent_prompts")) {
             RESOURCES.put("prompts/" + f + ".yaml",
-                    "common.prompt.PromptSource（11 份模板清单）");
+                    "agentengine.api.PromptSource（11 份模板清单）");
         }
         RESOURCES.put("agent/management/builtin_agents.yaml", "BuiltinAgentRegistry#load");
         RESOURCES.put("agent/management/agent_type_presets.yaml", "AgentTypePresets 构造器");
         // ── 其余按域 ──
-        RESOURCES.put("initialization/extract_config.yaml", "platform.prompt.ExtractPrompts");
+        RESOURCES.put("initialization/extract_config.yaml", "knowledge.api.ExtractPrompts");
         RESOURCES.put("initialization/asr_test.wav", "initialization.AsrTestAudio（fail-fast，仍纳入）");
         RESOURCES.put("dataset/samples.json", "evaluation.DatasetService");
         RESOURCES.put("jieba/hmm_model.json", "retrieval…JiebaTokenizer");

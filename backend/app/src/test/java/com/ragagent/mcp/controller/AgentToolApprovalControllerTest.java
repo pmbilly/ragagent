@@ -10,8 +10,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.mcp.approval.Decision;
 import com.ragagent.mcp.approval.ToolApprovalException;
 import com.ragagent.mcp.approval.ToolApprovalGate;

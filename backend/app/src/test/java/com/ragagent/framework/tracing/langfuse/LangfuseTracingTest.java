@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.memory.runtime.MemoryTrace;
 import java.util.List;
 import java.util.Map;

@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.domain.access;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.api.faq.FaqChunkMetadata;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.KnowledgeBase;

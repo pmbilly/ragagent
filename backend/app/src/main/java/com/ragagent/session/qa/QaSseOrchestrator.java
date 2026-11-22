@@ -3,12 +3,12 @@ package com.ragagent.session.qa;
 
 import com.ragagent.agentengine.api.AgentToolCallData;
 import com.ragagent.agentengine.api.AgentToolResultData;
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.event.EventBusFactory;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.storage.support.StreamRewriter;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.framework.vocabulary.AgentToolCall;
 import com.ragagent.framework.vocabulary.SseSink;

@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * POSIX 斜杠语义的路径清洗（纯字符串实现）。

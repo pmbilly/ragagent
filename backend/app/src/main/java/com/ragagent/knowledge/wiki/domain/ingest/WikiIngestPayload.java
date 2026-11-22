@@ -2,7 +2,7 @@ package com.ragagent.knowledge.wiki.domain.ingest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 
 /**
  * wiki ingest 批次触发任务的载荷。

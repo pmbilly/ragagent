@@ -95,7 +95,7 @@ MISPLACED_TEST_ALLOW: dict[str, str] = {
         "同上：wire A/B 使用 domains 的 Model/ModelRowViews",
     "backend/app/src/test/java/com/ragagent/llm/provider/ProviderRegistryTest.java":
         "provider 目录测试使用 domains 的 Model/ModelRowViews；迁 model-runtime 会形成反向边",
-    "backend/app/src/test/java/com/ragagent/framework/access/TracingCarrierNestingTest.java":
+    "backend/app/src/test/java/com/ragagent/framework/tracing/langfuse/TracingCarrierNestingTest.java":
         "用 domains 的任务载荷验证平台 tracing carrier；迁 platform 会形成反向边",
     "backend/app/src/test/java/com/ragagent/framework/web/JsonFaceVocabularyTest.java":
         "用 domains 的 DTO/配置验证平台 JSON 口径；迁 platform 会形成反向边",

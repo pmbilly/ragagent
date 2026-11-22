@@ -3,8 +3,8 @@ package com.ragagent.session.qa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantContext;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.session.attachment.TemporaryDocumentService;
 import com.ragagent.session.conversation.MessageService;

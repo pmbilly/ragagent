@@ -1,9 +1,9 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.SseSink;
 import com.ragagent.session.dto.QaRequests.CreateKnowledgeQARequest;
 import com.ragagent.session.service.AgentResolver;

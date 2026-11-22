@@ -2,7 +2,7 @@ package com.ragagent.session.rag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;

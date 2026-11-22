@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * <b>接缝（seam）</b>：HTML → Markdown。

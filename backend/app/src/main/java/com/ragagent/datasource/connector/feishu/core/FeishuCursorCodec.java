@@ -1,7 +1,7 @@
 package com.ragagent.datasource.connector.feishu.core;
 
 import com.ragagent.datasource.domain.SyncCursor;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

@@ -10,7 +10,7 @@ import com.ragagent.agentengine.api.ErrorData;
 import com.ragagent.agentengine.api.UserMessageInjectedData;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.vocabulary.AgentStep;
 import com.ragagent.framework.vocabulary.SearchResult;

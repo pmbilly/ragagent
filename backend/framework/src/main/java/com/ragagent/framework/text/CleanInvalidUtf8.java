@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * 丢弃字符串中的 NUL 字符（\x00）与无效编码单元（孤立代理项）。

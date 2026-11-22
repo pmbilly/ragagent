@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.service.image;
 
-import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.text.ContentTypeByFilename;
 import com.ragagent.knowledge.api.ImageRefRewriter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.Knowledge;

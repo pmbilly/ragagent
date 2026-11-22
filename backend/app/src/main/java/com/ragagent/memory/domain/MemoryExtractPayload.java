@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TracingContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 import com.ragagent.memory.domain.scope.MemoryScope;
 
 /**

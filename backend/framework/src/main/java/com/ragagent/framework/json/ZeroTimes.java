@@ -7,7 +7,7 @@ import java.time.ZoneOffset;
 /**
  * 零值时间哨兵（{@code "0001-01-01T00:00:00Z"}）——落 jsonb / 作响应体的时间字段共用语义的单一实现。
  *
- * <p>原在 {@code platform.web.ZeroTimeSerializer}（该序列化器保留既有常量名并委托此处）；
+ * <p>序列化器 {@code ZeroTimeSerializer} 已与本常量同包（原在 web 包）；
  * 契约载荷的默认值与判据（如 {@code AgentStep#timestamp}、{@code MemoryMessageCursor#at}）引用本类。</p>
  */
 public final class ZeroTimes {

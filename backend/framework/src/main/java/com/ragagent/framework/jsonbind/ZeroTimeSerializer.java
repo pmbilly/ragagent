@@ -1,4 +1,4 @@
-package com.ragagent.framework.web;
+package com.ragagent.framework.jsonbind;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -81,7 +82,7 @@ public class ZeroTimeSerializer extends JsonSerializer<OffsetDateTime> {
     public static final class Utc extends ZeroTimeSerializer {
         @Override
         protected ZoneId targetZone() {
-            return java.time.ZoneOffset.UTC;
+            return ZoneOffset.UTC;
         }
     }
 }

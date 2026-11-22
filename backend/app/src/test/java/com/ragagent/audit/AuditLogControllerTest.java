@@ -16,7 +16,7 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.KnowledgeBaseFacts;
 import com.ragagent.framework.vocabulary.KnowledgeBaseGateway;
 import com.ragagent.framework.web.error.GlobalExceptionHandler;

@@ -1,6 +1,6 @@
 package com.ragagent.mcp.oauth;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.mcp.domain.McpAuthConfig;
 import com.ragagent.mcp.domain.McpOAuthClient;
 import com.ragagent.mcp.domain.McpOAuthToken;

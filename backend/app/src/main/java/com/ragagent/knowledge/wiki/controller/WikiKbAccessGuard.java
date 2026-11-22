@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.wiki.controller;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;

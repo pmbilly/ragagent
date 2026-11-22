@@ -4,7 +4,7 @@ package com.ragagent.session.rag.plugin;
 
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.eventbus.EventType;
+import com.ragagent.framework.event.EventType;
 import com.ragagent.memory.api.MemoryItemView;
 import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.retrieval.api.RetrievalObsRows;

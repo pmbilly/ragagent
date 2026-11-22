@@ -11,7 +11,7 @@ import com.ragagent.datasource.domain.DataSourceException;
 import com.ragagent.datasource.domain.SyncCursor;
 import com.ragagent.datasource.domain.SyncResult;
 import com.ragagent.datasource.repository.DataSourceRepository;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;

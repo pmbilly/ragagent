@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TenantScopes;
+import com.ragagent.framework.tenant.TenantContext;
+import com.ragagent.framework.tenant.TenantScopes;
 import com.ragagent.framework.text.RequestLanguages;
 import java.util.ArrayList;
 import java.util.List;

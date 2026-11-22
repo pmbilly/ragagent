@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tenant;
 
 /**
  * 请求级认证会话信息：由 Filter 链填充，service 层经 current*() 读取。

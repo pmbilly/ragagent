@@ -3,10 +3,10 @@ package com.ragagent.framework.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.ragagent.framework.html.HtmlConversionException;
-import com.ragagent.framework.html.HtmlEntities;
-import com.ragagent.framework.html.HtmlToMarkdown;
-import com.ragagent.framework.html.JdkHtmlToMarkdown;
+import com.ragagent.framework.text.HtmlConversionException;
+import com.ragagent.framework.text.HtmlEntities;
+import com.ragagent.framework.text.HtmlToMarkdown;
+import com.ragagent.framework.text.JdkHtmlToMarkdown;
 import com.ragagent.framework.text.Whitespace;
 import org.junit.jupiter.api.Test;
 

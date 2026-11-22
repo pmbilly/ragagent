@@ -2,10 +2,10 @@ package com.ragagent.knowledge.index;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;
 import com.ragagent.knowledge.config.BatchEmbedProperties;

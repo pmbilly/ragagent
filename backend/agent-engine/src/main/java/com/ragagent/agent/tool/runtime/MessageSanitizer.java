@@ -1,6 +1,6 @@
 package com.ragagent.agent.tool.runtime;
 
-import com.ragagent.framework.html.HtmlText;
+import com.ragagent.framework.text.HtmlText;
 import com.ragagent.llm.api.ChatMessage;
 import java.util.ArrayList;
 import java.util.List;

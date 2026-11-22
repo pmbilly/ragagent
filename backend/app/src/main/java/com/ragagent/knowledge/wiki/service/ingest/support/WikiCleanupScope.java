@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest.support;
 
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import java.util.concurrent.Callable;
 
 /**

@@ -6,7 +6,7 @@ import com.ragagent.auth.service.OidcService;
 import com.ragagent.auth.service.OidcStateCodec;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.html.UnicodeText;
+import com.ragagent.framework.text.UnicodeText;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

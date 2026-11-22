@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.memory.runtime.MemoryTrace;
 import com.sun.net.httpserver.HttpServer;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;

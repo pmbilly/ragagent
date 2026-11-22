@@ -1,7 +1,6 @@
 package com.ragagent.framework.tracing.langfuse;
 
-import com.ragagent.framework.access.TenantContext;
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tenant.TenantContext;
 
 /**
  * 观测上下文的注入/续接门面。

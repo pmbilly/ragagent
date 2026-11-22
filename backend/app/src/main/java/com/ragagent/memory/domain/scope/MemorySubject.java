@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import com.ragagent.memory.domain.MemoryExtractionState;
 import com.ragagent.memory.domain.MemoryExtractionStateTypeHandler;
 import com.ragagent.memory.domain.MemoryStringListTypeHandler;

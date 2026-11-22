@@ -1,8 +1,8 @@
 package com.ragagent.retrieval;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.retrieval.api.ChunkFacts;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;

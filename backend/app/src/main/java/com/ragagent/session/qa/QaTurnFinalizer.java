@@ -1,7 +1,7 @@
 package com.ragagent.session.qa;
 
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.memory.api.MemoryAccess;
 import com.ragagent.session.attachment.TemporaryDocumentService;

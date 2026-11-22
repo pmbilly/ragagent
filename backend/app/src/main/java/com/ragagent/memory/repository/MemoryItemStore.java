@@ -1,8 +1,8 @@
 package com.ragagent.memory.repository;
 
 import com.ragagent.auth.api.MemoryKinds;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import com.ragagent.framework.pagination.PageResult;
-import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.domain.item.MemoryItem;
 import com.ragagent.memory.domain.item.MemoryTombstone;
 import com.ragagent.memory.domain.scope.MemoryScope;

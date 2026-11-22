@@ -1,7 +1,7 @@
 package com.ragagent.websearch.fetch;
 
-import com.ragagent.framework.html.HtmlToMarkdown;
-import com.ragagent.framework.html.JdkHtmlToMarkdown;
+import com.ragagent.framework.text.HtmlToMarkdown;
+import com.ragagent.framework.text.JdkHtmlToMarkdown;
 import com.ragagent.websearch.api.FetchException;
 import java.net.URI;
 import java.util.ArrayList;

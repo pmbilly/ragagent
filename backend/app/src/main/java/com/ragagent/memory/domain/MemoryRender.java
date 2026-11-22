@@ -2,7 +2,7 @@ package com.ragagent.memory.domain;
 
 import com.ragagent.auth.api.MemoryKeys;
 import com.ragagent.auth.api.MemoryKinds;
-import com.ragagent.framework.html.HtmlText;
+import com.ragagent.framework.text.HtmlText;
 import com.ragagent.memory.domain.item.MemoryItem;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

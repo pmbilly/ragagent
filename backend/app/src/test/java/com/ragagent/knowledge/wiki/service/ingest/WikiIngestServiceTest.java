@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;

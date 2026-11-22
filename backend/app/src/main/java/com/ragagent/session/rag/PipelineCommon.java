@@ -2,9 +2,9 @@ package com.ragagent.session.rag;
 
 import com.ragagent.agentengine.api.AgentPromptPlaceholders;
 import com.ragagent.agentengine.api.PromptComposer;
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.error.PipelinePortException;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

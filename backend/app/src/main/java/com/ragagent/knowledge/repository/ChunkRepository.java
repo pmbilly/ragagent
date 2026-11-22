@@ -2,11 +2,11 @@ package com.ragagent.knowledge.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.ragagent.framework.html.CleanInvalidUtf8;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.framework.persistence.PageRequests;
 import com.ragagent.framework.persistence.TxTemplate;
+import com.ragagent.framework.text.CleanInvalidUtf8;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.ChunkRevision;

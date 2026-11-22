@@ -9,7 +9,7 @@ import com.ragagent.agenttools.wiki.PageView;
 import com.ragagent.agenttools.wiki.RepairResult;
 import com.ragagent.agenttools.wiki.WikiPages;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.web.ZeroTimeSerializer;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import com.ragagent.knowledge.wiki.api.WikiIndex;
 import com.ragagent.knowledge.wiki.api.WikiIndexEntry;
 import com.ragagent.knowledge.wiki.api.WikiLinkRepairResult;

@@ -1,4 +1,4 @@
-package com.ragagent.framework.access;
+package com.ragagent.framework.tenant;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

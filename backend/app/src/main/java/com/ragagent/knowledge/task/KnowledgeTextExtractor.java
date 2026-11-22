@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.html.ContentTypeByFilename;
+import com.ragagent.framework.text.ContentTypeByFilename;
 import com.ragagent.knowledge.api.ImageRefRewriter;
 import com.ragagent.knowledge.api.ParserEngineRules;
 import com.ragagent.knowledge.client.DocReaderClient;

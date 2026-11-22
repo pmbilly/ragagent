@@ -40,7 +40,7 @@ PAYLOAD_DIRS = [
     _sr.find_pkg_path("session/api"),
     _sr.find_pkg_path("mcp/api"),
 ]
-EVENT_TYPE = _sr.find_pkg_path("framework/eventbus/EventType.java")
+EVENT_TYPE = _sr.find_pkg_path("framework/event/EventType.java")
 RESPONSE_TYPE = _sr.find_pkg_path("llm/api/ResponseType.java")
 
 # 查询参数白名单（键 → 判定依据）。OIDC/OAuth2 标准参数，由外部协议决定，不得改名。

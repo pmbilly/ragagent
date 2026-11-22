@@ -1,9 +1,9 @@
 package com.ragagent.memory.service;
 
 import com.ragagent.auth.api.MemoryConfig;
+import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.tenant.TenantConfigLookup;
-import com.ragagent.framework.web.ZeroTimeSerializer;
 import com.ragagent.memory.api.MemoryRecall;
 import com.ragagent.memory.api.MemoryRetrievalContext;
 import com.ragagent.memory.config.MemorySettings;

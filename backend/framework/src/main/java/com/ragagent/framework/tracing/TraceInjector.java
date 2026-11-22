@@ -1,7 +1,7 @@
 package com.ragagent.framework.tracing;
 
-import com.ragagent.framework.access.TracingContext;
 import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 
 /**
  * 观测载体注入的技术门面：把当前 trace 上下文带进任务载荷。

@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.html.CodePointOrder;
+import com.ragagent.framework.text.CodePointOrder;
 import com.ragagent.framework.text.RequestLanguages;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;

@@ -1,8 +1,8 @@
 package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.framework.vocabulary.SearchResult;

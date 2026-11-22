@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * 五字符 HTML 转义（{@code & ' < > "} → {@code &amp; &#39; &lt; &gt; &#34;}）的单一实现。

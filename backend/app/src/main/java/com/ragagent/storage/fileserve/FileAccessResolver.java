@@ -1,11 +1,11 @@
 package com.ragagent.storage.fileserve;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.storage.fileserve.MessageFactsLookup;
 import com.ragagent.framework.storage.fileserve.MessageFileFacts;
 import com.ragagent.framework.storage.fileserve.StoragePaths;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.storage.domain.StoredResource;
 import com.ragagent.storage.service.ResourceCatalogService;
 import java.util.List;

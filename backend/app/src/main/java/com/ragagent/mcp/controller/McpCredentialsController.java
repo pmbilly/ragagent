@@ -1,8 +1,8 @@
 package com.ragagent.mcp.controller;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.mcp.dto.McpCredentialsResponse;

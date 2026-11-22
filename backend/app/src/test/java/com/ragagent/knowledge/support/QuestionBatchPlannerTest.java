@@ -2,7 +2,7 @@ package com.ragagent.knowledge.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.access.TracingContext;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.domain.QuestionBatchPayload;
 import com.ragagent.retrieval.api.ChunkTypes;

@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.access.TracingContext;
 import com.ragagent.framework.jsonbind.JsonMappers;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package com.ragagent.session.conversation;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
@@ -14,6 +13,7 @@ import com.ragagent.framework.storage.support.Rewriter;
 import com.ragagent.framework.storage.support.StorageBackendResolver;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.support.MessageReferenceRewriter;
 import com.ragagent.session.support.SessionNotFoundException;

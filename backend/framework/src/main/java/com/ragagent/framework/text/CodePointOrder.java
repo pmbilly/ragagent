@@ -1,4 +1,4 @@
-package com.ragagent.framework.html;
+package com.ragagent.framework.text;
 
 /**
  * 码点序比较（对合法 UTF-8 字符串等价于 UTF-8 字节序）。

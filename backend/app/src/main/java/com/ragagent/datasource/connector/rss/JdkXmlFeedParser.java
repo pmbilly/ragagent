@@ -1,7 +1,7 @@
 package com.ragagent.datasource.connector.rss;
 
-import com.ragagent.framework.html.HtmlEntities;
-import com.ragagent.framework.html.UnicodeText;
+import com.ragagent.framework.text.HtmlEntities;
+import com.ragagent.framework.text.UnicodeText;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;

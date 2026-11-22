@@ -1,6 +1,5 @@
 package com.ragagent.knowledge.controller;
 
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.storage.support.PublicModeForbiddenException;
@@ -8,6 +7,7 @@ import com.ragagent.framework.storage.support.ResourceModeException;
 import com.ragagent.framework.storage.support.ResourceUrlMode;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.web.ApiResponse;

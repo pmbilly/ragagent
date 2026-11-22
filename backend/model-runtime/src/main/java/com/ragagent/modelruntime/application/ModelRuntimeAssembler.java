@@ -1,10 +1,10 @@
 package com.ragagent.modelruntime.application;
 
 import com.ragagent.embedding.EmbedderFactory;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.CryptoService;
 import com.ragagent.framework.security.SsrfGuard;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.llm.api.ChatConfig;
 import com.ragagent.llm.api.Embedder;
 import com.ragagent.llm.api.LlmChatClient;

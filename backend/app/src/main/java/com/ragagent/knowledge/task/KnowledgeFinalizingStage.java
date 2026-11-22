@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ragagent.framework.access.TracingContext;
 import com.ragagent.framework.tracing.langfuse.LangfuseTracing;
+import com.ragagent.framework.tracing.langfuse.TracingContext;
 import com.ragagent.knowledge.api.WikiEnqueueResult;
 import com.ragagent.knowledge.api.WikiIngestPort;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;

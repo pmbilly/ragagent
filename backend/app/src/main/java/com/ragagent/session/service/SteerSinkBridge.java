@@ -1,8 +1,8 @@
 package com.ragagent.session.service;
 
 import com.ragagent.agentengine.api.SteerSink;
-import com.ragagent.framework.access.TenantContextSnapshot;
-import com.ragagent.framework.access.TenantScope;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.vocabulary.MentionedItem;
 import com.ragagent.modelruntime.stream.StreamBatch;
 import com.ragagent.modelruntime.stream.StreamEvent;

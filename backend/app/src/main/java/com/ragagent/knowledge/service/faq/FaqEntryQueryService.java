@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.service.faq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.security.LogSanitizer;
+import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.faq.FaqChunkMetadata;
 import com.ragagent.knowledge.api.faq.FaqChunkMetadataCodec;

@@ -1,7 +1,7 @@
 package com.ragagent.datasource.connector.rss;
 
-import com.ragagent.framework.html.UnicodeText;
 import com.ragagent.framework.security.Hashes;
+import com.ragagent.framework.text.UnicodeText;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

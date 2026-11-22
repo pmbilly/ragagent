@@ -27,11 +27,12 @@ class VocabularyManifestTest {
                     "SearchResult", "SseSink", "SuggestionAttribution", "ToolCallTarget",
                     "ToolResult", "UsedMemory");
 
-    /** tenant 白名单：租户配置载荷与 API Key 模型（RbacInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
+    /** tenant 白名单：请求级租户上下文（原 access 包并入）+ 租户配置载荷与 API Key 模型（RbacInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
     private static final List<String> TENANT_ALLOW =
             List.of("APIKeyCapability", "APIKeyScopeContext", "APIKeyScopeType",
                     "APIPrincipalConfig", "StorageEngineConfig", "TenantAPIKeyScope",
-                    "TenantConfigLookup", "TenantRole");
+                    "TenantConfigLookup", "TenantRole",
+                    "TenantContext", "TenantContextSnapshot", "TenantScope", "TenantScopes");
 
     private static List<String> mainClasses(String pkg) {
         Path dir = Path.of("src/main/java/com/ragagent/framework/" + pkg);

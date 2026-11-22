@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -109,13 +109,11 @@
 | `:backend` | `com.ragagent.favorite.repository` | 收藏仓储门面：四键复合主键的查询、插入与删除。 |
 | `:backend` | `com.ragagent.favorite.service` | 收藏 · 服务：UserResourceFavoriteService。 |
 | `:backend` | `com.ragagent.framework` | 平台面（platform，阶段 6 起逐步收纳）：框架适配、可靠执行与通用技术能力。 |
-| `:backend` | `com.ragagent.framework.access` | 平台访问上下文面（方案 的 platform.access/）：请求级会话与追踪载体。 |
 | `:backend` | `com.ragagent.framework.concurrent` | 平台并发原语：进程内 in-flight 去重（SingleFlight）等与业务无关的并发工具。 |
 | `:backend` | `com.ragagent.framework.config` | 平台配置面：部署属性与环境查找面。 |
 | `:backend` | `com.ragagent.framework.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:backend` | `com.ragagent.framework.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
 | `:backend` | `com.ragagent.framework.eventbus` | 平台事件总线面（platform.event/）： Event / EventBus / EventJson 等 9 类——进程内事件总线与载荷编解码。 |
-| `:backend` | `com.ragagent.framework.html` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.framework.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:backend` | `com.ragagent.framework.jsonbind` | JSON 绑定：Jackson 的 mapper 工厂、契约 mixin 注册表与各模块贡献的模块 SPI。 |
@@ -127,8 +125,8 @@
 | `:backend` | `com.ragagent.framework.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
 | `:backend` | `com.ragagent.framework.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |
 | `:backend` | `com.ragagent.framework.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
-| `:backend` | `com.ragagent.framework.tenant` | 多租户与访问控制（基础设施）：租户角色、租户配置读取面、API Key 作用域。 |
-| `:backend` | `com.ragagent.framework.text` | 契约文本工具面：契约载荷共用的纯 JDK 文本原语 （TextConv / CodePoints / Tokens / 空白与语言判定）。 |
+| `:backend` | `com.ragagent.framework.tenant` | 多租户与访问控制（基础设施）：请求级租户上下文（TenantContext 及其跨线程作用域）、租户角色、租户配置读取面、API Key 作用域。 |
+| `:backend` | `com.ragagent.framework.text` | 平台文本与标记卫生面（原 text + html 两包合并）：契约文本原语、繁简转换、 请求语言解析、HTML→Markdown 转换、实体表与转义、路径/文件名/无效字符清洗、 退化检测与码点序比较。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
 | `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用、且无法落到任何单个域/引擎 api 的形状（纯 JDK）。 |
