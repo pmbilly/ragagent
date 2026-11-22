@@ -2,6 +2,8 @@ package com.ragagent.session.controller;
 
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
+import com.ragagent.framework.tenant.TenantContextSnapshot;
+import com.ragagent.framework.tenant.TenantScope;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.EmitterSseSink;
 import com.ragagent.framework.web.SseEndpoints;
@@ -91,15 +93,23 @@ public class KnowledgeQaController {
         SseEmitter emitter = SseEndpoints.newStream();
         EmitterSseSink sink = new EmitterSseSink(emitter, response);
         QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareKnowledgeQA(rawSessionId, rawBody, resourceUrls);
-        Thread.ofVirtual().name("qa-knowledge-sse").start(() -> {
+        // 身份快照在请求线程捕获（AuthFilter 已 set）——虚线程没有 ThreadLocal；
+        // 执行期租户读取（chat-history 索引/工具租户/webSearch 配额）依赖完整身份。
+        TenantContextSnapshot identity =
+                TenantContextSnapshot.capture();
+        Thread.ofVirtual().name("qa-knowledge-sse").start(() ->
+                TenantScope.run(identity, () -> {
             try {
                 qaEntryRunner.runPrepared(prepared, sink);
                 sink.complete();
             } catch (IOException e) {
                 // 客户端已走：写失败按流收束处理，不触发错误派发
                 sink.complete();
+            } catch (RuntimeException e) {
+                // 409 重复提交/500/503：completeError 经异步错误派发落 JSON 信封
+                sink.completeError(e);
             }
-        });
+        }));
         return emitter;
     }
 
@@ -111,14 +121,20 @@ public class KnowledgeQaController {
         SseEmitter emitter = SseEndpoints.newStream();
         EmitterSseSink sink = new EmitterSseSink(emitter, response);
         QaEntryRunner.PreparedQa prepared = qaEntryRunner.prepareAgentQA(rawSessionId, rawBody, resourceUrls);
-        Thread.ofVirtual().name("qa-agent-sse").start(() -> {
+        TenantContextSnapshot identity =
+                TenantContextSnapshot.capture();
+        Thread.ofVirtual().name("qa-agent-sse").start(() ->
+                TenantScope.run(identity, () -> {
             try {
                 qaEntryRunner.runPrepared(prepared, sink);
                 sink.complete();
             } catch (IOException e) {
                 sink.complete();
+            } catch (RuntimeException e) {
+                // AGENT 模式重复提交 409 等：异步错误派发落 JSON 信封
+                sink.completeError(e);
             }
-        });
+        }));
         return emitter;
     }
 

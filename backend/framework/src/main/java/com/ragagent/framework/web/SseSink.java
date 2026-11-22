@@ -6,7 +6,7 @@ import java.io.IOException;
  * SSE 帧出口（会话流的写面抽象，载荷级）。
  *
  * <p>实现负责把 {@code (eventName, json)} 组成规范帧写出：servlet 直写（过渡实现，见
- * {@code framework.web.ServletSseSink}）与 {@code SseEmitter}（{@code session.controller.sse.EmitterSseSink}）
+ * {@code framework.web.ServletSseSink}）与 {@code SseEmitter}（{@code EmitterSseSink}）
  * 两种出口产出的帧字节一致（实测钉于 {@code EmitterFrameBytesTest}）。响应头由控制器在首帧前设置，
  * 不属本接口。</p>
  */

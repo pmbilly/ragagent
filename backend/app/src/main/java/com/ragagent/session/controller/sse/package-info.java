@@ -1,10 +1,6 @@
 /**
- * 会话 · SSE 传输面：{@code SseContract}（头部契约）与 {@code JsonSseFrameSink}
- * （Servlet 直写 + 帧组装）。
- *
- * <p>传输无关的事件→响应组装在 {@code session.service.sse}
- * （{@code StreamEventEmitter} / {@code StreamResponseBuilder} / {@code SseFrameSink}）；
- * 本包只保留与 Servlet 强绑定的两端，供控制器使用。编排层依赖
- * {@code SseFrameSink} 端口，不反向依赖本包。</p>
+ * SSE 控制器辅助（探针 {@code EmitterFrameBytesTest} 所在包）：帧出口实现与契约
+ * 已迁 {@code framework.web}（SseSink/EmitterSseSink/SseEndpoints/SseContract）、
+ * 帧序列化在 {@code session.service.sse.JsonSseFrameSink}。
  */
 package com.ragagent.session.controller.sse;

@@ -20,7 +20,7 @@ sequenceDiagram
   participant X as 检索/模型/Agent
   participant B as AgentStreamBridge
   participant SM as StreamManager
-  participant W as SseFrameWriter
+  participant W as 帧写出实现（SseEmitter 化后的 `SseSink`）
 
   C->>K: POST /api/v1/knowledge-chat/{sessionId}
   K->>R: runKnowledgeQA(sessionId, rawBody, resourceUrls, sink)
@@ -84,7 +84,7 @@ domains/.../session/assembly/QaWiring.java
 
 ### 2. 生成侧与输出侧不是同一个线程
 
-`AgentStreamBridge` 订阅 16 种事件，按到达序把事件 append 进 `StreamManager`；HTTP 线程通过 `SessionStreamController` / `SseFrameWriter` **每 100ms 轮询** `getEvents(fromOffset)` 写 SSE。
+`AgentStreamBridge` 订阅 16 种事件，按到达序把事件 append 进 `StreamManager`；HTTP 线程通过 `SessionStreamController` / `帧写出实现（SseEmitter 化后的 `SseSink`）` **每 100ms 轮询** `getEvents(fromOffset)` 写 SSE。
 
 后果：**代码顺序、日志顺序、帧顺序三者不重合**。排障时以 `messageId + event id` 为准，不要用日志时间戳推断帧顺序。
 
@@ -119,7 +119,7 @@ domains/.../session/assembly/QaWiring.java
 | 请求 404 / 401 | 路由与鉴权；`session-read-miss` / `session-read-forbidden` |
 | 有回答但没有引用 | 起服 `retrieval=`、`engines=`；`chunk_search` 阶段日志 |
 | 回答卡住不结束 | `AgentStreamBridge` 是否收到 `complete`；`StreamManager` 是否还有事件 |
-| 中途断流 | `SseFrameWriter.write` 的 `IOException`（客户端断开检测靠写失败） |
+| 中途断流 | `帧写出实现（SseEmitter 化后的 `SseSink`）.write` 的 `IOException`（客户端断开检测靠写失败） |
 | 消息没落库 | `QaTurnFinalizer` 的提交/回滚日志 |
 | 工具调用失败 | `[Agent][Round-N]` + 工具名；MCP 服务是否可达 |
 

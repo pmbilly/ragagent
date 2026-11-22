@@ -31,7 +31,7 @@
 | **技能 / skill** | 以 `SKILL.md` 为载体的指令包，按元数据/正文/资源三级注入 | `agent-engine/.../agent/skills/Manager.java` |
 | **MCP** | Model Context Protocol：接入外部工具服务的协议 | `domains/.../mcp/` |
 | **modelcontext** | 模型上下文装配（消息/工具编码）的包名，**与 MCP 无关** | `model-runtime/.../modelcontext/` |
-| **SSE** | Server-Sent Events；问答的流式输出协议 | `domains/.../session/controller/sse/SseFrameWriter.java` |
+| **SSE** | Server-Sent Events；问答的流式输出协议 | `domains/.../session/controller/sse/帧写出实现（SseEmitter 化后的 `SseSink`）.java` |
 | **流管理器 / StreamManager** | append-only 事件流；内存 / Redis 双实现 | `platform/.../stream/StreamManager.java` |
 | **steer** | 运行中转向：向正在生成的一轮追加用户指令，走独立控制面 | `StreamManager.appendSteerEvents`、`SteerSinkBridge` |
 

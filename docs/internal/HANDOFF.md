@@ -65,7 +65,7 @@
 
 ## 4. 两条判定标准（沿用，2026-10-16 拍板）
 
-**`*/api`**：跨域词汇的落点（原 `contract` 的唯一性判据沿用）；零框架依赖（C1）；**每一个类都能回答"谁在跨域消费我"**（`gen-contract-consumers.py`）。跨模块形状的落点是各模块 `api` 与 `framework.vocabulary`（单包：拆兄弟包会成环）；`shared` 已不存在。
+**`*/api`**：跨域词汇的落点（原 `contract` 的唯一性判据沿用）；零框架依赖（C1）；**每一个类都能回答"谁在跨域消费我"**（`gen-contract-consumers.py`）。跨模块形状的落点是各模块 `api` 与 `framework/web（SSE 出口四件）`（单包：拆兄弟包会成环）；`shared` 已不存在。
 
 **platform**：只剩**技术适配**（框架、HTTP、存储、提示词、追踪、事件基建）；**任何业务形状出现即红灯**。
 
@@ -146,7 +146,7 @@ app             1489 件（17 个业务域 + config 装配根）
 依赖方向：app → 全部；agent-engine → framework, model-runtime；
           retrieval-engine / model-runtime → framework；framework → 无模块依赖（技术底座）。
 （`contract` 与 `shared` 均已解散：跨域类型已归位到各域/引擎 `api`，以及
-  `framework.vocabulary`（30 个跨域形状）与 `framework.tenant`（租户 / API Key）。）
+  `framework/web（SSE 出口四件）`（30 个跨域形状）与 `framework.tenant`（租户 / API Key）。）
 ```
 
 ### 8.2 域内分层（上一阶段方案 §6，本次沿用）

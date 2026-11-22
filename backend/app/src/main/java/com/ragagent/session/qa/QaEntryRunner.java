@@ -80,38 +80,8 @@ public final class QaEntryRunner {
         executor.executeQA(prepared.reqCtx(), prepared.mode(), prepared.generateTitle(), sink);
     }
 
-    /** knowledge-chat 入口：bind/parse 同步 + 执行（兼容旧调用形态）。 */
-    public void runKnowledgeQA(String rawSessionId, String rawBody, String resourceUrls,
-            SseSink sink) throws IOException {
-        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
-        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "KnowledgeQA", agentResolver, currentTenant());
-        executor.executeQA(parsed.reqCtx(), QaMode.NORMAL, !request.disableTitle, sink);
-    }
 
 
-    /** agent-chat 入口：agent 模式判定（customAgent.agent_mode &gt; request.agent_enabled）后分派。 */
-    public void runAgentQA(String rawSessionId, String rawBody, String resourceUrls,
-            SseSink sink) throws IOException {
-        CreateKnowledgeQARequest request = QaRequestBinder.bindQaRequest(rawBody);
-        ParsedRequest parsed = qaRequestParser.parseQARequest(rawSessionId, request, resourceUrls, "AgentQA", agentResolver, currentTenant());
-        QaRequestContext reqCtx = parsed.reqCtx();
-
-        // agent 模式判定：customAgent.agent_mode > request.agent_enabled
-        boolean agentModeEnabled = request.agentEnabled;
-        if (reqCtx.agentConfig != null) {
-            agentModeEnabled = SessionKnowledgeQaService.isAgentMode(reqCtx.agentConfig);
-        }
-
-        if (agentModeEnabled && reqCtx.agentConfig == null) {
-            throw BizException.badRequest("agent_id is required when agent mode is enabled");
-        }
-
-        if (agentModeEnabled) {
-            executor.executeQA(reqCtx, QaMode.AGENT, true, sink);
-        } else {
-            executor.executeQA(reqCtx, QaMode.NORMAL, !request.disableTitle, sink);
-        }
-    }
 
     /**
      * 读者租户实体——供 Rewriter 解析"引用不带 provider scheme 时的租户默认

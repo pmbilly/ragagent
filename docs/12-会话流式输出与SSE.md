@@ -15,7 +15,7 @@
 
 ## 12.2 SSE 帧协议
 
-帧由 `SseFrameWriter` 手工拼（不用 Spring `SseEmitter`）：`event:message\ndata:<JSON>\n\n`——事件名恒为 `message`，冒号后无空格；`data` 是 `StreamResponse` 的 JSON，业务类型在 `response_type` 字段（`ResponseType` 枚举共 23 个值）。四个 SSE 头（`Content-Type: text/event-stream`、`Cache-Control: no-cache`、`Connection: keep-alive`、`X-Accel-Buffering: no`）必须在**任何正文写出之前**设置（`SseContract.setSSEHeaders`），否则参数校验失败就退不回普通 400 JSON。
+帧由 `SseSink` 实现（`SseEmitter` 化后）写出：`event:message\ndata:<JSON>\n\n`——事件名恒为 `message`，冒号后无空格（与旧手拼实现逐字节一致，实测钉于 `EmitterFrameBytesTest`）；`data` 是 `StreamResponse` 的 JSON，业务类型在 `response_type` 字段（`ResponseType` 枚举共 23 个值）。四个 SSE 头（`Content-Type: text/event-stream`、`Cache-Control: no-cache`、`Connection: keep-alive`、`X-Accel-Buffering: no`）必须在**任何正文写出之前**设置（`SseContract.setSSEHeaders`），否则参数校验失败就退不回普通 400 JSON。
 
 前端可见的事件帧来自 `AgentStreamBridge` 订阅的 16 种 `EventType`（订阅序即回调序）：
 
@@ -58,7 +58,7 @@
 - **消息文件代理**：`MessageFileProxyController` 的 `GET /api/v1/sessions/{id}/messages/{messageId}/files` 经 `FileProxyPort` 代理消息产物文件。
 - **标题生成**：会话 `title` 为空时 `SessionService.generateTitleAsync` 起虚拟线程异步生成，完成后发 `EVENT_SESSION_TITLE` 事件（经 `AgentStreamBridge` 变成 `sessionTitle` 帧）；首轮推流泵会为它多等 3 秒，避免标题帧永远到不了客户端。
 
-> **边界**：`SseContract.sendCompletionEvent` 是刻意的空实现——完成信号由 `complete` 帧承载，再补一个 `done=true` 的空 `answer` 帧会扰乱前端状态机；`Content-Type` 最终被 SSE 渲染器无条件覆盖为 `text/event-stream;charset=utf-8`（`SseFrameWriter.RENDERED_CONTENT_TYPE`），`Cache-Control: no-cache` 保持不变。
+> **边界**：`SseContract.sendCompletionEvent` 是刻意的空实现——完成信号由 `complete` 帧承载，再补一个 `done=true` 的空 `answer` 帧会扰乱前端状态机；`Content-Type` 由 Spring SSE 渲染器写为 `text/event-stream;charset=utf-8`，`Cache-Control: no-cache` 保持不变。
 
 
 ---

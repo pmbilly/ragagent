@@ -37,7 +37,7 @@ class EmitterFrameBytesTest {
             return emitter;
         }
 
-        /** 探针：SseEmitter 返回类型的 handler 同步抛 BizException——advice 是否解析？ */
+        /** 探针端点（保留）：SseEmitter 返回类型的 handler 同步抛 BizException 的解析行为留证点；当前无消费测试。 */
         @GetMapping(path = "/probe-throw", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
         SseEmitter probeThrow() {
             throw com.ragagent.framework.error.BizException.badRequest("probe-400");

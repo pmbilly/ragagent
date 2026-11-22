@@ -102,7 +102,7 @@ Thread.ofVirtual().start(() -> TenantScope.run(snap, () -> {
 
 - `AgentStreamBridge` 订阅 16 种事件，按到达序 `appendEvent(...)`；
 - 主链路由 `TurnStreamPump` 一个循环读流：有 SSE 客户端时 100ms；客户端断开后降级为 300ms 无头监控（继续检测 STOP/终态，取消能力不丢）；
-- 断线续传走 `SessionStreamController` / `SseFrameWriter` 的另一条 100ms 轮询（`POLL_INTERVAL_MILLIS = 100`）；
+- 断线续传走 `SessionStreamController` / `帧写出实现（SseEmitter 化后的 `SseSink`）` 的另一条 100ms 轮询（`POLL_INTERVAL_MILLIS = 100`）；
 - `StreamManager` 只有 append/get，没有"推送"；`complete` 是结束信号；
 - steer（运行中转向）走独立子列表，永不混进用户可见的 SSE 流。
 
