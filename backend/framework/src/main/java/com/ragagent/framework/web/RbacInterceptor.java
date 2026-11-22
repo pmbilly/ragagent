@@ -14,8 +14,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -57,21 +55,6 @@ public class RbacInterceptor implements HandlerInterceptor {
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
 
     /**
-     * 一条 RBAC 规则：方法 + Ant 路径 + 角色下限 + 是否允许系统管理员绕过 + 是否**仅限**系统管理员
-     * + 是否跨空间守卫。
-     *
-     * <p>后三者是不同语义，别混：{@code orSystemAdmin} 是"租户角色达标**或**系统管理员"（放行条件），
-     * {@code sysAdminOnly} 是"必须是系统管理员"（限定条件）。
-     * 用前者表达后者会把租户 Owner 也放进来。
-     * （注记：{@code crossTenant} 随空间分享裁撤已无规则置位，判定分支已移除。）</p>
-     */
-    public record Rule(String method, String pattern, TenantRole minRole, boolean orSystemAdmin,
-                       boolean sysAdminOnly, boolean crossTenant) {}
-
-    /** 公开/自服务路由：不设角色下限，鉴权由 AuthFilter、渠道 token、签名或所有权层负责。 */
-    public record PublicRule(String method, String pattern) {}
-
-    /**
      * 拒绝审计回调。
      *
      * <p>{@code requestPath} 传<b>路由模板</b>——这是 Spring 侧对 gin {@code c.FullPath()}
@@ -109,8 +92,7 @@ public class RbacInterceptor implements HandlerInterceptor {
         return deniedAuditor;
     }
 
-    private final List<Rule> rules = new ArrayList<>();
-    private final List<PublicRule> publicRules = new ArrayList<>();
+    private final RbacRules rbac = new RbacRules();
     private final TenantProperties tenantProperties;
 
     public RbacInterceptor(TenantProperties tenantProperties) {
@@ -118,7 +100,7 @@ public class RbacInterceptor implements HandlerInterceptor {
     }
 
     public RbacInterceptor addRule(String method, String pattern, TenantRole minRole, boolean orSystemAdmin) {
-        rules.add(new Rule(method, pattern, minRole, orSystemAdmin, false, false));
+        rbac.addRule(method, pattern, minRole, orSystemAdmin);
         return this;
     }
 
@@ -127,7 +109,7 @@ public class RbacInterceptor implements HandlerInterceptor {
      * 用于 {@code /api/v1/system/**} 这类平台级端点——租户角色再高也不放行。
      */
     public RbacInterceptor addSystemAdminRule(String method, String pattern) {
-        rules.add(new Rule(method, pattern, TenantRole.ADMIN, false, true, false));
+        rbac.addSystemAdminRule(method, pattern);
         return this;
     }
 
@@ -136,7 +118,7 @@ public class RbacInterceptor implements HandlerInterceptor {
      * <p>默认拒绝只对 {@code /api/v1/**} 生效，未登记且无规则的 API 路径返回 403。</p>
      */
     public RbacInterceptor addPublicRule(String method, String pattern) {
-        publicRules.add(new PublicRule(method, pattern));
+        rbac.addPublicRule(method, pattern);
         return this;
     }
 
@@ -156,9 +138,9 @@ public class RbacInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        Rule rule = match(request.getMethod(), request.getRequestURI());
+        RbacRules.Rule rule = rbac.match(request.getMethod(), request.getRequestURI());
         if (rule == null) {
-            if (isPublic(request.getMethod(), request.getRequestURI())) {
+            if (rbac.isPublic(request.getMethod(), request.getRequestURI())) {
                 return true;
             }
             // 只对“真实控制器方法”默认拒绝；未映射路径继续由 Spring 返回 404
@@ -237,7 +219,7 @@ public class RbacInterceptor implements HandlerInterceptor {
      * 回落到本拦截器命中的 Ant 规则模式——无论如何都<b>不能</b>退回原始 URI，
      * 那会让 URL 里的 UUID 变成新的去重键。</p>
      */
-    private static String routeTemplate(HttpServletRequest request, Rule rule) {
+    private static String routeTemplate(HttpServletRequest request, RbacRules.Rule rule) {
         Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         if (pattern instanceof String s && !s.isEmpty()) {
             return s;
@@ -283,42 +265,7 @@ public class RbacInterceptor implements HandlerInterceptor {
         return false;
     }
 
-    private boolean isPublic(String method, String uri) {
-        if (matchPublic(method, uri) != null) {
-            return true;
-        }
-        return "HEAD".equals(method) && matchPublic("GET", uri) != null;
-    }
-
-    private PublicRule matchPublic(String method, String uri) {
-        for (PublicRule rule : publicRules) {
-            if (rule.method().equals(method) && MATCHER.match(rule.pattern(), uri)) {
-                return rule;
-            }
-        }
-        return null;
-    }
-
-    private Rule match(String method, String uri) {
-        Rule rule = matchExact(method, uri);
-        if (rule == null && "HEAD".equals(method)) {
-            // Spring 对 GET 自动派生 HEAD；若不按 GET 规则兜底，HEAD 会成为
-            // 绕过方法级角色下限的旁路（只返回头，但仍泄露存在性/元数据）。
-            rule = matchExact("GET", uri);
-        }
-        return rule;
-    }
-
-    private Rule matchExact(String method, String uri) {
-        for (Rule rule : rules) {
-            if (rule.method().equals(method) && MATCHER.match(rule.pattern(), uri)) {
-                return rule;
-            }
-        }
-        return null;
-    }
-
-    private boolean check(Rule rule) {
+    private boolean check(RbacRules.Rule rule) {
         // API-key 主体由 APIKeyGate 全权判定（能力 + KB 白名单 + default-deny），
         // 角色阶梯不适用于机器主体——角色下限规则短路放行；
         // sysAdminOnly 规则只放行平台 Key、拒绝租户 Key。
