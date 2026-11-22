@@ -1,6 +1,5 @@
 package com.ragagent.embedchannel.api;
 
-import com.ragagent.framework.vocabulary.SuggestionItem;
 import java.time.OffsetDateTime;
 import java.util.List;
 

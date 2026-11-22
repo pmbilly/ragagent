@@ -13,7 +13,7 @@ import com.ragagent.framework.prompt.AgentPromptPlaceholders;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.settings.ConversationProperties;
 import com.ragagent.framework.tenant.TenantRole;
-import com.ragagent.framework.vocabulary.SessionLastRequestState;
+import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

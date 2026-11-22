@@ -1,4 +1,7 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.im.api;
+
+import com.ragagent.framework.vocabulary.MentionedItem;
+
 
 
 import java.util.List;

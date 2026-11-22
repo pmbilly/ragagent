@@ -1,7 +1,7 @@
 package com.ragagent.session.domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ragagent.framework.vocabulary.SuggestionItem;
+import com.ragagent.embedchannel.api.SuggestionItem;
 import java.util.List;
 
 /**

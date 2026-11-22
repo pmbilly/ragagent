@@ -6,7 +6,7 @@ import com.ragagent.framework.pagination.PageResult;
 import com.ragagent.framework.persistence.DatabaseDialects;
 import com.ragagent.framework.persistence.LikeEscapes;
 import com.ragagent.framework.persistence.PageRequests;
-import com.ragagent.framework.vocabulary.SessionLastRequestState;
+import com.ragagent.im.api.SessionLastRequestState;
 import com.ragagent.session.domain.conversation.EmbedVisitorSessionRow;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.dto.SessionListItem;

@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.embedchannel.api;
 
 import java.util.List;
 
