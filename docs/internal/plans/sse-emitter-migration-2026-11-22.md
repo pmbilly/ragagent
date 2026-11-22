@@ -116,3 +116,13 @@
 3. **线程安全**：emitter 回调与泵 finally 的并发收尾幂等。
 4. **vocabulary 归零的守卫联动**：module-map/packages/棘轮三件套同 commit。
 5. **过渡批字节不变**：WP2 后金片仍绿（旧路径未变），WP3 才切流量。
+
+## 6. Deferred 修复批台账（2026-11-22 追加，edc13619e）
+
+| 项 | 内容 | 验收 |
+|---|---|---|
+| 平台入口 live 契约测试 | `KnowledgeQaLiveContractTest`（3 门）：400 同步信封 / AGENT 撞 live run 409 信封（completeError→异步错误派发）/ **租户身份断言**（memo 落 sessions.agent_config，F1 缺陷形态回归钉）；种子面=tenants+tenant_members+users+custom_agents（smart-reasoning）+直插 sessions（repository.create 会覆盖 id） | 3/3 绿，CI 盲区补齐 |
+| F8 | Content-Type 实测值 `text/event-stream`（charset 后缀消失——spec 合法线上形态变化，SseContract 契约表本就无 charset）逐字钉回两处（SessionStreamControllerTest + EmitterFrameBytesTest） | 逐字断言恢复 |
+| F11 | agentChat 分派语义注释现在时（按 agent 配置 agentMode 判定，尊重显式配置；quick-answer 默认解析为 NORMAL 与历史一致） | 迁移叙事棘轮绿 |
+| **附带 Critical 前提修复** | **RbacInterceptor 跳过 ASYNC 派发**：completeError 的错误派发重跑拦截器时 AuthFilter finally 已清 TenantContext → 角色恒空 403（409 信封渲染的隐藏前提） | live 409 断言成立的前提 |
+| C2/SCC 基线 | controller-catch 121 处登记（两入口 catch(RuntimeException)=异步边界收尾）；包级 SCC 5 组固化 | 49/49 |
