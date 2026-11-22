@@ -137,7 +137,7 @@
 | `:backend` | `com.ragagent.framework.tool` | 平台工具技术适配：工具 schema 的 JSON 解析（ToolSchemas）。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
-| `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用的形状（租户外的业务载荷、会话视图、检索引擎形状等）。 |
+| `:backend` | `com.ragagent.framework.vocabulary` | 跨域词汇：被两个以上模块共用、且无法下沉到任何单个域的形状。 |
 | `:backend` | `com.ragagent.framework.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.framework.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:backend` | `com.ragagent.framework.web.health` | 平台健康检查面。 |
