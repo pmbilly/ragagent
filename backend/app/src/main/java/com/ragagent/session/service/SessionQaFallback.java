@@ -1,13 +1,13 @@
 package com.ragagent.session.service;
 
 
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.agentengine.api.AgentPromptPlaceholders;
 import com.ragagent.agentengine.api.PromptComposer;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.knowledge.api.catalog.KnowledgeCatalogPort;

@@ -1,15 +1,15 @@
-package com.ragagent.framework.event.payload;
+package com.ragagent.mcp.api;
 
 
 /**
- * 会话内 OAuth 提示结果（authorized / timeout / cancel）确认事件体。
- * emit 点：common/approval/Gate（{@code <pendingID>-mcp-oauth-resolved}）。
+ * 用户决定（或超时/取消）的确认事件体。
+ * emit 点：common/approval/Gate（{@code <pendingID>-approval-resolved}）。
  *
- * <p>零值输出 {@code {"pendingId":"","serviceId":"","authorized":false}}；
+ * <p>零值输出 {@code {"pendingId":"","approved":false}}；
  * {@code reason}/{@code timed_out}/{@code canceled} 空则省略。</p>
  */
 
-public class MCPOAuthResolvedData {
+public class ToolApprovalResolvedData {
 
     private static String orEmpty(String v) {
         return v == null ? "" : v;
@@ -18,10 +18,8 @@ public class MCPOAuthResolvedData {
 
     private String pendingId = "";
 
-    private String serviceId = "";
-
     /** false 恒输出 */
-    private boolean authorized;
+    private boolean approved;
 
     /** 空串省略 */
     private String reason = "";
@@ -32,14 +30,13 @@ public class MCPOAuthResolvedData {
     /** false 省略 */
     private boolean canceled;
 
-    public MCPOAuthResolvedData() {
+    public ToolApprovalResolvedData() {
     }
 
-    public MCPOAuthResolvedData(String pendingId, String serviceId, boolean authorized,
-                                String reason, boolean timedOut, boolean canceled) {
+    public ToolApprovalResolvedData(String pendingId, boolean approved, String reason,
+                                    boolean timedOut, boolean canceled) {
         this.pendingId = orEmpty(pendingId);
-        this.serviceId = orEmpty(serviceId);
-        this.authorized = authorized;
+        this.approved = approved;
         this.reason = orEmpty(reason);
         this.timedOut = timedOut;
         this.canceled = canceled;
@@ -53,20 +50,12 @@ public class MCPOAuthResolvedData {
         this.pendingId = orEmpty(v);
     }
 
-    public String getServiceId() {
-        return serviceId;
+    public boolean isApproved() {
+        return approved;
     }
 
-    public void setServiceId(String v) {
-        this.serviceId = orEmpty(v);
-    }
-
-    public boolean isAuthorized() {
-        return authorized;
-    }
-
-    public void setAuthorized(boolean v) {
-        this.authorized = v;
+    public void setApproved(boolean v) {
+        this.approved = v;
     }
 
     public String getReason() {

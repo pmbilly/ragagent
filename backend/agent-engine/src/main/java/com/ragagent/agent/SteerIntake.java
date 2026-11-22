@@ -1,8 +1,8 @@
 package com.ragagent.agent;
 
 import com.ragagent.agent.domain.AgentState;
+import com.ragagent.agentengine.api.UserMessageInjectedData;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.UserMessageInjectedData;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.llm.api.ChatMessage;

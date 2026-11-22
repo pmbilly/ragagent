@@ -2,8 +2,8 @@ package com.ragagent.session.rag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;

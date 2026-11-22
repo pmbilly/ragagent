@@ -3,8 +3,8 @@ package com.ragagent.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ragagent.agentengine.api.AgentCompleteData;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.AgentCompleteData;
 import com.ragagent.framework.eventbus.EventType;
 import java.util.ArrayList;
 import java.util.List;

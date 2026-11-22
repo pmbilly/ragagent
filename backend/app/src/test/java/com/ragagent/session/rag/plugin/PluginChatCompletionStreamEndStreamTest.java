@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.session.rag.PipelineState;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -1,12 +1,12 @@
 package com.ragagent.im.service;
 
+import com.ragagent.agentengine.api.AgentCompleteData;
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.agentengine.api.AgentLookup;
+import com.ragagent.agentengine.api.ErrorData;
 import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.event.EventBusFactory;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.event.payload.AgentCompleteData;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
-import com.ragagent.framework.event.payload.ErrorData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.im.api.QaRequestPayload;

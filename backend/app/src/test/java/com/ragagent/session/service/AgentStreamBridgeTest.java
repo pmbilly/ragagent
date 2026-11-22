@@ -8,12 +8,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.ragagent.agentengine.api.AgentCompleteData;
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
+import com.ragagent.agentengine.api.AgentThoughtData;
+import com.ragagent.agentengine.api.AgentToolCallData;
+import com.ragagent.agentengine.api.AgentToolResultData;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.AgentCompleteData;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
-import com.ragagent.framework.event.payload.AgentThoughtData;
-import com.ragagent.framework.event.payload.AgentToolCallData;
-import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.eventbus.EventBus;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.vocabulary.SearchResult;

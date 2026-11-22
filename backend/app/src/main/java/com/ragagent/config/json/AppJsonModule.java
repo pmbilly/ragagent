@@ -13,8 +13,13 @@ import com.ragagent.framework.tenant.StorageEngineConfig;
 import com.ragagent.framework.vocabulary.MessageView;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
+import com.ragagent.mcp.api.MCPOAuthRequiredData;
+import com.ragagent.mcp.api.MCPOAuthResolvedData;
+import com.ragagent.mcp.api.ToolApprovalRequiredData;
+import com.ragagent.mcp.api.ToolApprovalResolvedData;
 import com.ragagent.memory.api.MemoryMessageCursor;
 import com.ragagent.retrieval.api.ImageInfo;
+import com.ragagent.session.api.StopData;
 
 /**
  * 业务域面载荷的 Jackson 装配（wiki / tenant 配置 / 会话 / 记忆 / 认证 / 网页搜索）。
@@ -39,6 +44,12 @@ public final class AppJsonModule extends SimpleModule {
         setMixInAnnotation(ImageInfo.class, WebSearchJsonMixins.ImageInfoMixin.class);
         setMixInAnnotation(MemoryMessageCursor.class, MemoryJsonMixins.MemoryMessageCursorMixin.class);
         setMixInAnnotation(MessageView.class, SessionJsonMixins.MessageViewMixin.class);
+        // Stop/MCP 审批事件 payload 随载荷归位 session.api 与 mcp.api，mixin 随迁（只追加）
+        setMixInAnnotation(StopData.class, EventJsonMixins.StopDataMixin.class);
+        setMixInAnnotation(ToolApprovalRequiredData.class, EventJsonMixins.ToolApprovalRequiredDataMixin.class);
+        setMixInAnnotation(ToolApprovalResolvedData.class, EventJsonMixins.ToolApprovalResolvedDataMixin.class);
+        setMixInAnnotation(MCPOAuthRequiredData.class, EventJsonMixins.MCPOAuthRequiredDataMixin.class);
+        setMixInAnnotation(MCPOAuthResolvedData.class, EventJsonMixins.MCPOAuthResolvedDataMixin.class);
         setMixInAnnotation(UserPreferences.class, AuthJsonMixins.UserPreferencesMixin.class);
     }
 

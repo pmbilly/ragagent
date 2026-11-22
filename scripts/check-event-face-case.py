@@ -33,7 +33,13 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 路径改成按模块查找（新增模块无需改这里）。
 import _source_roots as _sr
 
-PAYLOAD_DIR = _sr.find_pkg_path("framework/event/payload")
+# 2026-11-22 WP5：payload 类自 framework/event/payload 迁出（agentengine/api 9 类、
+# app session/api 1 类、app mcp/api 4 类），检查面随之换锚三处。
+PAYLOAD_DIRS = [
+    _sr.find_pkg_path("agentengine/api"),
+    _sr.find_pkg_path("session/api"),
+    _sr.find_pkg_path("mcp/api"),
+]
 EVENT_TYPE = _sr.find_pkg_path("framework/eventbus/EventType.java")
 RESPONSE_TYPE = _sr.find_pkg_path("llm/api/ResponseType.java")
 
@@ -49,14 +55,15 @@ problems: list[str] = []
 
 def check_payload_annotations() -> None:
     ann = re.compile(r'@JsonProperty\("([^"]+)"\)')
-    for p in sorted(PAYLOAD_DIR.glob("*.java")):
-        for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
-            m = ann.search(line)
-            if m and "_" in m.group(1):
-                problems.append(
-                    f"{p.relative_to(ROOT)}:{i} 事件载荷注解仍是 snake：{m.group(1)}"
-                    "（载荷键一律 camel；字段注解值应等于 Java 字段名）"
-                )
+    for d in PAYLOAD_DIRS:
+        for p in sorted(d.glob("*.java")):
+            for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+                m = ann.search(line)
+                if m and "_" in m.group(1):
+                    problems.append(
+                        f"{p.relative_to(ROOT)}:{i} 事件载荷注解仍是 snake：{m.group(1)}"
+                        "（载荷键一律 camel；字段注解值应等于 Java 字段名）"
+                    )
 
 
 def check_enum_values() -> None:

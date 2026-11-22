@@ -11,7 +11,6 @@ import com.ragagent.framework.access.TenantContext;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusException;
 import com.ragagent.framework.event.EventHandler;
-import com.ragagent.framework.event.payload.AgentThoughtData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,21 @@ import org.junit.jupiter.api.Test;
  * 异步行为全部用 latch/barrier 做<b>确定性</b>断言，禁止靠墙钟。
  */
 class EventBusTest {
+
+    /** 载荷中立性的本地哑载荷（原用 AgentThoughtData，该类已迁 agent-engine api）。 */
+    static final class SampleThought {
+
+        private final String content;
+
+        SampleThought(String content) {
+            this.content = content;
+        }
+
+        public String getContent() {
+            return content;
+        }
+    }
+
 
     // ===== 同步模式 =====
 
@@ -260,7 +274,7 @@ class EventBusTest {
     @Test
     void newEventCreatesEmptyMetadataAndWithersCopy() {
         Event e = Event.newEvent(EventType.EVENT_AGENT_THOUGHT,
-                new AgentThoughtData("c", 1, false));
+                new SampleThought("c"));
         assertEquals(EventType.EVENT_AGENT_THOUGHT, e.getType());
         assertEquals("", e.getId());
         assertEquals("", e.getRequestId());

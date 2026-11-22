@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.ragagent.framework.event.payload.ToolApprovalRequiredData;
 import com.ragagent.framework.redis.RedisPubSub;
 import com.ragagent.framework.redis.SpringRedisPubSub;
 import com.ragagent.llm.api.ResponseType;
+import com.ragagent.mcp.api.ToolApprovalRequiredData;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

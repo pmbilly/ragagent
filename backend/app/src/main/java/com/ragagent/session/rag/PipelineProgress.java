@@ -1,9 +1,9 @@
 package com.ragagent.session.rag;
 
+import com.ragagent.agentengine.api.AgentToolCallData;
+import com.ragagent.agentengine.api.AgentToolResultData;
 import com.ragagent.framework.event.Event;
 import com.ragagent.framework.event.EventBusInterface;
-import com.ragagent.framework.event.payload.AgentToolCallData;
-import com.ragagent.framework.event.payload.AgentToolResultData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.SearchTarget;

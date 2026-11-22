@@ -1,4 +1,4 @@
-package com.ragagent.framework.event.payload;
+package com.ragagent.mcp.api;
 
 
 /**

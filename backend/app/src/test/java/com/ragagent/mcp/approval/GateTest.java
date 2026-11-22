@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.event.payload.MCPOAuthRequiredData;
-import com.ragagent.framework.event.payload.MCPOAuthResolvedData;
-import com.ragagent.framework.event.payload.ToolApprovalRequiredData;
-import com.ragagent.framework.event.payload.ToolApprovalResolvedData;
 import com.ragagent.llm.api.ResponseType;
+import com.ragagent.mcp.api.MCPOAuthRequiredData;
+import com.ragagent.mcp.api.MCPOAuthResolvedData;
+import com.ragagent.mcp.api.ToolApprovalRequiredData;
+import com.ragagent.mcp.api.ToolApprovalResolvedData;
 import com.ragagent.mcp.service.Adapter;
 import java.time.Duration;
 import java.util.ArrayList;

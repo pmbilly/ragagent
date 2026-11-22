@@ -9,11 +9,11 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:framework` | `framework` | 28 | 224 | 1 |
+| `:framework` | `framework` | 27 | 208 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 229 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 140 | 0 |
-| `:agent-engine` | `agent`、`agentengine` | 11 | 112 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 275 | 1863 | 51 |
+| `:agent-engine` | `agent`、`agentengine` | 11 | 122 | 0 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 277 | 1871 | 51 |
 
 ## 18 个业务域（domains）
 
@@ -23,17 +23,17 @@
 | `agenttools` | `com.ragagent.agenttools` | 68 | 0 |
 | `audit` | `com.ragagent.audit` | 26 | 1 |
 | `auth` | `com.ragagent.auth` | 164 | 8 |
-| `config` | `com.ragagent.config` | 25 | 0 |
+| `config` | `com.ragagent.config` | 26 | 0 |
 | `datasource` | `com.ragagent.datasource` | 147 | 2 |
 | `embedchannel` | `com.ragagent.embedchannel` | 31 | 1 |
 | `favorite` | `com.ragagent.favorite` | 13 | 1 |
 | `im` | `com.ragagent.im` | 112 | 2 |
 | `initialization` | `com.ragagent.initialization` | 11 | 1 |
 | `knowledge` | `com.ragagent.knowledge` | 557 | 9 |
-| `mcp` | `com.ragagent.mcp` | 171 | 4 |
+| `mcp` | `com.ragagent.mcp` | 176 | 4 |
 | `memory` | `com.ragagent.memory` | 101 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
-| `session` | `com.ragagent.session` | 213 | 8 |
+| `session` | `com.ragagent.session` | 215 | 8 |
 | `storage` | `com.ragagent.storage` | 74 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 63 | 3 |
@@ -62,5 +62,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：356 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：357 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

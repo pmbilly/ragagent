@@ -1,14 +1,14 @@
 package com.ragagent.session.qa;
 
 
+import com.ragagent.agentengine.api.AgentCompleteData;
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
+import com.ragagent.agentengine.api.AgentThoughtData;
+import com.ragagent.agentengine.api.ErrorData;
 import com.ragagent.framework.access.TenantContextSnapshot;
 import com.ragagent.framework.access.TenantScope;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.AgentCompleteData;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
-import com.ragagent.framework.event.payload.AgentThoughtData;
-import com.ragagent.framework.event.payload.ErrorData;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.vocabulary.MessageAttachment;

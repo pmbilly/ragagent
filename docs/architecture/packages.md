@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-356 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -114,7 +114,6 @@
 | `:backend` | `com.ragagent.framework.config` | 平台配置面：部署属性与环境查找面。 |
 | `:backend` | `com.ragagent.framework.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:backend` | `com.ragagent.framework.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
-| `:backend` | `com.ragagent.framework.event.payload` | 事件载荷契约面：SSE 事件载荷（线格式由 common.web.ContractJsonMixinsEvent 承载）。 |
 | `:backend` | `com.ragagent.framework.eventbus` | 平台事件总线面（platform.event/）： Event / EventBus / EventJson 等 9 类——进程内事件总线与载荷编解码。 |
 | `:backend` | `com.ragagent.framework.html` | 平台文本面（的 `platform.text/`）：HTML→Markdown、实体/空白/代码点处理、路径与文件类型推断。 |
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
@@ -235,6 +234,7 @@
 | `:backend` | `com.ragagent.llm.provider` | LLM · 提供方：AzureOpenAIProvider / SiliconFlowProvider / OpenRouterProvider…。 |
 | `:backend` | `com.ragagent.mcp` | MCP 域：Model Context Protocol 的仓内实现——协议、OAuth（含回调与令牌存储）、 服务注册与调用面；对外 /api/v1/mcp-services。 |
 | `:backend` | `com.ragagent.mcp.adapter` | MCP · 端口实现：McpToolRegistrationAdapter / McpApprovalOpsAdapter。 |
+| `:backend` | `com.ragagent.mcp.api` | 种类：集成适配 入口：MCP 审批与 OAuth 的事件载荷（com.ragagent.mcp.api.ToolApprovalRequiredData 等） 对外契约面：MCP 危险工具审批 / 会 |
 | `:backend` | `com.ragagent.mcp.approval` | 工具审批域：审批门（Gate）、待审请求/决议消息、Redis pub/sub 适配与工具策略。 |
 | `:backend` | `com.ragagent.mcp.controller` | mcp 域控制器的 HTTP 端点与协作类（2 个协作类）。 |
 | `:backend` | `com.ragagent.mcp.domain` | MCP · 领域模型：McpService / McpAuthConfigTypeHandler / McpToolListTypeHandler…。 |
@@ -306,6 +306,7 @@
 | `:backend` | `com.ragagent.retrieval.telemetry` | 检索 · telemetry：RetrievalObs。 |
 | `:backend` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
 | `:backend` | `com.ragagent.session.adapter` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / EmbedSessionOpsAdapter / KnowledgeQaEventAdapter |
+| `:backend` | `com.ragagent.session.api` | 种类：产品能力（编排域） 入口：会话域跨域形状（com.ragagent.session.api.StopData） 对外契约面：会话编排对外暴露的事件载荷（continue-stream 的停止请求 |
 | `:backend` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
 | `:backend` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:backend` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |

@@ -1,20 +1,19 @@
-package com.ragagent.framework.jsonbind;
+package com.ragagent.agentengine.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * 事件 payload（contract.event.payload）的 Jackson mixin。
+ * Agent 事件 payload 的 Jackson mixin（SSE 前端协议面，随载荷自 framework.jsonbind 迁入）。
  *
- * <p>为什么独立成文件：契约面（{@code contract.*}）要求<b>纯 JDK</b>——载荷类的线格式由
- * 这里的 mixin 承载（Jackson 只在读写时把注解套上去），契约类本身零框架引用。</p>
+ * <p>载荷类在 {@code agentengine.api}（AgentCompleteData 等 9 类）；线格式由本文件承载，
+ * 经 {@link AgentJsonModule} 注册，由所有读写契约载荷的 mapper 共用。</p>
  */
-public final class ContractJsonMixinsEvent {
+public final class AgentEventMixins {
 
-    private ContractJsonMixinsEvent() {
+    private AgentEventMixins() {
     }
 
     /** AgentActionData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
@@ -107,59 +106,6 @@ public final class ContractJsonMixinsEvent {
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private Map<String, Object> extra;
-
-    }
-
-    /** MCPOAuthRequiredData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class MCPOAuthRequiredDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String requestId;
-
-    }
-
-    /** MCPOAuthResolvedData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class MCPOAuthResolvedDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String reason;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private boolean timedOut;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private boolean canceled;
-
-    }
-
-    /** StopData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class StopDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String reason;
-
-    }
-
-    /** ToolApprovalRequiredData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class ToolApprovalRequiredDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private Object args;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String argsJson;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String requestId;
-
-    }
-
-    /** ToolApprovalResolvedData 的 mixin（注解逐条对位，行为与搬迁前一致）。 */
-    public abstract static class ToolApprovalResolvedDataMixin {
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private String reason;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private boolean timedOut;
-
-        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-        private boolean canceled;
 
     }
 

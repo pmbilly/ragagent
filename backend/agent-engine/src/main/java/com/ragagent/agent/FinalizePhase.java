@@ -2,10 +2,10 @@ package com.ragagent.agent;
 
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.ragagent.agent.domain.AgentState;
+import com.ragagent.agentengine.api.AgentCompleteData;
+import com.ragagent.agentengine.api.AgentFinalAnswerData;
 import com.ragagent.agentengine.api.ThinkBlocks;
 import com.ragagent.framework.event.Event;
-import com.ragagent.framework.event.payload.AgentCompleteData;
-import com.ragagent.framework.event.payload.AgentFinalAnswerData;
 import com.ragagent.framework.eventbus.EventIds;
 import com.ragagent.framework.eventbus.EventType;
 import com.ragagent.framework.vocabulary.AgentStep;
