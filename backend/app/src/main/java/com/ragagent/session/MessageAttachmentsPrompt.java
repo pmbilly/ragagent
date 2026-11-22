@@ -1,7 +1,6 @@
 package com.ragagent.session;
 
 import com.ragagent.framework.html.HtmlText;
-import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
 import java.util.List;
 
 /**

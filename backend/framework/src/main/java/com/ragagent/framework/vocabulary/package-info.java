@@ -8,7 +8,7 @@
  * 成员清单由 {@code VocabularyManifestTest} 棘轮钉住——只许减不许增，新增前先论证
  * "是否真的没有更合适的属主"。</p>
  *
- * <h2>按领域查（终态 20 类）</h2>
+ * <h2>按领域查（终态 19 类）</h2>
  * <ul>
  *   <li><b>会话消息聚合</b>：{@link com.ragagent.framework.vocabulary.MessageView}
  *       （消息线格式视图，字段聚合了下面多数类型，是这一簇的锚——channel 合并批重构它的
@@ -23,7 +23,6 @@
  *       model-runtime 双引擎消费）</li>
  *   <li><b>知识与工具</b>：{@code KnowledgeBaseGateway}（auth→knowledge 的只读端口，待
  *       Provider 模式反转）、{@code KnowledgeBaseFacts}（被 Gateway 签名钉住）、
- *       {@code PipelineMessageAttachmentView}（附件提示词视图）、
  *       {@code SseSink}（framework/web/ServletSseSink 实现；SSE 技术件，待 SseEmitter 批）</li>
  * </ul>
  *

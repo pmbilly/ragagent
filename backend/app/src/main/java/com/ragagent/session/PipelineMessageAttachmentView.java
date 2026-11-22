@@ -1,4 +1,4 @@
-package com.ragagent.framework.vocabulary;
+package com.ragagent.session;
 
 /**
  * 用户消息附件的「提示词视图」——附件渲染成 LLM 提示词段

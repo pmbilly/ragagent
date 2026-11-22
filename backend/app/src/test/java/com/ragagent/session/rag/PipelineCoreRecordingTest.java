@@ -4,8 +4,8 @@ import static com.ragagent.session.rag.Rec46cSupport.assertRec;
 import static com.ragagent.session.rag.Rec46cSupport.errOf;
 import static com.ragagent.session.rag.Rec46cSupport.json;
 
-import com.ragagent.framework.vocabulary.PipelineMessageAttachmentView;
 import com.ragagent.knowledge.api.SearchTarget;
+import com.ragagent.session.PipelineMessageAttachmentView;
 import com.ragagent.session.dto.PipelineUsedMemoryView;
 import com.ragagent.session.rag.plugin.PluginError;
 import java.util.ArrayList;

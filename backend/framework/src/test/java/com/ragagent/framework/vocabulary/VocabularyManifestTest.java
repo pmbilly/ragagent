@@ -23,7 +23,7 @@ class VocabularyManifestTest {
             List.of("AgentStep", "AgentToolCall", "ChunkView", "GraphNode", "GraphRelation",
                     "KnowledgeBaseFacts", "KnowledgeBaseGateway", "MentionedItem",
                     "MessageArtifact", "MessageAttachment", "MessageExecutionContext",
-                    "MessageImage", "MessageView", "PipelineMessageAttachmentView",
+                    "MessageImage", "MessageView",
                     "SearchResult", "SseSink", "SuggestionAttribution", "ToolCallTarget",
                     "ToolResult", "UsedMemory");
 

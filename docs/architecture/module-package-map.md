@@ -9,11 +9,11 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:framework` | `framework` | 27 | 208 | 1 |
+| `:framework` | `framework` | 27 | 207 | 1 |
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 229 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 140 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 122 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 277 | 1871 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`config`、`datasource`、`embedchannel`、`favorite`、`im`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 277 | 1872 | 51 |
 
 ## 18 个业务域（domains）
 
@@ -33,7 +33,7 @@
 | `mcp` | `com.ragagent.mcp` | 176 | 4 |
 | `memory` | `com.ragagent.memory` | 101 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
-| `session` | `com.ragagent.session` | 215 | 8 |
+| `session` | `com.ragagent.session` | 216 | 8 |
 | `storage` | `com.ragagent.storage` | 74 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 63 | 3 |
