@@ -1,5 +1,5 @@
 package com.ragagent.agentengine.api;
-import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.llm.api.ToolResult;
 
 
 /**

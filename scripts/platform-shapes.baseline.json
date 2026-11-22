@@ -2,9 +2,9 @@
   "note": "C8（判定标准二）：platform 业务形状豁免登记——每条必须能回答「为何属技术适配」。只许减不许增；新增须先处置（搬 contract / 归域 / 中性化 / 改名）或在此登记并写明理由。",
   "allowed": {
     "com/ragagent/framework/web/ApiResponse.java": "统一响应壳（全仓 HTTP 响应外壳）——HTTP 技术适配",
-    "com/ragagent/framework/storage/fileserve/FileProxyPort.java": "文件直出 HTTP 面（request/response 进出，与 FileServeHttp/FileTransport 配套）——HTTP 技术适配",
+    "com/ragagent/storage/fileserve/FileProxyPort.java": "文件直出 HTTP 面（request/response 进出，与 FileServeHttp/FileTransport 配套）——HTTP 技术适配",
     "com/ragagent/framework/config/RetrievalDriverProperties.java": "检索驱动配置绑定（@ConfigurationProperties）——技术适配",
-    "com/ragagent/framework/storage/support/FileUrlPort.java": "存储 URL 解析端口（重写器/解析器工厂的参数面）：IO 能力契约，非业务形状",
-    "com/ragagent/framework/storage/fileserve/MessageFileFacts.java": "消息文件事实（会话 id / 文件键）：文件代理授权匹配的输入形状，随 framework/storage 同址"
+    "com/ragagent/storage/support/FileUrlPort.java": "存储 URL 解析端口（重写器/解析器工厂的参数面）：IO 能力契约，非业务形状",
+    "com/ragagent/storage/fileserve/MessageFileFacts.java": "消息文件事实（会话 id / 文件键）：文件代理授权匹配的输入形状，随 framework/storage 同址"
   }
 }

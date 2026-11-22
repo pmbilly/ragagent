@@ -1,16 +1,16 @@
 package com.ragagent.session.controller;
 
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.storage.support.Mode;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.ServletSseSink;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.session.dto.QaRequests.SearchKnowledgeRequest;
 import com.ragagent.session.qa.QaEntryRunner;
 import com.ragagent.session.qa.QaRequestBinder;
 import com.ragagent.session.service.QaSupport;
 import com.ragagent.session.service.SessionKnowledgeQaService;
+import com.ragagent.storage.support.Mode;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

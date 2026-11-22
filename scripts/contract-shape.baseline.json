@@ -45,6 +45,10 @@
     "com/ragagent/channel/api/MessageView.java": {
       "fields": 26,
       "reason": "消息线格式视图（聚合簇锚，channel 合并批整类保形）；字段级拆解留蓝图 D1 批"
+    },
+    "com/ragagent/llm/api/SearchResult.java": {
+      "fields": 25,
+      "reason": "检索命中元数据（双引擎+modelcontext 消费）；H6 评估拆分"
     }
   }
 }

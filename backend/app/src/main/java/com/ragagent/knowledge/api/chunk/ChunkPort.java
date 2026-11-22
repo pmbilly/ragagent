@@ -1,6 +1,6 @@
 package com.ragagent.knowledge.api.chunk;
 
-import com.ragagent.framework.vocabulary.ChunkView;
+import com.ragagent.llm.api.ChunkView;
 import java.util.List;
 
 /**

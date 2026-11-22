@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.KnowledgeBaseQueryPort;
 import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;

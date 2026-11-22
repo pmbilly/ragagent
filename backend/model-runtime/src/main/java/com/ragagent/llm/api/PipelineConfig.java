@@ -1,7 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.framework.vocabulary.GraphNode;
-import com.ragagent.framework.vocabulary.GraphRelation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

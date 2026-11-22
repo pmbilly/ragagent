@@ -9,11 +9,11 @@
 | 模块 | 主码包根 | 包数 | Java 文件 | 控制器 |
 |---|---|---:|---:|---:|
 | `:contract` |  | 0 | 0 | 0 |
-| `:framework` | `framework` | 25 | 194 | 1 |
-| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 229 | 0 |
+| `:framework` | `framework` | 25 | 166 | 1 |
+| `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 234 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 141 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 126 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 270 | 1871 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 270 | 1894 | 51 |
 
 ## 17 个业务域（domains）
 
@@ -21,7 +21,7 @@
 |---|---|---:|---:|
 | `agentmanagement` | `com.ragagent.agentmanagement` | 27 | 2 |
 | `agenttools` | `com.ragagent.agenttools` | 68 | 0 |
-| `audit` | `com.ragagent.audit` | 26 | 1 |
+| `audit` | `com.ragagent.audit` | 28 | 1 |
 | `auth` | `com.ragagent.auth` | 164 | 8 |
 | `channel` | `com.ragagent.channel` | 142 | 3 |
 | `config` | `com.ragagent.config` | 26 | 0 |
@@ -33,7 +33,7 @@
 | `memory` | `com.ragagent.memory` | 101 | 1 |
 | `model` | `com.ragagent.model` | 38 | 4 |
 | `session` | `com.ragagent.session` | 216 | 8 |
-| `storage` | `com.ragagent.storage` | 74 | 3 |
+| `storage` | `com.ragagent.storage` | 95 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 63 | 3 |
 

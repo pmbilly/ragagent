@@ -14,7 +14,7 @@ import com.ragagent.agentengine.api.ErrorData;
 import com.ragagent.agentengine.api.ToolCallTarget;
 import com.ragagent.agentengine.api.UserMessageInjectedData;
 import com.ragagent.framework.jsonbind.JsonModuleProvider;
-import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.llm.api.ToolResult;
 
 /**
  * Agent 面载荷的 Jackson 装配。

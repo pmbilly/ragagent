@@ -5,8 +5,8 @@ import com.ragagent.agentengine.api.BaseTool;
 import com.ragagent.agentengine.api.ToolRequest;
 import com.ragagent.agentengine.api.ToolSchemas;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ToolDefinitions;
+import com.ragagent.llm.api.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 

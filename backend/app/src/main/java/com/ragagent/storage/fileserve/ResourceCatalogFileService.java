@@ -1,7 +1,6 @@
 package com.ragagent.storage.fileserve;
 
 import com.ragagent.framework.security.Hashes;
-import com.ragagent.framework.storage.fileserve.OpenedFile;
 import com.ragagent.storage.api.FileContentService;
 import com.ragagent.storage.api.WritableFileContentService;
 import com.ragagent.storage.service.ResourceCatalogService;

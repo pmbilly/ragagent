@@ -1,10 +1,9 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.framework.storage.fileserve.OpenedFile;
-import com.ragagent.framework.storage.support.SeekableSource;
 import com.ragagent.storage.api.WritableFileContentService;
 import com.ragagent.storage.provider.FileService;
 import com.ragagent.storage.provider.SeekableFileService;
+import com.ragagent.storage.support.SeekableSource;
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -6,8 +6,8 @@ import com.ragagent.channel.runtime.ImFormat;
 import com.ragagent.channel.runtime.IncomingMessage;
 import com.ragagent.channel.runtime.ReplyMessage;
 import com.ragagent.channel.runtime.ThinkDisplay;
-import com.ragagent.framework.storage.support.Resolver;
-import com.ragagent.framework.storage.support.Rewriter;
+import com.ragagent.storage.support.Resolver;
+import com.ragagent.storage.support.Rewriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

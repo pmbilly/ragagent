@@ -1,7 +1,6 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
 import com.ragagent.framework.text.RequestLanguages;
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.KnowledgeView;
 import com.ragagent.knowledge.api.WikiImageMarkup;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
@@ -16,6 +15,7 @@ import com.ragagent.knowledge.wiki.service.ingest.support.WikiBatchContext;
 import com.ragagent.knowledge.wiki.service.ingest.support.WikiIngestPreviews;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
 import com.ragagent.knowledge.wiki.service.page.WikiTextUtils;
+import com.ragagent.llm.api.ChunkView;
 import com.ragagent.llm.api.LlmChatClient;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

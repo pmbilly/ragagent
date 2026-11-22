@@ -2,9 +2,9 @@ package com.ragagent.knowledge.storage;
 
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
-import com.ragagent.framework.storage.fileserve.OpenedFile;
-import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.api.ProviderFileStorePort;
+import com.ragagent.storage.fileserve.OpenedFile;
+import com.ragagent.storage.fileserve.StoragePaths;
 import java.io.IOException;
 import java.io.InputStream;
 import org.slf4j.Logger;

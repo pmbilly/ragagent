@@ -1,7 +1,7 @@
 package com.ragagent.retrieval.graph;
 
-import com.ragagent.framework.vocabulary.GraphNode;
-import com.ragagent.framework.vocabulary.GraphRelation;
+import com.ragagent.llm.api.GraphNode;
+import com.ragagent.llm.api.GraphRelation;
 import com.ragagent.retrieval.api.GraphData;
 import com.ragagent.retrieval.api.NameSpace;
 import com.ragagent.retrieval.api.RetrieveGraphRepository;

@@ -1,10 +1,10 @@
 package com.ragagent.session.controller;
 
-import com.ragagent.framework.storage.fileserve.FileProxyPort;
-import com.ragagent.framework.storage.fileserve.FileServeHttp;
-import com.ragagent.framework.storage.fileserve.MessageFileFacts;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.session.conversation.MessageService;
+import com.ragagent.storage.fileserve.FileProxyPort;
+import com.ragagent.storage.fileserve.FileServeHttp;
+import com.ragagent.storage.fileserve.MessageFileFacts;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

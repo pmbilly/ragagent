@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.KnowledgeView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.chunk.KnowledgeSpanPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.wiki.service.page.WikiPageService;
+import com.ragagent.llm.api.ChunkView;
 import java.util.List;
 
 /**

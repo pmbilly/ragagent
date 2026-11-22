@@ -12,7 +12,7 @@ import com.ragagent.channel.api.MessageExecutionContext;
 import com.ragagent.channel.api.MessageImage;
 import com.ragagent.channel.api.UsedMemory;
 import com.ragagent.framework.persistence.PgJsonTypeHandler;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.retrieval.api.MessageArtifact;
 import com.ragagent.session.domain.AgentStepListTypeHandler;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * <h2>跨模块类型的处置</h2>
  * <p>{@code knowledge_references} 与 {@code agent_steps} 是有类型的列表
- * （{@link com.ragagent.framework.vocabulary.SearchResult} / {@link AgentStep}）——
+ * （{@link com.ragagent.llm.api.SearchResult} / {@link AgentStep}）——
  * 二者都直接出现在消息响应体里；若按不透明的 {@code List<Object>} 透传，读回来的元素
  * 会退化成 {@code LinkedHashMap}，键序变成 PG jsonb 的规范化序，**是实打实的契约偏差**。</p>
  * <p>仍按不透明类型处理的一处：{@code execution_context} 的字段本身是 {@code json:"-"}，

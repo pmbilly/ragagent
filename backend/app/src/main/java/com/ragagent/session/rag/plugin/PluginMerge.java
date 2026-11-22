@@ -2,10 +2,10 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
 import com.ragagent.knowledge.api.faq.FaqChunkMetadata;
 import com.ragagent.knowledge.api.faq.FaqChunkMetadataCodec;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ChunkFacts;
 import com.ragagent.retrieval.api.ChunkSearchUtil;
 import com.ragagent.retrieval.api.ChunkTypes;

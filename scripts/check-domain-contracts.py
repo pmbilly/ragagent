@@ -91,6 +91,9 @@ LEVEL = _load_levels()
 
 #: 跨域只允许 import 对方的契约包；实现包（service/repository/adapter/domain/mapper）一律禁
 LEGAL_IMPORT_PKG = {'api', 'dto'}
+#: 域级扩展：storage 的 fileserve/support/config 是该域对外技术契约面（IO 载体/URL 重写/后端白名单，
+#: 蓝图 storage 批「能力接口/IO 载体算基础设施」），被 auth/channel/knowledge/session 跨域消费属既定形态。
+LEGAL_IMPORT_PKG_BY_DOMAIN = {'storage': {'api', 'dto', 'fileserve', 'support', 'config'}}
 
 #: 由级别判定为合法的边（①②③ 之外的第四档：上级 → 下级、或同级 → api/dto）
 _LEVEL_OK: set[str] = set()
@@ -113,7 +116,8 @@ def level_verdict(edge, imps):
     if la < lb:
         return 'inverted'
     pkgs = _EDGE_PKGS.get(edge) or set()
-    if not pkgs or any(p not in LEGAL_IMPORT_PKG for p in pkgs):
+    legal = LEGAL_IMPORT_PKG_BY_DOMAIN.get(b, LEGAL_IMPORT_PKG)
+    if not pkgs or any(p not in legal for p in pkgs):
         return 'inverted'
     return 'ok'
 

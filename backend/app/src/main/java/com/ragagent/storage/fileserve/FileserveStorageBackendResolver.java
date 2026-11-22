@@ -1,15 +1,15 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.framework.storage.support.FileUrlPort;
-import com.ragagent.framework.storage.support.StorageBackendResolver;
 import com.ragagent.framework.tenant.TenantConfigLookup;
 import com.ragagent.framework.tenant.TenantConfigLookup.TenantStorageView;
 import com.ragagent.storage.api.FileContentService;
+import com.ragagent.storage.support.FileUrlPort;
+import com.ragagent.storage.support.StorageBackendResolver;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 
 /**
- * {@code com.ragagent.framework.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
+ * {@code com.ragagent.storage.support.StorageBackendResolver} 的生产实现（A3-3 接线）。
  *
  * <p>此前该端口<b>没有实现</b>：HTTP 面的三处调用点（{@code SessionStreamController} /
  * {@code KnowledgeQaController} / {@code MessageController}）都按

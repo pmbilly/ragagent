@@ -2,7 +2,7 @@ package com.ragagent.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ChunkFacts;
 import com.ragagent.retrieval.api.KnowledgeDocumentFacts;
 import java.util.Map;

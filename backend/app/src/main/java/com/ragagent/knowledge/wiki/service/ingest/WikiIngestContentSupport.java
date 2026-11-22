@@ -1,10 +1,10 @@
 package com.ragagent.knowledge.wiki.service.ingest;
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseLookup;
 import com.ragagent.knowledge.api.wiki.SlugUpdate;
 import com.ragagent.knowledge.wiki.repository.ingest.WikiDeletedTombstoneStore;
 import com.ragagent.knowledge.wiki.service.WikiImageEnricher;
+import com.ragagent.llm.api.ChunkView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

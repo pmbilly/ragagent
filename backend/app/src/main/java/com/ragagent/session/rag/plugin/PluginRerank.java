@@ -2,13 +2,13 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.DocumentChunkMetadata;
 import com.ragagent.knowledge.api.GeneratedQuestion;
 import com.ragagent.knowledge.api.SearchTarget;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.llm.api.RankResult;
 import com.ragagent.llm.api.Reranker;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.ImageInfo;
 import com.ragagent.retrieval.api.RetrievalObsRows;

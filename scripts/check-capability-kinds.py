@@ -25,6 +25,9 @@ IMPORT_RE = re.compile(r"^import\s+(?:static\s+)?com\.ragagent\.(\w+)\.(\w+)\.",
 
 #: 跨 kind 只允许 import 对方的契约包；实现包（service/repository/adapter/domain/mapper）一律禁
 LEGAL_IMPORT_PKG = {"api", "dto"}
+# 域级扩展：storage 的 fileserve/support/config 是该域对外技术契约面（IO 载体/URL 重写/后端白名单，
+# 蓝图 §4.5「能力接口/IO 载体算基础设施」），被 auth/channel/knowledge/session 跨域消费属既定形态。
+LEGAL_IMPORT_PKG_BY_DOMAIN = {"storage": {"api", "dto", "fileserve", "support", "config"}}
 
 
 def main() -> int:
@@ -54,7 +57,7 @@ def main() -> int:
                     src_lv is not None
                     and tgt_lv is not None
                     and src_lv >= tgt_lv
-                    and sub_pkg in LEGAL_IMPORT_PKG
+                    and sub_pkg in LEGAL_IMPORT_PKG_BY_DOMAIN.get(target, LEGAL_IMPORT_PKG)
                 ):
                     continue
                 violations[(source, target)].append(str(path.relative_to(ROOT)))

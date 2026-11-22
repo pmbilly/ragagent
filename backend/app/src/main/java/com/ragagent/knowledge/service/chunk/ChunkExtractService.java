@@ -3,8 +3,6 @@ package com.ragagent.knowledge.service.chunk;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.tenant.TenantScopes;
-import com.ragagent.framework.vocabulary.GraphNode;
-import com.ragagent.framework.vocabulary.GraphRelation;
 import com.ragagent.knowledge.api.ExtractPrompts;
 import com.ragagent.knowledge.api.PromptInstructions;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
@@ -23,6 +21,8 @@ import com.ragagent.knowledge.support.ProcessOverridesResolver;
 import com.ragagent.knowledge.support.SubtaskDrain;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
+import com.ragagent.llm.api.GraphNode;
+import com.ragagent.llm.api.GraphRelation;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.llm.api.PipelineConfig;

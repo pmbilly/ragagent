@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.wiki.service;
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
+import com.ragagent.llm.api.ChunkView;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

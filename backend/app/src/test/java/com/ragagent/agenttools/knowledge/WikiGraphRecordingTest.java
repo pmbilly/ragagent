@@ -15,10 +15,10 @@ import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphRelationVi
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.GraphSearch;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.KnowledgeBaseView;
 import com.ragagent.agenttools.knowledge.QueryKnowledgeGraphTool.SearchResultView;
-import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.knowledge.api.SearchAuth.KnowledgeTagsFetcher;
 import com.ragagent.knowledge.api.SearchAuth.TagView;
 import com.ragagent.knowledge.api.SearchTarget;
+import com.ragagent.llm.api.ToolResult;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

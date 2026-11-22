@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.agentengine.api.AgentToolCall;
-import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;

@@ -13,8 +13,8 @@ import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.KnowledgeSearchBack
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RankResult;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.RerankerModel;
 import com.ragagent.agenttools.knowledge.KnowledgeSearchTool.SearchResultView;
-import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.knowledge.api.SearchTarget;
+import com.ragagent.llm.api.ToolResult;
 import com.ragagent.retrieval.api.ChunkFacts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

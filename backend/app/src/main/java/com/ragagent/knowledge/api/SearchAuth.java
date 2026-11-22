@@ -1,8 +1,8 @@
 package com.ragagent.knowledge.api;
 
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.SearchTarget.SearchTargets;
+import com.ragagent.llm.api.ChunkView;
 import com.ragagent.retrieval.api.ChunkFacts;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

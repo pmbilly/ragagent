@@ -1,7 +1,7 @@
 package com.ragagent.session.service.sse;
 
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.llm.api.ResponseType;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.modelruntime.stream.StreamEvent;
 import java.util.ArrayList;

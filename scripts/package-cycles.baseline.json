@@ -24,6 +24,13 @@
       "com.ragagent.retrieval.engine.sqlite",
       "com.ragagent.retrieval.engine.tencentvectordb",
       "com.ragagent.retrieval.engine.weaviate"
+    ],
+    [
+      "com.ragagent.storage.api",
+      "com.ragagent.storage.fileserve",
+      "com.ragagent.storage.provider",
+      "com.ragagent.storage.service",
+      "com.ragagent.storage.support"
     ]
   ],
   "depend_on_config": [],

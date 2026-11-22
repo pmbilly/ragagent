@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.retrieval.api.SearchChunkMerge;
 import com.ragagent.retrieval.api.SearchTextUtil;

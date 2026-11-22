@@ -6,11 +6,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.wiki.ExtractedItem;
 import com.ragagent.knowledge.wiki.prompt.WikiPrompts;
 import com.ragagent.knowledge.wiki.service.page.NewSlugFromCitation;
+import com.ragagent.llm.api.ChunkView;
 import com.ragagent.llm.api.LlmChatClient;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

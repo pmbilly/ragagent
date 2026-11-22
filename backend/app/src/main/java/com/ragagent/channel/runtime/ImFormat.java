@@ -1,6 +1,6 @@
 package com.ragagent.channel.runtime;
 
-import com.ragagent.framework.storage.support.StreamRewriter;
+import com.ragagent.storage.support.StreamRewriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;

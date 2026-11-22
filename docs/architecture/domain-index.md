@@ -10,8 +10,8 @@
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
 | **产品能力** | 6 | 982 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 5 | 602 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 2 | 190 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **集成适配** | 5 | 623 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **控制面** | 2 | 192 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
@@ -28,10 +28,10 @@
 | `mcp` | 集成适配 | 176 | 4 | — | `views/settings/McpSettings.vue` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `channel` | 集成适配 | 142 | 3 | — | `views/embed · views/settings（挂件渠道与 IM 渠道面板，合并批不改前端）` |
-| `storage` | 集成适配 | 74 | 3 | — | `views/settings/StorageBackendSettings.vue` |
+| `storage` | 集成适配 | 95 | 3 | — | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 63 | 3 | — | `views/settings/WebSearchSettings.vue` |
 | `auth` | 控制面 | 164 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
-| `audit` | 控制面 | 26 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
+| `audit` | 控制面 | 28 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
 | `model` | 能力配置 | 38 | 4 | — | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 20 | 1 | — | `views/settings/VectorStoreSettings.vue` |
 | `initialization` | 初始化向导 | 11 | 1 | — | `views/settings/OllamaSettings.vue · views/settings/ParserEngineSettings.vue` |

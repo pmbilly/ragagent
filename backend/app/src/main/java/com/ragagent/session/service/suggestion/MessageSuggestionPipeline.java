@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.channel.api.SuggestionItem;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.text.RequestLanguages;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.SearchTextUtil;
 import com.ragagent.session.domain.message.Message;
 import com.ragagent.session.service.suggestion.MessageSuggestionService.Evidence;

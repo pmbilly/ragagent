@@ -1,7 +1,7 @@
 package com.ragagent.session.rag.support;
 
-import com.ragagent.framework.vocabulary.SearchResult;
 import com.ragagent.knowledge.api.ChunkQueryPort;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -9,7 +9,7 @@ import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.agentengine.api.ToolCallTarget;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.jsonbind.ZeroTimeSerializer;
-import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.llm.api.ToolResult;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package com.ragagent.storage.service;
 
 import com.ragagent.framework.security.Hashes;
-import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.domain.StoredResource;
+import com.ragagent.storage.fileserve.StoragePaths;
 import com.ragagent.storage.provider.StorageProviders;
 import com.ragagent.storage.repository.ResourceRepository;
 import java.nio.charset.StandardCharsets;

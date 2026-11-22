@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchFilters;
 import com.ragagent.websearch.config.WebSearchProviderParams;

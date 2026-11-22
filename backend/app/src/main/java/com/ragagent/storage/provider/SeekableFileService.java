@@ -1,6 +1,6 @@
 package com.ragagent.storage.provider;
 
-import com.ragagent.framework.storage.support.SeekableSource;
+import com.ragagent.storage.support.SeekableSource;
 import java.io.IOException;
 
 /**

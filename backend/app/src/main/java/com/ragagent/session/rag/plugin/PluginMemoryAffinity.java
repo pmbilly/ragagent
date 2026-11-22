@@ -1,6 +1,6 @@
 package com.ragagent.session.rag.plugin;
 
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.memory.api.MemoryQueryPort;
 import com.ragagent.session.rag.PipelineEventType;
 import com.ragagent.session.rag.PipelineState;

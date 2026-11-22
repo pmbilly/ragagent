@@ -11,14 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ragagent.audit.api.AuditAction;
 import com.ragagent.audit.api.AuditOutcome;
+import com.ragagent.audit.api.KnowledgeBaseFacts;
+import com.ragagent.audit.api.KnowledgeBaseGateway;
 import com.ragagent.audit.controller.AuditLogController;
 import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.framework.tenant.TenantContext;
-import com.ragagent.framework.vocabulary.KnowledgeBaseFacts;
-import com.ragagent.framework.vocabulary.KnowledgeBaseGateway;
 import com.ragagent.framework.web.error.GlobalExceptionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

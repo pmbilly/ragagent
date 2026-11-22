@@ -1,11 +1,11 @@
 package com.ragagent.knowledge.adapter;
 
-import com.ragagent.framework.vocabulary.ChunkView;
 import com.ragagent.knowledge.api.chunk.ChunkPort;
 import com.ragagent.knowledge.api.projection.ChunkProjectionAdapter;
 import com.ragagent.knowledge.domain.Chunk;
 import com.ragagent.knowledge.repository.ChunkRepository;
 import com.ragagent.knowledge.support.ChunkRowViews;
+import com.ragagent.llm.api.ChunkView;
 import com.ragagent.retrieval.support.ImageInfoEnricher;
 import java.util.ArrayList;
 import java.util.List;

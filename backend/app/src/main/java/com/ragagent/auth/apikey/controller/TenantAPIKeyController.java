@@ -1,6 +1,8 @@
 package com.ragagent.auth.apikey.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.audit.api.KnowledgeBaseFacts;
+import com.ragagent.audit.api.KnowledgeBaseGateway;
 import com.ragagent.auth.api.TenantAPIKeyCreateResponse;
 import com.ragagent.auth.api.TenantAPIKeyResponse;
 import com.ragagent.auth.apikey.TenantAPIKeyNotFoundException;
@@ -11,8 +13,6 @@ import com.ragagent.auth.apikey.service.TenantAPIKeyValidator;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.KnowledgeBaseFacts;
-import com.ragagent.framework.vocabulary.KnowledgeBaseGateway;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonBodyErrors;

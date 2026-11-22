@@ -1,9 +1,9 @@
 package com.ragagent.session.rag.support;
 
 import com.ragagent.agentengine.api.PromptComposer;
-import com.ragagent.framework.vocabulary.SearchResult;
-import com.ragagent.framework.vocabulary.ToolResult;
 import com.ragagent.llm.api.ChatMessage;
+import com.ragagent.llm.api.SearchResult;
+import com.ragagent.llm.api.ToolResult;
 import com.ragagent.modelcontext.Registry;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.support.ImageInfoEnricher;

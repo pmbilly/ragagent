@@ -1,7 +1,7 @@
 package com.ragagent.websearch.service;
 
 
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.WebResultConverter;
 import com.ragagent.retrieval.api.WebSearchResult;
 import com.ragagent.websearch.api.WebSearchFilters;

@@ -14,7 +14,7 @@ import com.ragagent.channel.api.MessageExecutionContext;
 import com.ragagent.channel.api.MessageImage;
 import com.ragagent.channel.api.SuggestionAttribution;
 import com.ragagent.channel.api.UsedMemory;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.llm.api.TokenUsage;
 import com.ragagent.retrieval.api.MessageArtifact;
 import com.ragagent.session.domain.message.Message;

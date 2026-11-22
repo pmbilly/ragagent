@@ -2,7 +2,7 @@ package com.ragagent.session.rag.support;
 
 /**
  * 匹配类型常量（int 枚举）。
- * {@code com.ragagent.framework.vocabulary.SearchResult.matchType} 为 int，常量值即其取值。
+ * {@code com.ragagent.llm.api.SearchResult.matchType} 为 int，常量值即其取值。
  */
 public final class MatchTypes {
 

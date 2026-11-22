@@ -1,7 +1,5 @@
 package com.ragagent.storage.fileserve;
 
-import com.ragagent.framework.storage.fileserve.OpenedFile;
-import com.ragagent.framework.storage.fileserve.StoragePaths;
 import com.ragagent.storage.api.FileContentService;
 import com.ragagent.storage.api.StoragePathGuard;
 import com.ragagent.storage.api.WritableFileContentService;

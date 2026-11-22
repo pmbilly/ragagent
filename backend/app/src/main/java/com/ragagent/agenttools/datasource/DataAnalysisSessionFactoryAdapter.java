@@ -7,7 +7,7 @@ import com.ragagent.agenttools.api.DataAnalysisSessionFactory;
 import com.ragagent.agenttools.api.KnowledgeData;
 import com.ragagent.agenttools.api.TableSchema;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.llm.api.ToolResult;
 import java.util.ArrayList;
 import java.util.List;
 

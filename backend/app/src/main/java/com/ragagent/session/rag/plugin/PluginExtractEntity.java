@@ -2,12 +2,12 @@ package com.ragagent.session.rag.plugin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.knowledge.api.KnowledgeBaseBatchQueryPort;
 import com.ragagent.knowledge.api.KnowledgeDocumentQueryPort;
 import com.ragagent.knowledge.api.kb.KnowledgeBaseView;
 import com.ragagent.llm.api.EntityExtractionPort;
 import com.ragagent.llm.api.EntityExtractionResult;
+import com.ragagent.llm.api.GraphNode;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelFactoryPort;
 import com.ragagent.llm.api.PipelineConfig;

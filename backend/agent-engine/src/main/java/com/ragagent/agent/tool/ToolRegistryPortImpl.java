@@ -6,7 +6,7 @@ import com.ragagent.agentengine.api.ToolCancellation;
 import com.ragagent.agentengine.api.ToolExecContext;
 import com.ragagent.agentengine.api.ToolRegistryPort;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.vocabulary.ToolResult;
+import com.ragagent.llm.api.ToolResult;
 import java.util.List;
 
 /**

@@ -1,7 +1,7 @@
 package com.ragagent.knowledge.api;
 
-import com.ragagent.framework.vocabulary.GraphNode;
-import com.ragagent.framework.vocabulary.GraphRelation;
+import com.ragagent.llm.api.GraphNode;
+import com.ragagent.llm.api.GraphRelation;
 import com.ragagent.llm.api.PipelineConfig.PromptTemplateStructured;
 import java.io.InputStream;
 import java.util.ArrayList;

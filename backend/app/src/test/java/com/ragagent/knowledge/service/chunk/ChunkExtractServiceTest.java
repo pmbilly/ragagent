@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.framework.vocabulary.GraphNode;
 import com.ragagent.knowledge.api.ExtractPrompts;
 import com.ragagent.knowledge.api.WikiKnowledgeFinalizer;
 import com.ragagent.knowledge.domain.Chunk;
@@ -31,6 +30,7 @@ import com.ragagent.llm.api.ChatMessage;
 import com.ragagent.llm.api.ChatOptions;
 import com.ragagent.llm.api.ChatResponse;
 import com.ragagent.llm.api.ChatStream;
+import com.ragagent.llm.api.GraphNode;
 import com.ragagent.llm.api.LlmChatClient;
 import com.ragagent.llm.api.ModelRuntime;
 import com.ragagent.llm.extract.EntityExtractionAdapter;

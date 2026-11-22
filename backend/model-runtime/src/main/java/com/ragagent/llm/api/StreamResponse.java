@@ -1,6 +1,5 @@
 package com.ragagent.llm.api;
 
-import com.ragagent.framework.vocabulary.SearchResult;
 import java.util.List;
 import java.util.Map;
 

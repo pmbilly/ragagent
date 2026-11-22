@@ -1,7 +1,7 @@
 package com.ragagent.session.dto;
 
 
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.session.PipelineMessageAttachmentView;
 import java.time.OffsetDateTime;
 import java.util.List;

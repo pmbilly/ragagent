@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.ragagent.TestSchema;
 import com.ragagent.channel.api.MessageAttachment;
 import com.ragagent.channel.api.MessageImage;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.MessageArtifact;
 import com.ragagent.session.domain.conversation.Session;
 import com.ragagent.session.domain.message.Message;

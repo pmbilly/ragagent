@@ -5,7 +5,7 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.SsrfGuard;
-import com.ragagent.framework.storage.config.StorageAllowList;
+import com.ragagent.storage.config.StorageAllowList;
 import com.ragagent.storage.domain.StorageBackend;
 import com.ragagent.storage.dto.StorageConfig;
 import com.ragagent.storage.provider.StorageProviders;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.ragagent.agentengine.api.AgentPromptPlaceholders;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.security.InputSanitizer;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ChunkTypes;
 import com.ragagent.retrieval.api.RetrievalObsRows;
 import com.ragagent.session.MessageAttachmentsPrompt;

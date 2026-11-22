@@ -6,8 +6,8 @@ import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.agentengine.api.AgentToolCall;
 import com.ragagent.channel.api.MessageImage;
 import com.ragagent.framework.jsonbind.JsonMappers;
-import com.ragagent.framework.storage.support.Rewriter;
 import com.ragagent.session.domain.message.Message;
+import com.ragagent.storage.support.Rewriter;
 import java.util.List;
 
 /**

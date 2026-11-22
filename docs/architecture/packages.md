@@ -133,7 +133,7 @@
 | `:backend` | `com.ragagent.framework.persistence` | 平台持久化面：MyBatis 拦截器（全表写守卫 / 租户过滤）、分页请求、JSONB / 时间类型处理器、方言与 LIKE 转义。 |
 | `:backend` | `com.ragagent.framework.redis` | 平台 · Redis：SpringRedisPubSub / RedisPubSub。 |
 | `:backend` | `com.ragagent.framework.security` | 平台安全面：加密（AES）、SSRF 守卫/白名单、输入与日志净化、IP 分类、用户名查找。 |
-| `:backend` | `com.ragagent.framework.storage.config` | 平台存储配置面：允许清单、上传上限与存储运行时环境。 |
+| `:backend` | `com.ragagent.framework.storage.config` | 存储启动期环境快照与上传上限：framework 侧消费（llm 图片解析兜底、URL 抓取限额）与 app 侧装配共用。 |
 | `:backend` | `com.ragagent.framework.storage.fileserve` | 存储 · 文件服务：FileTransport / FileProxyPort / FileServeHttp…。 |
 | `:backend` | `com.ragagent.framework.storage.support` | 存储 · 支撑：FileResolverFactory / ResourceUrlMode / StreamRewriter…。 |
 | `:backend` | `com.ragagent.framework.task` | 平台任务面：Redis 任务队列核心（RedisTaskQueueCore）、 Redis 重试执行循环（RedisRetryingTaskQueue）、进程内执行队列 （InProcessTaskQ |
@@ -141,7 +141,7 @@
 | `:backend` | `com.ragagent.framework.text` | 平台文本与标记卫生面（原 text + html 两包合并）：契约文本原语、繁简转换、 请求语言解析、HTML→Markdown 转换、实体表与转义、路径/文件名/无效字符清洗、 退化检测与码点序比较。 |
 | `:backend` | `com.ragagent.framework.tracing` | 观测技术面：Langfuse/OTLP 适配与 trace 载体注入。 |
 | `:backend` | `com.ragagent.framework.tracing.langfuse` | 平台追踪面（Langfuse OTel 适配； |
-| `:backend` | `com.ragagent.framework.vocabulary` | 跨引擎晶格形状（终态 8 类，纯 JDK）：retrieval-engine 与 model-runtime 互不可见、 又都被 app/agent-engine 消费——framework 是它们唯一的共同可见层。 |
+| `:backend` | `com.ragagent.framework.vocabulary` | 跨引擎形状的最后一站（终态 1 类）：SseSink——SSE 帧出口接口，被 framework/web/ServletSseSink 实现；随 SseEmitter 替换批（蓝图 5.6.6）一并消亡。 |
 | `:backend` | `com.ragagent.framework.web` | 平台 Web 面：统一响应外壳、JSON 映射、分页/字段参数、请求 ID 过滤器、非空体/RBAC 拦截器与序列化器。 |
 | `:backend` | `com.ragagent.framework.web.error` | 平台错误面：`BizException` 家族（含 `GuardForbiddenException`、`PlainErrorException`）、统一响应外壳的错误分派与全局异常处理器。 |
 | `:backend` | `com.ragagent.framework.web.health` | 平台健康检查面。 |

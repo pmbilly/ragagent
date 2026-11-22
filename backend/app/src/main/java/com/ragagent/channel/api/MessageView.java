@@ -2,7 +2,7 @@ package com.ragagent.channel.api;
 
 import com.ragagent.agentengine.api.AgentStep;
 import com.ragagent.agentengine.api.MentionedItem;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.MessageArtifact;
 
 

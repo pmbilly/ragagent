@@ -1,5 +1,7 @@
 package com.ragagent.audit.controller;
 
+import com.ragagent.audit.api.KnowledgeBaseFacts;
+import com.ragagent.audit.api.KnowledgeBaseGateway;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
@@ -7,8 +9,6 @@ import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
-import com.ragagent.framework.vocabulary.KnowledgeBaseFacts;
-import com.ragagent.framework.vocabulary.KnowledgeBaseGateway;
 import com.ragagent.framework.web.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

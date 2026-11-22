@@ -1,6 +1,6 @@
 package com.ragagent.retrieval.api;
 
-import com.ragagent.framework.vocabulary.ChunkView;
+import com.ragagent.llm.api.ChunkView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

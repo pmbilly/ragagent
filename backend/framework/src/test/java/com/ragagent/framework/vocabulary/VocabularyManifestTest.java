@@ -20,9 +20,7 @@ class VocabularyManifestTest {
 
     /** vocabulary 白名单（终态 8）：MessageView 簇已迁 channel/api 与 agentengine/api（channel 合并批）；余下为晶格孤儿（双引擎消费）与待解钉件。 */
     private static final List<String> VOCABULARY_ALLOW =
-            List.of("ChunkView", "GraphNode", "GraphRelation",
-                    "KnowledgeBaseFacts", "KnowledgeBaseGateway",
-                    "SearchResult", "SseSink", "ToolResult");
+            List.of("SseSink");
 
     /** tenant 白名单：请求级租户上下文（原 access 包并入）+ 租户配置载荷与 API Key 模型（RbacInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
     private static final List<String> TENANT_ALLOW =

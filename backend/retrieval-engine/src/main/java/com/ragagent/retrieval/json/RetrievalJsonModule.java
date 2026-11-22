@@ -3,7 +3,7 @@ package com.ragagent.retrieval.json;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.ragagent.framework.jsonbind.JsonModuleProvider;
-import com.ragagent.framework.vocabulary.SearchResult;
+import com.ragagent.llm.api.SearchResult;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
 import com.ragagent.retrieval.api.SearchParams;
