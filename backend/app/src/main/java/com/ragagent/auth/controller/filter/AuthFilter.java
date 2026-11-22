@@ -70,6 +70,14 @@ public class AuthFilter extends OncePerRequestFilter {
         this.apiKeyAuthChannel = apiKeyAuthChannel;
     }
 
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        // SseEmitter 引入 async dispatch 后，本过滤器不得在异步派发阶段重复执行
+        //（鉴权/清理各只跑一次；async 轮询帧的写回不走本过滤器的安全语义）。
+        return true;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

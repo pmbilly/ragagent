@@ -11,10 +11,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT="${SMOKE_PORT:-18083}"
 LOG="${SMOKE_LOG:-/tmp/ragagent-ci-smoke.log}"
-JAR="$(find "$ROOT/boot/target" -maxdepth 1 -name 'boot-*.jar' ! -name '*.jar.original' | head -1)"
+JAR="$(find "$ROOT/backend/app/target" -maxdepth 1 -name 'app-*.jar' ! -name '*-tests.jar' ! -name '*.jar.original' | head -1)"
 
 if [[ -z "$JAR" ]]; then
-    echo "✗ 未找到 boot jar，请先 mvn -B -Dmaven.test.skip=true -pl boot -am package" >&2
+    echo "✗ 未找到 app jar，请先 mvn -B -DskipTests -pl backend/app -am package" >&2
     exit 1
 fi
 
@@ -37,7 +37,7 @@ trap cleanup EXIT
 
 echo "==> smoke: $(basename "$JAR") on :$PORT"
 (
-    cd "$ROOT/boot"
+    cd "$ROOT/backend/app"
     SERVER_PORT="$PORT" \
     DB_HOST="${DB_HOST:-localhost}" \
     DB_PORT="${DB_PORT:-15432}" \

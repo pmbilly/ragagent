@@ -6,7 +6,7 @@
 #   SSRF_WHITELIST_EXTRA=mcp.example.com scripts/java-server-up.sh
 #
 # ⚠️ **改完代码必须重启本脚本起的服务**（2026-10-10 实测，B184）：这里起的是
-# `boot/target/*.jar` 的**一次性快照**，重新构建只会替换磁盘上的 jar，进程仍跑旧代码
+# `backend/app/target/*.jar` 的**一次性快照**，重新构建只会替换磁盘上的 jar，进程仍跑旧代码
 # （表现为"改了没生效"，与业务代码无关）。停掉重启即可；
 # 在服务运行中跑 `mvn package` / `mvn verify` 后记得重启。
 #
@@ -50,21 +50,22 @@ JAVA_BIN="${JAVA_HOME:+${JAVA_HOME}/bin/}java"
 # 先构建再起 jar：Maven 的 spring-boot:run 在多模块 reactor 里会对每个 -am 模块执行该 goal，
 # 非组合根模块没有主类 ⇒ 直接用 package + java -jar。工作目录是仓库根，
 # application.yml 的相对路径（build/generated-migrations）口径不变。
-mvn -B -q -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -pl boot -am package >> "${LOG}" 2>&1 \
+# 只能 -DskipTests 不能 -Dmaven.test.skip：跨模块 test-jar 依赖（framework → model-runtime）需要 testCompile 产出。
+mvn -B -q -DskipTests -Dmaven.javadoc.skip=true -pl backend/app -am package >> "${LOG}" 2>&1 \
     || { echo "✗ 构建失败，见 ${LOG}"; exit 1; }
 
-# 运行副本：任何一次 mvn package/install 都会覆盖 boot/target/*.jar，
+# 运行副本：任何一次 mvn package/install 都会覆盖 backend/app/target/*.jar，
 # 运行中的进程若直接指向它，懒加载类会 ClassNotFoundException（本地踩过 3 次）。
 # 放在用户主目录：不进仓库、mvn clean 也碰不到（本地已踩过 target/ 下的副本被 clean 删掉）
 RUN_DIR="${HOME}/.ragagent/run"
 mkdir -p "${RUN_DIR}"
-cp -f boot/target/boot-0.0.1-SNAPSHOT.jar "${RUN_DIR}/boot.jar"
+cp -f backend/app/target/app-0.0.1-SNAPSHOT.jar "${RUN_DIR}/app.jar"
 
 SERVER_PORT="${JAVA_PORT}" \
 JWT_SECRET="${JWT_SECRET}" \
 SYSTEM_AES_KEY="${SYSTEM_AES_KEY}" \
 LOCAL_STORAGE_BASE_DIR="${LOCAL_STORAGE_BASE_DIR}" \
-"${JAVA_BIN}" -jar "${RUN_DIR}/boot.jar" >> "${LOG}" 2>&1 &
+"${JAVA_BIN}" -jar "${RUN_DIR}/app.jar" >> "${LOG}" 2>&1 &
 
 echo "==> waiting for readiness（Spring 启动 + Flyway 校验，约 20-40 秒）"
 wait_for_port "${JAVA_PORT}" /api/v1/knowledge-bases 40

@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 # dev server「陈旧」检测（B186；X4 起改看 Maven 的 target/classes）。
 #
-# 背景（B184 记录、B186 再次实测）：本仓 dev server（`scripts/java-server-up.sh` 起的
-# `mvn -pl boot -am spring-boot:run`）类路径里是**各模块的 target/classes**，而构建会
-# **就地重写**这些 class 文件 ⇒ 运行中的 JVM：已加载的类走旧视图、**惰性加载的类
-# 版本不一致** ⇒ 两种症状：
-#   · 全端点点 500（日志 `unhandled exception … ClassNotFoundException`）—— 2026-10-10 首见；
-#   · 某条"少走"的功能路径卡住/中断（日志 `NoClassDefFoundError: …/tools/wiki/WikiTexts`，
-#     前端表现为工具卡片**一直转圈**）—— 2026-10-10 二次实测（wiki 搜索）。
+# 背景（B184 记录、B186 再次实测）：`scripts/java-server-up.sh` 起的是运行副本
+# `~/.ragagent/run/app.jar`，而 `mvn package` 会就地重写 `backend/*/target/classes`
+# 与 `backend/app/target/app-*.jar` ⇒ 磁盘产物已更新、进程仍是旧代码，
+# 表现为"改了没生效"，历史上另有两种症状：全端点点 500（`ClassNotFoundException`）、
+# 某条"少走"的功能路径卡住（`NoClassDefFoundError`，前端工具卡片一直转圈）。
 #
-# 本脚本判断「正在跑的 dev server 是否比刚构建的产物更旧」；`mvn verify` 收尾时由 boot
-# 模块的 exec 调用，也可随时手动跑：bash scripts/dev-stale-check.sh
+# 本脚本判断「正在跑的 dev server 是否比刚构建的产物更旧」；`mvn verify` 收尾时由
+# backend/app 模块的 exec 调用，也可随时手动跑：bash scripts/dev-stale-check.sh
 # **永远退出 0**（只提醒，不阻断构建）。
 set -uo pipefail
 
@@ -33,11 +31,11 @@ START_EPOCH="$(date -j -f "%b %d %T %Y" "${START_RAW}" +%s 2>/dev/null \
     || date -d "${START_RAW}" +%s 2>/dev/null)"
 [ -z "${START_EPOCH}" ] && exit 0
 
-# 最新模块产物时刻（按目录 mtime 取最新的 target/classes）
-NEWEST_ARTIFACT="$(ls -dt domains/target/classes \
-    model-runtime/target/classes retrieval-engine/target/classes \
-    agent-engine/target/classes platform/target/classes \
-    contract/target/classes boot/target/classes 2>/dev/null | head -1)"
+# 最新产物时刻：五模块 target/classes 与组合根 jar，取 mtime 最新者
+NEWEST_ARTIFACT="$(ls -dt backend/framework/target/classes \
+    backend/model-runtime/target/classes backend/retrieval-engine/target/classes \
+    backend/agent-engine/target/classes backend/app/target/classes \
+    backend/app/target/app-*.jar 2>/dev/null | head -1)"
 [ -z "${NEWEST_ARTIFACT}" ] && exit 0
 ARTIFACT_EPOCH="$(stat -f %m "${NEWEST_ARTIFACT}" 2>/dev/null \
     || stat -c %Y "${NEWEST_ARTIFACT}" 2>/dev/null)"
@@ -47,8 +45,7 @@ if [ "${ARTIFACT_EPOCH}" -gt "${START_EPOCH}" ]; then
     echo ""
     echo "⚠️  dev server 已陈旧（B184/B186）：它在 ${PORT} 上启动于 $(date -r "${START_EPOCH}" '+%H:%M:%S')，"
     echo "    而构建产物已更新到 $(date -r "${ARTIFACT_EPOCH}" '+%H:%M:%S')（${NEWEST_ARTIFACT}）。"
-    echo "    该 JVM 的类路径已被就地重写 ⇒ 可能表现为全端点 500，或某条功能路径卡住"
-    echo "    （如 wiki 搜索的卡片一直转圈）。"
+    echo "    该进程跑的是启动时的 jar 快照 ⇒ 刚构建的改动不会生效。"
     echo "    处置：bash scripts/java-server-up.sh   ← 重启即恢复（与业务代码无关）"
     echo ""
 fi

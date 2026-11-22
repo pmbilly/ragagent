@@ -13,7 +13,7 @@
 #   - 五批划分 = B1 纪律（agent/chatpipeline 与 Spring 包分批，避免 Mockito attach 假红）
 #   - 每批失败即停并指明批次；全绿输出 ACCEPTANCE PASS
 #   - --changed 映射：改动文件 → 领域包 → 批次；命中「共享面」自动升格为全量五批：
-#     pom.xml 与模块构建脚本、domains/src 下的根包与资源、
+#     pom.xml 与模块构建脚本、backend 下的根包与资源、
 #     migrations/、以及未知新域（映射不认识的包一律保守处理）
 #   - 为什么不是每次全量：五个 --tests 过滤器互为 task 输入 → 批次间不共享缓存，
 #     全量一次约 3.5 分钟。日常提交用 --changed（秒~分钟级），交付门再全量。
@@ -108,7 +108,7 @@ if [ "$MODE" = changed ]; then
           SHARED="$SHARED $f" # 根包文件或未知新域 → 保守升格
         fi
         ;;
-      server/src/* | migrations/* | gradle/* | *.gradle.kts | gradle.properties | settings*)
+      pom.xml | backend/*/pom.xml | */src/*/resources/* | migrations/*)
         SHARED="$SHARED $f"
         ;;
       *)
@@ -120,7 +120,7 @@ if [ "$MODE" = changed ]; then
   SEL_DOMAINS="$(uniq_words "$SEL_DOMAINS")"
 
   if [ -z "$SEL_DOMAINS" ] && [ -z "$SHARED" ]; then
-    echo "── --changed（基线 ${BASE}）：无影响 :server:test 的改动（忽略 ${IGNORED} 个非源码文件）──"
+    echo "── --changed（基线 ${BASE}）：无影响 backend/app 测试的改动（忽略 ${IGNORED} 个非源码文件）──"
     echo "SKIP：没有需要跑的批次"
     exit 0
   fi
@@ -169,7 +169,7 @@ run_batch() {
     filters="${filters:+${filters},}com.ragagent.${d}.*"
   done
   t0=$(date +%s)
-  if mvn -B -pl boot test -Dtest="$filters" > "/tmp/acceptance-${name}.log" 2>&1; then
+  if mvn -B -pl backend/app test -Dtest="$filters" > "/tmp/acceptance-${name}.log" 2>&1; then
     t1=$(date +%s)
     echo "   PASS（$((t1 - t0))s）"
   else
