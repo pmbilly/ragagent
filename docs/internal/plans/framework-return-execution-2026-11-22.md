@@ -230,9 +230,22 @@ WP0（死代码+文档钉）──► WP1（model/tool，无依赖）──► W
 
 ## 9. 执行台账（执行 Agent 填写）
 
+> **已执行**（2026-11-22，8 commits fc9f58dd3..add0cd459，终态 5241/0/2 · 守卫 49/49）。
+> 逐批台账与 16 条 Ruling 见 `.superpowers/sdd/framework-return-execution-2026-11-22/progress.md`（会话级暂存，要点已回填本节）。
+
 | 批 | 日期 | 内容 | 验收数字（测试/守卫/金片） | 备注 |
 |---|---|---|---|---|
-| 基线 | | 开工全量 verify + 守卫 | / / | 参考上轮 5256/0/2 · 49/49 |
+| 基线 | 2026-11-22 | 开工全量 verify + 守卫 @7f3f5280f | 5257/0/2 · 49/49 | 必须带 ZZ_PG_JDBC=…/RagAgent（HANDOFF.md:109） |
+| WP0 | 2026-11-22 | 删 7 死 payload+GlobalEventBus+PromptTemplates；mixin 清理；orEmpty 内联 14 类；修 3 文档钉+索引漂移 | 5236/0/2 · 49/49 | 测试差值 -21 精确对账 |
+| WP1 | 2026-11-22 | model/tool 四类→llm.api/agentengine.api；C8 20→18；re→mr 依赖边补线（蓝图 §5.2） | 5236/0/2 · 49/49 | R6 矩阵登记新边 |
+| WP2 | 2026-11-22 | 晶格改道：SessionLastRequestState→im/api、SuggestionItem→embedchannel/api；6 类被 MessageView 聚合簇字段级反钉留守 | 5236/0/2 · 49/49 | D-1 的"同级放行"判断对 L2 通道域不成立；上游 D-4 判断正确 |
+| WP3 | 2026-11-22 | MemoryConfig/MemoryKeys/MemoryKinds→auth/api；SystemSettingRegistry→auth/system/dto；ConversationProperties→framework/config；settings 包删除 | 5236/0/2 · 49/49 | tenant 三类被 RbacInterceptor→TenantAPIKeyScope 钉链留守 |
+| WP4 | 2026-11-22 | prompt 10 类+11 YAML+extract_config.yaml 迁出；content 8 类+KnowledgeView/SearchTarget/ChunkFacts 随行；WikiLanguageSupport→text/RequestLanguages；prompt/content 包删除 | 5236/0/2 · 49/49 | PromptSource 断钉=清单副本内联；ExtractPrompts 落 knowledge/api（R10 拒实现包） |
+| WP5 | 2026-11-22 | 事件载荷 14 类迁出（agentengine/api 9+session/api+mcp/api）；mixin 拆三处；ContractJsonMixinsEvent 删除；守卫换锚三目录 | 5236/0/2 · 49/49 | 金片全绿=线格式零漂移 |
+| WP6 | 2026-11-22 | vocabulary 终态 20 类 package-info 重写；VocabularyManifestTest 双白名单棘轮（framework 首个自卫测试） | 5239/0/2 · 49/49 | 六寄住点 import 全部清零 |
+| 终审 | 2026-11-22 | fresh-context 审阅 verdict 可合并；3 Important 修复（PipelineMessageAttachmentView→session、C8 基线对齐、绑定钉测试） | 5241/0/2 · 49/49 | 终态 vocabulary 19+tenant 8；16 条 Ruling 在执行台账 |
+
+**终态验收对照（计划 §7）**：1 ✓（六目录消失，vocabulary 19+tenant 8——20/6 的原始目标经 13 条字段级反钉实证修正为 19/8，逐类理由在 package-info 与 Ruling 5/8/14）；2 ✓；3 ✓（环零新增、金片全绿）；4 ✓（VocabularyManifestTest）；5 部分——`retrieval.*`/`model.*`/knowledge/session 面归位 ✓、`error/event.Event/pagination/json` 留 framework ✓。
 
 ---
 
