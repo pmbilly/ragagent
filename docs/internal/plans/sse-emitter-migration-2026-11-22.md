@@ -126,3 +126,7 @@
 | F11 | agentChat 分派语义注释现在时（按 agent 配置 agentMode 判定，尊重显式配置；quick-answer 默认解析为 NORMAL 与历史一致） | 迁移叙事棘轮绿 |
 | **附带 Critical 前提修复** | **RbacInterceptor 跳过 ASYNC 派发**：completeError 的错误派发重跑拦截器时 AuthFilter finally 已清 TenantContext → 角色恒空 403（409 信封渲染的隐藏前提） | live 409 断言成立的前提 |
 | C2/SCC 基线 | controller-catch 121 处登记（两入口 catch(RuntimeException)=异步边界收尾）；包级 SCC 5 组固化 | 49/49 |
+
+## 7. 流程纪律修正（2026-11-22，用户复核提出）
+
+**注释/文档-only 批次的最小验收口径**（全量 verify 对注释改动零检出能力）：生成物重生成（gen-arch-index 等）+ 守卫套件 + 受影响模块 javadoc-check。全量 verify 保留给代码批次。另：契约纯度守卫修复——扫描段 vocabulary 已删但白名单静默跳过（B168 同款覆盖丢失），改为消失段显式报错（commit 02446a4ab）。
