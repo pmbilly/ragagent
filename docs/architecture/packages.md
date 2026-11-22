@@ -125,7 +125,7 @@
 | `:backend` | `com.ragagent.framework.config` | 平台配置面：部署属性与环境查找面。 |
 | `:backend` | `com.ragagent.framework.error` | 契约 · 错误：ErrorCode / BizException / AppError。 |
 | `:backend` | `com.ragagent.framework.event` | 契约 · 事件：EventBusInterface / EventBusFactory / EventHandler…。 |
-| `:backend` | `com.ragagent.framework.eventbus` | 平台事件总线面（platform.event/）： Event / EventBus / EventJson 等 9 类——进程内事件总线与载荷编解码。 |
+| `:backend` | `com.ragagent.framework.eventbus` | 进程内事件总线的实现面（每轮 QA/Agent 运行的局部订阅-发射机制）： EventBus（本体）、EventMiddleware（日志/计时/panic 恢复）、 EventIds（帧 id 生 |
 | `:backend` | `com.ragagent.framework.http` | 平台 HTTP 面：SSRF 策略下的安全抓取工具，以及全进程共享的裸 HTTP 传输层 （com.ragagent.framework.http.LlmTransport：连接级 SSRF 校验 + |
 | `:backend` | `com.ragagent.framework.json` | 契约 · JSON：ByteKeyOrder / JsonValues / ZeroTimes。 |
 | `:backend` | `com.ragagent.framework.jsonbind` | JSON 绑定：Jackson 的 mapper 工厂、契约 mixin 注册表与各模块贡献的模块 SPI。 |
