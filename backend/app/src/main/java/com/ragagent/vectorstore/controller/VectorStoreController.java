@@ -12,7 +12,11 @@ import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.RequestFields;
 import com.ragagent.retrieval.api.ConnectionConfig;
 import com.ragagent.retrieval.api.IndexConfig;
+import com.ragagent.vectorstore.assembler.VectorStoreAssembler;
 import com.ragagent.vectorstore.config.EnvVectorStores;
+import com.ragagent.vectorstore.controller.vo.VectorStoreRespVo;
+import com.ragagent.vectorstore.controller.vo.VectorStoreTypeVo;
+import com.ragagent.vectorstore.dto.VectorStoreResponse;
 import com.ragagent.vectorstore.dto.VectorStoreTypes;
 import com.ragagent.vectorstore.service.VectorStoreConfigService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,8 +81,8 @@ public class VectorStoreController {
     // ── 端点 ───────────────────────────────────────────────────────────
 
     @GetMapping("/types")
-    public ResponseEntity<?> listStoreTypes() {
-        return ResponseEntity.ok(VectorStoreTypes.all());
+    public ResponseEntity<List<VectorStoreTypeVo>> listStoreTypes() {
+        return ResponseEntity.ok(VectorStoreAssembler.toTypeVoList(VectorStoreTypes.all()));
     }
 
     @PostMapping("/test")
@@ -96,7 +100,7 @@ public class VectorStoreController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createStore(@RequestBody(required = false) String rawBody) {
+    public ResponseEntity<VectorStoreRespVo> createStore(@RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         JsonNode body = parseOrValidator(rawBody);
         String name = textOrNull(body, "name");
@@ -113,28 +117,28 @@ public class VectorStoreController {
         }
         var created = service.createResponse(tenantId, name, engineType,
                 configOf(body, "connectionConfig"), indexOf(body, "indexConfig"));
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(VectorStoreAssembler.toVo(created));
     }
 
     /** env stores 在前、DB stores 在后（合并顺序固定） */
     @GetMapping
-    public ResponseEntity<?> listStores() {
+    public ResponseEntity<List<VectorStoreRespVo>> listStores() {
         long tenantId = requireTenant();
-        return ResponseEntity.ok(service.listResponses(tenantId));
+        return ResponseEntity.ok(VectorStoreAssembler.toVoList(service.listResponses(tenantId)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getStore(@PathVariable("id") String id) {
+    public ResponseEntity<VectorStoreRespVo> getStore(@PathVariable("id") String id) {
         long tenantId = requireTenant();
-        Object response = service.getResponse(tenantId, id);
+        VectorStoreResponse response = service.getResponse(tenantId, id);
         if (response == null) {
             throw notFoundPure();
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(VectorStoreAssembler.toVo(response));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateStore(@PathVariable("id") String id,
+    public ResponseEntity<VectorStoreRespVo> updateStore(@PathVariable("id") String id,
             @RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         if (EnvVectorStores.isEnvStoreId(id)) {
@@ -147,11 +151,11 @@ public class VectorStoreController {
         if (req.name() == null || req.name().isEmpty()) {
             throw validator("Name");
         }
-        Object result = service.updateNameResponse(tenantId, id, req.name());
+        VectorStoreResponse result = service.updateNameResponse(tenantId, id, req.name());
         if (result == null) {
             throw notFoundPure();
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(VectorStoreAssembler.toVo(result));
     }
 
     @DeleteMapping("/{id}")

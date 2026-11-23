@@ -102,6 +102,7 @@ mvn -B clean verify
 | 9 | 内联全限定名 | 全闸门才红（`check-fully-qualified-names.py`） | 快闸已含此检查，import 后用短名 |
 | 10 | 分页包裹差一层 | 金片红，响应多/少一层嵌套 | `PageResult.of(items, total, page, pageSize)` 四项都要传 |
 | 11 | 嵌套字段 null 语义被改写 | 金片红：可空列表由 `null` 变 `[]` | 装配器对**可空嵌套列表**保持 `null` 透传；只有端点级"空列表兜底"才用 `List.of()` |
+| 12 | 嵌套类字段抄漏 | 金片红，响应少几个键（如 `min`/`max`/`enumValues`） | 源类的字段常**分散在文件末尾**；按整个类体核对，不要用 `head -N` 截断输出后就抄 |
 
 ## 5. 高风险改造：先建影子控制器
 
@@ -159,6 +160,7 @@ backend/app/src/main/java/com/ragagent/knowledge/
 | `auth`（管理面） | 4 | 0（复用） | 4 | 邀请/成员**列表**端点是 Map 包裹，按 §2 不动；`TenantRowView` 是 L1 行视图不 VO 化 |
 | `audit` | 2 | 1 | 3 | 原响应 `items` 是实体直出（`List<AuditLog>`），本批一并切断；无金片但有 standalone 契约测试 |
 | `websearch` | 3 | 1 | 5 | 先显式化 `ResponseEntity<?>`；`updateProvider` 因两条返回形状不同，保持 `?` 是正确解 |
+| `vectorstore` | 2 | 1 | 5 | 同上；嵌套 `FieldInfo` 有 10 个字段（末三个易漏） |
 
 已知盲区：本手册 §3.1 的 grep 只抓 `ResponseEntity<...>` / `ApiResponse<...>`，**裸返回类型会漏**（`memory` 的 `MemoryListResponse<T>`、`MemoryTopicView` 等就是这样漏掉的）。侦察时补一条：`grep -E "public [A-Z][A-Za-z]+<" 控制器`。
 
