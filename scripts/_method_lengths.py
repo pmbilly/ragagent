@@ -13,7 +13,7 @@ public/private/protected 会漏掉门面里的大量包级方法（红态探针�
 import pathlib
 import re
 
-MODULES = ["backend/contract", "backend/framework", "backend/model-runtime", "backend/retrieval-engine",
+MODULES = ["backend/framework", "backend/model-runtime", "backend/retrieval-engine",
            "backend/agent-engine", "backend/app"]
 
 DECL = re.compile(r"^ {4}(?! )(?!if\b|for\b|while\b|switch\b|catch\b|try\b|else\b|return\b|"

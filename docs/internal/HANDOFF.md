@@ -29,7 +29,7 @@
 
 **阶段**：P0 基线 → P1 规则先行 → P2 纯包移动 → P3 类职责归位 → P4 `api` 语义与边界校验（见 §5）。
 
-**当前状态（2026-11-21）**：**P0~P4 与 S1、S6 已完成**；7 模块 → **5 模块**（`domains`→`app`、`boot`→`app`、`contract` 解散）。P0 三份基线可复现；P1 两条棘轮在线（R-1 跨域直连 1 条 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 消 40 / 留 22；P4 跨域直连 2 → 1。**`shared` 已于 2026-11-22 清零**（153 个业务词汇全部归位：各域/引擎 `api` + `framework.{vocabulary,tenant}`）。全量条数以开工基线重测为准（旧口径 5257 已过期：`contract`/`platform`/`boot` 三个模块名都不存在了；S6 记录为 app 4220 · model-runtime 321 · retrieval-engine 286 · agent-engine 157）。守卫 **49/49**。
+**当前状态（2026-11-21）**：**P0~P4 与 S1、S6 已完成**；7 模块 → **5 模块**（`domains`→`app`、`boot`→`app`、`contract` 解散）。P0 三份基线可复现；P1 两条棘轮在线（R-1 跨域直连 1 条 · R-2 注解 SQL 282）；P2 32 个 Adapter 迁入 `adapter/`；P3 回引 62 → 消 40 / 留 22；P4 跨域直连 2 → 1。**`shared` 已于 2026-11-22 清零**（153 个业务词汇全部归位：各域/引擎 `api` + `framework.{vocabulary,tenant}`）。全量条数以开工基线重测为准（旧口径 5257 已过期：`contract`/`platform`/`boot` 三个模块名都不存在了；S6 记录为 app 4220 · model-runtime 321 · retrieval-engine 286 · agent-engine 157）。守卫 **50/50**（2026-11-23 WPQ 批：+参数数量棘轮 +Checkstyle 嵌套硬门，方法长度棘轮收紧至 >80）。
 
 ## 1. 仓库身份与分支
 
@@ -186,7 +186,9 @@ app             1489 件（17 个业务域 + config 装配根）
 | `check-internal-codes.py` | 主码注释禁止批次号/裸日期戳（ISO-8601 时间示例保留）；旧夹具名不得回流 | 硬零 |
 | `gen-module-map.py --check` | 模块/包根、业务域文件/控制器数量与 `module-package-map.md` 同步 | 硬零 |
 | `check-version-consistency.py` | Boot/springdoc/MyBatis-Plus jsqlparser/README/wrapper/Dockerfile 版本一致 | 硬零 |
-| `check-method-length.py` | 方法长度棘轮（>150 行只许减，新增即红） | `method-length.baseline.json`（只许减） |
+| `check-method-length.py` | 方法长度棘轮（2026-11-23 收紧：>80 行只许减，新增即红） | `method-length.baseline.json`（只许减） |
+| `check-parameter-count.py` | 参数数量棘轮（WPQ2c：>7 参方法/构造器只许减，新增即红） | `parameter-count.baseline.json`（只许减） |
+| Checkstyle 嵌套硬门 | 嵌套深度（if/for/try 各 max=2，`config/checkstyle.xml`，Maven validate 拦截，零抑制） | 硬零 |
 | `check-wiring-points.py` | 装配点清单（W1~W4：@Configuration 必须登记；分类/理由/overview 三处一致） | `wiring-points.baseline.json` |
 | `check-doc-truth.py` | 文档事实（README 的模块数/控制器数/package-info 覆盖率必须与代码一致） | 硬零 |
 | `check-known-gaps.py` | 已知缺口（类注释声明缺口必须指向 `HANDOFF §11.1`） | 硬零 |
@@ -208,7 +210,7 @@ app             1489 件（17 个业务域 + config 装配根）
 | `gen-domain-index.py --check` | 业务域索引（`domain-index.md` 必须与分类/源码同步） | 硬零 |
 | ArchUnit `ArchitectureRulesTest` | A1~A20（含 A16/A17 边界禁令、A18 状态所有权、A19 分层、A20 装配契约） | 各基线只许减 |
 
-> 守卫总数以 `scripts/run-guards.sh` 的**汇总行**为准（当前 **49** 条；`^run ` 行 49 处，另 1 处 `run` 在注释里）；本表是语义索引，二者增删要同步。
+> 守卫总数以 `scripts/run-guards.sh` 的**汇总行**为准（当前 **50** 条；`^run ` 行 50 处，另 1 处 `run` 在注释里）；本表是语义索引，二者增删要同步。
 
 ## 9. 落刀方法论（精要；**全量判据见归档 v0.2.0 §13/§14**）
 

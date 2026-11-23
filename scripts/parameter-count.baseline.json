@@ -1,0 +1,351 @@
+{
+  "note": ">7 参签名基线（方法+构造器）：只许减；新增必须人工登记理由；--write 不新增条目。",
+  "threshold": 7,
+  "growthSlack": 0,
+  "parameters": {
+    "backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java#AgentEngine": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java#executeLoop": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java#withSkills": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/ReActIteration.java#runReActIteration": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/ReActIteration.java#runReActIterationBody": {
+      "count": 13,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/ThinkPhase.java#emitAnswer": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/compaction/CompactionResult.java#CompactionResult": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agentengine/api/AgentCompleteData.java#AgentCompleteData": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agentengine/api/AgentToolResultData.java#AgentToolResultData": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agentengine/api/ContextCompactedData.java#ContextCompactedData": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/agentmanagement/repository/AgentQuestionRepository.java#listRecommendedFaqChunks": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/audit/api/ActivityAuditRecorder.java#record": {
+      "count": 12,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/audit/service/AuditLogService.java#newAuditLog": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/controller/AuthController.java#AuthController": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/controller/TenantCatalogController.java#TenantCatalogController": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/system/dto/SystemSettingRegistry.java#spec": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/system/service/DeploymentCapabilitiesHolder.java#bind": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/channel/wecom/WecomLongConnClient.java#fileMessage": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/channel/wecom/WecomWebhookAdapter.java#WecomWebhookAdapter": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/channel/yunzhijia/YunzhijiaAdapter.java#YunzhijiaAdapter": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/config/RuntimeSnapshotWiring.java#RuntimeSnapshotWiring": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/domain/DataSourceSyncPayload.java#withTracing": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/service/DataSourceService.java#DataSourceService": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/service/DataSourceSupport.java#recordKbActivity": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/service/DataSourceSyncResultOps.java#updateSyncRunResult": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/service/MapperKnowledgeBridge.java#insertFileRow": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/adapter/KnowledgeCatalogAdapter.java#KnowledgeCatalogAdapter": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/adapter/KnowledgeCatalogAdapter.java#listFaqEntries": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/adapter/KnowledgeCatalogAdapter.java#listKnowledge": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/adapter/KnowledgeCatalogAdapter.java#listPagedChunksByKnowledgeId": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/controller/FaqController.java#listEntries": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/domain/QuestionBatchPayload.java#QuestionBatchPayload": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/domain/QuestionBatchPayload.java#withTracing": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/repository/ChunkRepository.java#listPagedChunksByKnowledgeId": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/repository/ChunkRepository.java#pagedFilter": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/repository/FaqChunkRepository.java#updateChunkFieldsByTagId": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/repository/KnowledgeRepository.java#searchPage": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkExtractService.java#ChunkExtractService": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkExtractService.java#ChunkExtractService#2": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkQuestionService.java#ChunkQuestionService": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/enrichment/KnowledgeSummaryService.java#KnowledgeSummaryService": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryCommandService.java#FaqEntryCommandService": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryQueryService.java#convertSearchResults": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryQueryService.java#fillPriorityLevel": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryQueryService.java#listEntries": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryQueryService.java#searchFaqChunks": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqImportService.java#FaqImportService": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqIndexWriter.java#FaqIndexWriter": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeBaseService.java#KnowledgeBaseService": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeCloneService.java#KnowledgeCloneService": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeMoveService.java#KnowledgeMoveService": {
+      "count": 12,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeService.java#listKnowledge": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeTagService.java#KnowledgeTagService": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/query/KnowledgeSpanService.java#spanNode": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/task/KnowledgeFinalizingStage.java#KnowledgeFinalizingStage": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/task/KnowledgeIndexStage.java#KnowledgeIndexStage": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#buildUpdates": {
+      "count": 14,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#classifyAndMerge": {
+      "count": 15,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#extractCandidatesWithFallback": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/api/MCPOAuthRequiredData.java#MCPOAuthRequiredData": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/api/ToolApprovalRequiredData.java#ToolApprovalRequiredData": {
+      "count": 15,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/service/McpMetadataService.java#commitMCPMetadata": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpExposure.java#loadMcpDirectory": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpExposure.java#registerMcpTools": {
+      "count": 11,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/repository/MemoryRepository.java#MemoryRepository": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/controller/SessionStreamController.java#SessionStreamController": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/conversation/SessionService.java#SessionService": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/qa/QaTurnExecutor.java#QaTurnExecutor": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginChatCompletionStream.java#endStream": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginSearchOps.java#searchModelGroup": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/repository/TemporaryDocumentRepository.java#markReady": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java#AgentEngineAssembler": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentToolBackends.java#AgentToolBackends": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentWebPages.java#AgentWebPages": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java#SessionKnowledgeQaService": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/storage/provider/OssFileService.java#OssFileService": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/storage/provider/TenantFileServiceResolver.java#resolveWithFallback": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/storage/provider/TosFileService.java#TosFileService": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/app/src/main/java/com/ragagent/websearch/dto/WebSearchProviderTypes.java#of": {
+      "count": 10,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/embedding/provider/AzureOpenAiEmbedder.java#AzureOpenAiEmbedder": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelcontext/ToolPolicy.java#policy": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java#HybridSearchService": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/api/IndexDocument.java#IndexDocument": {
+      "count": 9,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/elasticsearch/ElasticsearchV7RetrieveRepository.java#ElasticsearchV7RetrieveRepository": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/elasticsearch/ElasticsearchV8RetrieveRepository.java#ElasticsearchV8RetrieveRepository": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/opensearch/OpenSearchRetrieveRepository.java#OpenSearchRetrieveRepository": {
+      "count": 8,
+      "reason": "存量基线（WPQ2c 首次登记，2026-11-23）"
+    }
+  }
+}

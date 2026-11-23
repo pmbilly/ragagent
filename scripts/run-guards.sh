@@ -31,7 +31,8 @@ run '前端契约键棘轮（前端 snake / 后端 camel）' python3 scripts/che
 run '换锚棘轮 + 冻结覆盖快照（--strict：非冻结面不许新增 snake 键；冻结面不许静默失去覆盖）' python3 scripts/check-json-key-case.py --strict
 run '事件面/路由面命名口径（B93b）'    python3 scripts/check-event-face-case.py
 run '大文件棘轮（B121：不得新增 >600 行主源码）' python3 scripts/check-file-size.py
-run '方法长度棘轮（M1：>150 行只许减，新增即红）' python3 scripts/check-method-length.py
+run '方法长度棘轮（M1 起步，2026-11-23 收紧至 >80 行只许减，新增即红）' python3 scripts/check-method-length.py
+run '参数数量棘轮（WPQ2c：>7 参方法/构造器只许减，新增即红）' python3 scripts/check-parameter-count.py
 run '卫生预算计数（>100 行方法 / trim 副本 / ≥8 参构造器 只许减）' python3 scripts/check-hygiene-budget.py
 run '目录卫生（B124：游离目录 / 死包目录）' python3 scripts/check-stray-dirs.py
 run '死成员守卫（B131）'             python3 scripts/check-dead-members.py
