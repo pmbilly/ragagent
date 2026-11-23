@@ -152,6 +152,7 @@ backend/app/src/main/java/com/ragagent/knowledge/
 | `memory` | 6 | 1 | 7 | 含泛型分页壳 `MemoryListRespVo<T>`；导出空 `items` 必须保持 null |
 | `storage` | 4 | 2 | 6 | 另 5 个是空体 / `Map` / 文件流，按 §2 不动 |
 | `agentmanagement` | 2 | 1 | 5 | VO 必须复制源 record 的 `@JsonPropertyOrder` / `NON_NULL` 注解，否则线格式变 |
+| `channel` | 2 | 1 | 4 | 另有 28 个端点是 `SseEmitter` / 手搓 `Map` / 控制器包内响应类，按 §2 不动 |
 
 已知盲区：本手册 §3.1 的 grep 只抓 `ResponseEntity<...>` / `ApiResponse<...>`，**裸返回类型会漏**（`memory` 的 `MemoryListResponse<T>`、`MemoryTopicView` 等就是这样漏掉的）。侦察时补一条：`grep -E "public [A-Z][A-Za-z]+<" 控制器`。
 

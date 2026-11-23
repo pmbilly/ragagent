@@ -10,7 +10,7 @@
 | 种类 | 域数 | 文件 | 控制器 | 说明 |
 |---|---:|---:|---:|---|
 | **产品能力** | 6 | 1001 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
-| **集成适配** | 5 | 631 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
+| **集成适配** | 5 | 636 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
 | **控制面** | 2 | 192 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 58 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
@@ -26,8 +26,8 @@
 | `agentmanagement` | 产品能力 | 32 | 2 | — | `views/agent` |
 | `favorite` | 产品能力 | 17 | 1 | — | `views/agent · views/knowledge（列表置顶/收藏）` |
 | `mcp` | 集成适配 | 176 | 4 | — | `views/settings/McpSettings.vue` |
+| `channel` | 集成适配 | 147 | 3 | — | `views/embed · views/settings（挂件渠道与 IM 渠道面板，合并批不改前端）` |
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
-| `channel` | 集成适配 | 142 | 3 | — | `views/embed · views/settings（挂件渠道与 IM 渠道面板，合并批不改前端）` |
 | `storage` | 集成适配 | 103 | 3 | — | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 63 | 3 | — | `views/settings/WebSearchSettings.vue` |
 | `auth` | 控制面 | 164 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
@@ -49,8 +49,8 @@
 | `agentmanagement` | `AgentController`、`SkillController` | — |
 | `favorite` | `UserFavoriteController` | — |
 | `mcp` | `AgentToolApprovalController`、`McpCredentialsController`、`McpOAuthController`、`McpServiceController` | — |
-| `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `channel` | `EmbedChannelController`、`ImCallbackController`、`ImChannelController` | — |
+| `datasource` | `DataSourceController`、`DataSourceCredentialsController` | — |
 | `storage` | `FileProxyController`、`StorageBackendController`、`StorageEngineController` | — |
 | `websearch` | `WebSearchController`、`WebSearchProviderController`、`WebSearchProviderCredentialsController` | — |
 | `auth` | `AuthController`、`SystemAdminController`、`SystemController`、`TenantAPIKeyController`、`TenantAPIPrincipalController`、`TenantCatalogController`、`TenantInvitationController`、`TenantMemberController` | — |

@@ -2,7 +2,10 @@ package com.ragagent.channel.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.channel.assembler.ImChannelAssembler;
 import com.ragagent.channel.channel.wechat.WechatQRCodeService;
+import com.ragagent.channel.controller.vo.ImChannelRowRespVo;
+import com.ragagent.channel.controller.vo.ImChannelSummaryRespVo;
 import com.ragagent.channel.dto.ImChannelRows;
 import com.ragagent.channel.service.ImChannelService;
 import com.ragagent.framework.error.AppError;
@@ -80,7 +83,7 @@ public class ImChannelController {
 
     /** 创建渠道：201 + 裸资源行。 */
     @PostMapping("/api/v1/agents/{id}/im-channels")
-    public ResponseEntity<ImChannelRows.ChannelRow> create(@PathVariable("id") String agentId,
+    public ResponseEntity<ImChannelRowRespVo> create(@PathVariable("id") String agentId,
                                                       @RequestBody(required = false) String rawBody) {
         if (agentId == null || agentId.isEmpty()) {
             return plain(400, "agent_id is required");
@@ -126,12 +129,12 @@ public class ImChannelController {
         } catch (RuntimeException e) {
             return plain(500, "failed to create channel");
         }
-        return ResponseEntity.status(201).body(ImChannelRows.channelRow(channel));
+        return ResponseEntity.status(201).body(ImChannelAssembler.toChannelVo(ImChannelRows.channelRow(channel)));
     }
 
     /** per-agent 列表 = 裸数组（凭据不出现在列表行，IMChannelSummary）。 */
     @GetMapping("/api/v1/agents/{id}/im-channels")
-    public ResponseEntity<List<ImChannelRows.ChannelSummary>> listByAgent(@PathVariable("id") String agentId) {
+    public ResponseEntity<List<ImChannelSummaryRespVo>> listByAgent(@PathVariable("id") String agentId) {
         if (agentId == null || agentId.isEmpty()) {
             return plain(400, "agent_id is required");
         }
@@ -141,7 +144,7 @@ public class ImChannelController {
             for (var ch : channels) {
                 data.add(ImChannelRows.summaryRow(ch));
             }
-            return ResponseEntity.ok(data);
+            return ResponseEntity.ok(ImChannelAssembler.toSummaryVoList(data));
         } catch (RuntimeException e) {
             return plain(500, "failed to list channels");
         }
@@ -181,7 +184,7 @@ public class ImChannelController {
 
     /** 更新渠道：成功 200 + 资源行。 */
     @PutMapping("/api/v1/im-channels/{id}")
-    public ResponseEntity<ImChannelRows.ChannelRow> update(@PathVariable("id") String channelId,
+    public ResponseEntity<ImChannelRowRespVo> update(@PathVariable("id") String channelId,
                                                       @RequestBody(required = false) String rawBody) {
         if (channelId == null || channelId.isEmpty()) {
             return plain(400, "channel id is required");
@@ -229,7 +232,7 @@ public class ImChannelController {
         } catch (RuntimeException e) {
             return plain(500, "failed to update channel");
         }
-        return ResponseEntity.ok(ImChannelRows.channelRow(channel));
+        return ResponseEntity.ok(ImChannelAssembler.toChannelVo(ImChannelRows.channelRow(channel)));
     }
 
     /** 删除渠道：任何失败都落 500 "failed to delete channel"；成功 200 + {@code ApiResponse} 外壳。 */
@@ -248,13 +251,13 @@ public class ImChannelController {
 
     /** 切换启用状态：任何失败都落 500 "failed to toggle channel"。 */
     @PostMapping("/api/v1/im-channels/{id}/toggle")
-    public ResponseEntity<ImChannelRows.ChannelRow> toggle(@PathVariable("id") String channelId) {
+    public ResponseEntity<ImChannelRowRespVo> toggle(@PathVariable("id") String channelId) {
         if (channelId == null || channelId.isEmpty()) {
             return plain(400, "channel id is required");
         }
         try {
             var channel = service.toggleChannel(channelId, currentTenant());
-            return ResponseEntity.ok(ImChannelRows.channelRow(channel));
+            return ResponseEntity.ok(ImChannelAssembler.toChannelVo(ImChannelRows.channelRow(channel)));
         } catch (RuntimeException e) {
             return plain(500, "failed to toggle channel");
         }

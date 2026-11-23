@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-353 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -73,6 +73,7 @@
 | `:backend` | `com.ragagent.auth.system.service` | 系统 · 服务：SystemAdminUserService / SystemSettingService / SystemInfoService…。 |
 | `:backend` | `com.ragagent.channel` | 种类：集成适配 入口：渠道回调适配与挂件会话端口（channel. |
 | `:backend` | `com.ragagent.channel.api` | embedchannel 域对外契约。 |
+| `:backend` | `com.ragagent.channel.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.channel.callback` | IM · 平台回调处理：渠道校验、适配器验签/解析与 ACK 直写。 |
 | `:backend` | `com.ragagent.channel.channel.dingtalk` | 渠道 · dingtalk：DingtalkAdapter / DingtalkAdapterFactory / DingtalkStreamClient。 |
 | `:backend` | `com.ragagent.channel.channel.feishu` | 渠道 · feishu：FeishuAdapter / FeishuLongConnClient / FeishuAdapterFactory…。 |
@@ -85,6 +86,7 @@
 | `:backend` | `com.ragagent.channel.channel.yunzhijia` | 渠道 · yunzhijia：YunzhijiaAdapter / YunzhijiaLongConnClient / YunzhijiaAdapterFactory…。 |
 | `:backend` | `com.ragagent.channel.controller` | IM · HTTP 层：ImCallbackController / ImChannelController。 |
 | `:backend` | `com.ragagent.channel.controller.filter` | 渠道域过滤器：挂件令牌交换与 API-Key 作用域清理（EmbedAuthFilter）。 |
+| `:backend` | `com.ragagent.channel.controller.vo` | 渠道模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.channel.domain` | IM · 领域模型：ChannelSessionEntity / ImChannelEntity。 |
 | `:backend` | `com.ragagent.channel.dto` | IM · 传输形状：渠道响应行。 |
 | `:backend` | `com.ragagent.channel.mapper` | IM · 映射：ChannelSessionMapper / ImChannelMapper。 |
