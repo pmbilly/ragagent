@@ -16,12 +16,14 @@ import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.system.service.DeploymentCapabilitiesHolder;
 import com.ragagent.framework.config.DeploymentProperties;
+import com.ragagent.framework.config.SecurityHeaderProperties;
 import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tracing.langfuse.LangfuseHttpInterceptor;
 import com.ragagent.framework.web.ApiResultInterceptor;
 import com.ragagent.framework.web.RbacInterceptor;
 import com.ragagent.framework.web.RequestIdFilter;
+import com.ragagent.framework.web.SecurityHeadersFilter;
 import java.util.List;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -36,7 +38,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * 全局装配顺序：CORS → RequestID → Auth（认证走 servlet filter）。
+ * 全局装配顺序：CORS → 安全头 → RequestID → Auth（认证走 servlet filter）。
  * 错误处理由 GlobalExceptionHandler + Spring 默认错误机制承担，
  * 响应契约由 golden 测试锁定。
  */
@@ -68,7 +70,10 @@ public class WebConfig implements WebMvcConfigurer {
         this.tenantProperties = tenantProperties;
     }
 
-    /** CORS：通配 Origin、显式头清单、MaxAge 12h */
+    /**
+     * CORS：通配 Origin、显式头清单、MaxAge 12h。
+     * 通配 Origin 与 allowCredentials(true) 并存是已知收紧点，见 HANDOFF §11.1。
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -90,6 +95,16 @@ public class WebConfig implements WebMvcConfigurer {
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+
+    /** 全局安全响应头：CORS 之后、认证之前，认证短路写 401 的响应同样带头。 */
+    @Bean
+    public FilterRegistrationBean<SecurityHeadersFilter> securityHeadersFilter(SecurityHeaderProperties properties) {
+        FilterRegistrationBean<SecurityHeadersFilter> bean =
+                new FilterRegistrationBean<>(new SecurityHeadersFilter(properties.isEnabled()));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 5);
+        bean.addUrlPatterns("/*");
         return bean;
     }
 

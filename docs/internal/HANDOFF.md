@@ -265,6 +265,7 @@ app             1489 件（17 个业务域 + config 装配根）
 | 18 | Wiki 页面 → chunks 同步 | 待实现 | Wiki 内容不写入 `chunks`，不参与常规 RAG；走 Wiki 专用检索 |
 | 19 | `Provider.validateConfig()` 生产接线 | 已关闭（Q1） | `ModelConfigValidator` 在模型保存（创建/更新/凭据）路径统一调用，只做结构校验 |
 | 20 | `system → auth.adapter.AdminUserAdapter` 跨域直连具体类 | 待实现 | `AdminUserAdapter` 未实现任何接口，system 两个 service 直接注入（字段名却叫 `adminUserPort`）；根治需在 `auth/api` 声明端口并把 `CreateUserResult` 上提。P2-4 移动时暴露，现登记在 R-1 棘轮基线 |
+| 21 | CORS `allowedOriginPatterns("*")` + `allowCredentials(true)` 并存（`config/WebConfig`） | 待核查 | 任意来源可带凭据跨域；白名单化需部署事实（前端同源拓扑、embed 宿主页清单），随部署另批收紧 |
 
 ## 12. 执行记录（本次重构；模板：批次｜内容｜读数｜验证）
 
