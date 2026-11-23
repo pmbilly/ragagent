@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -39,7 +39,9 @@
 | `:backend` | `com.ragagent.audit` | 审计日志域：审计条目的写入、查询与保留期清理。 |
 | `:backend` | `com.ragagent.audit.adapter` | 审计 · 端口实现：AuditWriteAdapter。 |
 | `:backend` | `com.ragagent.audit.api` | audit 域对外契约。 |
+| `:backend` | `com.ragagent.audit.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.audit.controller` | 审计 · HTTP 层：AuditLogController。 |
+| `:backend` | `com.ragagent.audit.controller.vo` | 审计模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.audit.domain` | 审计 · 领域模型：AuditLog。 |
 | `:backend` | `com.ragagent.audit.dto` | 审计 · 数据传输：AuditLogListResponse / AuditLogQuery。 |
 | `:backend` | `com.ragagent.audit.mapper` | 审计 · 映射：AuditLogRepository / AuditLogMapper。 |
@@ -56,9 +58,11 @@
 | `:backend` | `com.ragagent.auth.apikey.mapper` | apikey · 映射：TenantAPIKeyMapper。 |
 | `:backend` | `com.ragagent.auth.apikey.repository` | API Key 仓储门面：对 auth.apikey.mapper 的读写封装与不存在异常转换。 |
 | `:backend` | `com.ragagent.auth.apikey.service` | apikey · 服务：TenantAPIKeyService / ApiKeyAdminAdapter / TenantAPIKeyBootstrap…。 |
+| `:backend` | `com.ragagent.auth.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.auth.config` | 认证 · 配置：JwtProperties。 |
 | `:backend` | `com.ragagent.auth.controller` | auth 域控制器的 HTTP 端点与协作类（7 个协作类）。 |
 | `:backend` | `com.ragagent.auth.controller.filter` | 认证过滤器面（由 auth.filter 迁入 controller.filter，对齐方案）： AuthFilter（请求鉴权入口）与 WsAuthSupport（WebSocket 握手鉴权）。 |
+| `:backend` | `com.ragagent.auth.controller.vo` | 认证与租户模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.auth.domain` | 认证 · 领域模型：TenantConfigRedaction / TenantInvitation / TenantMember…。 |
 | `:backend` | `com.ragagent.auth.dto` | 认证 · 数据传输：UpdatePreferencesRequest / TenantInvitationResponse / InvitationLookupResponse…。 |
 | `:backend` | `com.ragagent.auth.mapper` | 认证 · 映射：TenantInvitationMapper / TenantMemberMapper / AuthTokenMapper…。 |

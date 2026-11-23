@@ -2,6 +2,8 @@ package com.ragagent.audit.controller;
 
 import com.ragagent.audit.api.KnowledgeBaseFacts;
 import com.ragagent.audit.api.KnowledgeBaseGateway;
+import com.ragagent.audit.assembler.AuditLogAssembler;
+import com.ragagent.audit.controller.vo.AuditLogListRespVo;
 import com.ragagent.audit.dto.AuditLogListResponse;
 import com.ragagent.audit.dto.AuditLogQuery;
 import com.ragagent.audit.service.AuditLogService;
@@ -69,7 +71,7 @@ public class AuditLogController {
      * 的行属于各自的 KB 流，不该混进空间级 feed。</p>
      */
     @GetMapping("/api/v1/tenants/{id}/audit-log")
-    public ResponseEntity<AuditLogListResponse> listTenantAuditLog(
+    public ResponseEntity<AuditLogListRespVo> listTenantAuditLog(
             @PathVariable("id") String rawTenantId,
             @RequestParam(value = "afterId", required = false) String afterId,
             @RequestParam(value = "limit", required = false) String limit,
@@ -107,7 +109,7 @@ public class AuditLogController {
      * </ol>
      */
     @GetMapping("/api/v1/knowledge-bases/{id}/activity")
-    public ResponseEntity<AuditLogListResponse> listKnowledgeBaseActivity(
+    public ResponseEntity<AuditLogListRespVo> listKnowledgeBaseActivity(
             @PathVariable("id") String kbId,
             @RequestParam(value = "afterId", required = false) String afterId,
             @RequestParam(value = "limit", required = false) String limit,
@@ -161,7 +163,7 @@ public class AuditLogController {
      * （反过来也会让 SystemAdmin 看不到平台自己的 system.* 行）。</p>
      */
     @GetMapping("/api/v1/system/admin/audit-log")
-    public ResponseEntity<AuditLogListResponse> listSystemAuditLog(
+    public ResponseEntity<AuditLogListRespVo> listSystemAuditLog(
             @RequestParam(value = "afterId", required = false) String afterId,
             @RequestParam(value = "limit", required = false) String limit,
             @RequestParam(value = "action", required = false) String action,
@@ -185,9 +187,9 @@ public class AuditLogController {
      * 若不在这里转换，异常会落到 {@code GlobalExceptionHandler.handleOther}，
      * 消息被换成固定的 {@code "Internal server error"}。</p>
      */
-    private AuditLogListResponse listOrInternalError(long tenantId, AuditLogQuery q) {
+    private AuditLogListRespVo listOrInternalError(long tenantId, AuditLogQuery q) {
         try {
-            return auditLogService.listResponse(tenantId, q);
+            return AuditLogAssembler.toVo(auditLogService.listResponse(tenantId, q));
         } catch (BizException e) {
             throw e;
         } catch (RuntimeException e) {
