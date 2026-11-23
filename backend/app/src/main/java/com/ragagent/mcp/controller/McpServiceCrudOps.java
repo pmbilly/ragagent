@@ -50,7 +50,7 @@ final class McpServiceCrudOps {
     // ── 创建 ─────────────────────────────────────────────────────────────
 
     /** 权限 Admin+。 */
-    public ResponseEntity<?> createMCPService(
+    public ResponseEntity<McpServiceResponse> createMCPService(
             @RequestBody(required = false) McpServiceCreateRequest req) {
         if (req == null) {
             // 空 body → "No content to map due to end-of-input"
@@ -91,7 +91,7 @@ final class McpServiceCrudOps {
     // ── 列表 / 详情 ──────────────────────────────────────────────────────
 
     /** 权限 Viewer+。 */
-    public ResponseEntity<?> listMCPServices() {
+    public ResponseEntity<List<McpServiceResponse>> listMCPServices() {
         long tenantId = McpServiceController.requireTenant();
         List<McpService> services;
         try {
@@ -104,7 +104,7 @@ final class McpServiceCrudOps {
     }
 
     /** 权限 Viewer+。 */
-    public ResponseEntity<?> getMCPService(@PathVariable("id") String id) {
+    public ResponseEntity<McpServiceResponse> getMCPService(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         McpService service;
         try {
@@ -125,7 +125,7 @@ final class McpServiceCrudOps {
      * "没传"与"显式清空"；非标量字段按类型判断，类型不符即静默跳过。
      * 秘密字段（auth_config.api_key / token）<b>永不</b>从主 PUT 读取，只记一条 deprecation 日志。</p>
      */
-    public ResponseEntity<?> updateMCPService(@PathVariable("id") String id,
+    public ResponseEntity<McpServiceResponse> updateMCPService(@PathVariable("id") String id,
                                               @RequestBody(required = false) JsonNode updateData) {
         if (updateData == null) {
             throw BizException.badRequest(JsonBodyErrors.EMPTY_BODY);
@@ -321,7 +321,7 @@ final class McpServiceCrudOps {
      * <p>与其它端点不同：连接失败也返回 <b>200</b>，把失败装进
      * {@code data.success=false} 的业务结果里，前端据此渲染测试面板。</p>
      */
-    public ResponseEntity<?> testMCPService(@PathVariable("id") String id) {
+    public ResponseEntity<McpTestResult> testMCPService(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
         log.info("Testing MCP service: {}", serviceId);
@@ -338,7 +338,7 @@ final class McpServiceCrudOps {
     }
 
     /** 权限 Viewer+（不落库）。 */
-    public ResponseEntity<?> getMCPServiceTools(@PathVariable("id") String id) {
+    public ResponseEntity<List<McpTool>> getMCPServiceTools(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
         List<McpTool> tools;
@@ -352,7 +352,7 @@ final class McpServiceCrudOps {
     }
 
     /** 权限 Viewer+。 */
-    public ResponseEntity<?> getMCPServiceResources(@PathVariable("id") String id) {
+    public ResponseEntity<List<McpResource>> getMCPServiceResources(@PathVariable("id") String id) {
         long tenantId = McpServiceController.requireTenant();
         String serviceId = McpServiceController.sanitize(id);
         List<McpResource> resources;

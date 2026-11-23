@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.datasource.catalog.ConnectorCatalog;
 import com.ragagent.datasource.catalog.ConnectorMetadata;
 import com.ragagent.datasource.dto.DataSourceResponse;
+import com.ragagent.datasource.dto.ResourceResponse;
 import com.ragagent.datasource.dto.SyncLogResponse;
 import com.ragagent.datasource.service.DataSourceReadService;
 import com.ragagent.datasource.service.DataSourceService;
@@ -130,7 +131,7 @@ public class DataSourceController {
 
     /** 查询单个数据源。 */
     @GetMapping("/api/v1/datasource/{id}")
-    public ResponseEntity<?> getDataSource(@PathVariable("id") String id) {
+    public ResponseEntity<DataSourceResponse> getDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -174,7 +175,7 @@ public class DataSourceController {
      * 客户端改不了租户，也改不了归属知识库（service 里还有第二道"不允许换库"）。</p>
      */
     @PutMapping("/api/v1/datasource/{id}")
-    public ResponseEntity<?> updateDataSource(@PathVariable("id") String id,
+    public ResponseEntity<DataSourceResponse> updateDataSource(@PathVariable("id") String id,
                                               @RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
@@ -213,7 +214,7 @@ public class DataSourceController {
 
     /** 校验已存连接：成功回 {@code {"status":"connected"}}。 */
     @PostMapping("/api/v1/datasource/{id}/validate")
-    public ResponseEntity<?> validateConnection(@PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> validateConnection(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -234,7 +235,7 @@ public class DataSourceController {
      * {@code invalid request: type and credentials are required}。</p>
      */
     @PostMapping("/api/v1/datasource/validate-credentials")
-    public ResponseEntity<?> validateCredentials(@RequestBody(required = false) String rawBody) {
+    public ResponseEntity<Map<String, Object>> validateCredentials(@RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -270,7 +271,7 @@ public class DataSourceController {
      * 大源）的入口。空列表同样归一成 {@code []}。</p>
      */
     @GetMapping("/api/v1/datasource/{id}/resources")
-    public ResponseEntity<?> listAvailableResources(
+    public ResponseEntity<List<ResourceResponse>> listAvailableResources(
             @PathVariable("id") String id,
             @RequestParam(value = "parentId", required = false) String parentId) {
         Long tenantId = TenantContext.currentTenantId();
@@ -294,7 +295,7 @@ public class DataSourceController {
      * 契约测试掩码该字段。</p>
      */
     @PostMapping("/api/v1/datasource/{id}/resource-ancestors")
-    public ResponseEntity<?> resolveResourceAncestors(@PathVariable("id") String id,
+    public ResponseEntity<Map<String, Object>> resolveResourceAncestors(@PathVariable("id") String id,
                                                       @RequestBody(required = false) String rawBody) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
@@ -333,7 +334,7 @@ public class DataSourceController {
      * 与状态不允许（400 {@code data source is not active}）——别合并。</p>
      */
     @PostMapping("/api/v1/datasource/{id}/sync")
-    public ResponseEntity<?> manualSync(@PathVariable("id") String id) {
+    public ResponseEntity<SyncLogResponse> manualSync(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -348,7 +349,7 @@ public class DataSourceController {
 
     /** 暂停数据源。 */
     @PostMapping("/api/v1/datasource/{id}/pause")
-    public ResponseEntity<?> pauseDataSource(@PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> pauseDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -364,7 +365,7 @@ public class DataSourceController {
 
     /** 恢复数据源。 */
     @PostMapping("/api/v1/datasource/{id}/resume")
-    public ResponseEntity<?> resumeDataSource(@PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> resumeDataSource(@PathVariable("id") String id) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");
@@ -388,7 +389,7 @@ public class DataSourceController {
      * {@code offset} 反而容错：解析失败或为负都归 0。</p>
      */
     @GetMapping("/api/v1/datasource/{id}/logs")
-    public ResponseEntity<?> getSyncLogs(@PathVariable("id") String id,
+    public ResponseEntity<List<SyncLogResponse>> getSyncLogs(@PathVariable("id") String id,
                                          @RequestParam(value = "limit", required = false) String limit,
                                          @RequestParam(value = "offset", required = false) String offset) {
         Long tenantId = TenantContext.currentTenantId();
@@ -429,7 +430,7 @@ public class DataSourceController {
      * 它回的是 {@code data source not found}。</p>
      */
     @GetMapping("/api/v1/datasource/logs/{logId}")
-    public ResponseEntity<?> getSyncLog(@PathVariable("logId") String logId) {
+    public ResponseEntity<SyncLogResponse> getSyncLog(@PathVariable("logId") String logId) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0L) {
             throw BizException.unauthorized( "unauthorized");

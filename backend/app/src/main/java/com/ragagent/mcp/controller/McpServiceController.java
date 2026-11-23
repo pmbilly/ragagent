@@ -23,6 +23,7 @@ import com.ragagent.mcp.service.McpServiceManagement;
 import com.ragagent.mcp.service.McpToolApprovalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -147,7 +148,7 @@ public class McpServiceController {
 
     /** 权限 Viewer+；只读数据库，不连接上游 */
     @GetMapping("/{id}/metadata")
-    public ResponseEntity<?> getMCPMetadata(@PathVariable("id") String id) {
+    public ResponseEntity<Object> getMCPMetadata(@PathVariable("id") String id) {
         return mcpMetadata(id, false);
     }
 
@@ -158,11 +159,11 @@ public class McpServiceController {
      * 静态鉴权写的是租户共享快照，故额外要求管理员。</p>
      */
     @PostMapping("/{id}/metadata/refresh")
-    public ResponseEntity<?> refreshMCPMetadata(@PathVariable("id") String id) {
+    public ResponseEntity<Object> refreshMCPMetadata(@PathVariable("id") String id) {
         return mcpMetadata(id, true);
     }
 
-    private ResponseEntity<?> mcpMetadata(String id, boolean refresh) {
+    private ResponseEntity<Object> mcpMetadata(String id, boolean refresh) {
         long tenant = requireTenant();
         String serviceId = sanitize(id);
 
@@ -235,7 +236,7 @@ public class McpServiceController {
 
 
     @PostMapping("/{id}/usage-instructions/generate")
-    public ResponseEntity<?> generateMCPUsageInstructions(@PathVariable("id") String id,
+    public ResponseEntity<Map<String, String>> generateMCPUsageInstructions(@PathVariable("id") String id,
                                                           @RequestBody(required = false) JsonNode body) {
         return usageOps.generateMCPUsageInstructions(id, body);
     }
@@ -249,7 +250,7 @@ public class McpServiceController {
 
     /** 权限 Viewer+。 */
     @GetMapping("/{id}/tool-approvals")
-    public ResponseEntity<?> listMCPToolApprovals(@PathVariable("id") String id) {
+    public ResponseEntity<List<McpToolApprovalResponse>> listMCPToolApprovals(@PathVariable("id") String id) {
         long tenantId = requireTenant();
         String serviceId = sanitize(id);
         List<McpToolApprovalResponse> out;
@@ -337,7 +338,7 @@ public class McpServiceController {
 
 
     /** 成功响应：HTTP 200 + 裸资源。 */
-    static ResponseEntity<?> ok(Object body) {
+    static <T> ResponseEntity<T> ok(T body) {
         return ResponseEntity.ok(body);
     }
 

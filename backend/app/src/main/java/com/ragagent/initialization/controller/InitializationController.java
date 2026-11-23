@@ -7,6 +7,7 @@ import com.ragagent.initialization.service.InitializationConfigService;
 import com.ragagent.initialization.service.ModelConnectivityTestService;
 import com.ragagent.initialization.service.TextExtractionTestService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,12 +55,12 @@ public class InitializationController {
     }
 
     @GetMapping("/api/v1/initialization/config/{kbId}")
-    public ResponseEntity<Object> getConfig(@PathVariable("kbId") String kbId) {
+    public ResponseEntity<Map<String, Object>> getConfig(@PathVariable("kbId") String kbId) {
         return ResponseEntity.ok(configService.getConfig(kbId));
     }
 
     @PutMapping("/api/v1/initialization/config/{kbId}")
-    public ResponseEntity<Object> updateConfig(@PathVariable("kbId") String kbId,
+    public ResponseEntity<Map<String, Object>> updateConfig(@PathVariable("kbId") String kbId,
             @RequestBody(required = false) String rawBody) {
         return ResponseEntity.ok(configService.updateConfig(kbId, rawBody));
     }

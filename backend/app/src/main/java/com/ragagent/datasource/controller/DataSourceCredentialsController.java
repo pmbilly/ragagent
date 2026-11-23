@@ -75,7 +75,7 @@ public class DataSourceCredentialsController {
      * （不包 data/success 信封）。</p>
      */
     @PutMapping("/api/v1/datasource/{id}/credentials")
-    public ResponseEntity<?> put(@PathVariable("id") String id,
+    public ResponseEntity<DatasourceCredentialsResponse> put(@PathVariable("id") String id,
                                  @RequestBody(required = false) String rawBody) {
         DataSourceOwnership ds = ownDataSource(id);
         PutRequest req = parsePutBody(rawBody);

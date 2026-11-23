@@ -25,6 +25,9 @@
 | `Map<String,Object>` / `JsonNode` / `ObjectNode` | **不动** | 不透明载荷，VO 化等于重定义整棵树 |
 | 枚举（如 `ParseStatus`） | **保留原类型** | 稳定值集，重建只引入映射风险，且可能改 JSON 字面量 |
 | `ApiResponse<Void>` | **不动** | 无响应体，外壳由框架统一 |
+| 已声明为「响应专用」的 dto（`mcp/dto/McpServiceResponse`、`datasource/dto/DataSourceResponse`、`initialization/dto/ModelViews`） | **不动** | 它们的设计意图就是 VO：类注释写明"响应形态刻意与实体分离 / 端点响应体 / 契约视图"，且只被 controller 与彼此引用。再套一层是机械重复，不增加隔离 |
+
+**判断"是否已经是 VO"的三条证据**（满足两条即可不动）：① 类注释自述为响应/视图；② 只被 controller 与同包引用，不被 service/domain 复用；③ 不含实体类型字段（或只含跨域 api 形状）。
 
 ## 3. 批次步骤
 
