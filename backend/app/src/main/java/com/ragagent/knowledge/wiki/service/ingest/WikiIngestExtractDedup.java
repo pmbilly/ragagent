@@ -142,6 +142,31 @@ final class WikiIngestExtractDedup {
      * <p>整个去重退化为"跳过 LLM 调用 + 恒等 stabilize"（见该接口的说明）。
      * 这是可见的降级，不是静默的错误答案。</p>
      */
+    /** FindSimilarPages 的一次探测：失败告警并返回空表（单条 query 的候选缺失不阻断整批去重）。 */
+    private List<WikiPageLite> findSimilarQuietly(String kbId, String q) {
+        try {
+            return wikiService.findSimilarPages(kbId, q,
+                    List.of(WikiConstants.PAGE_TYPE_ENTITY, WikiConstants.PAGE_TYPE_CONCEPT),
+                    WikiDedupSupport.DEDUP_CANDIDATE_TOP_K);
+        } catch (Exception e) {
+            log.warn("wiki ingest: dedup FindSimilarPages({}) failed", q, e);
+            return List.of();
+        }
+    }
+
+    /** 候选页并入两张表：全量候选表 putIfAbsent + 条目自有集合追加（null / 空 slug 跳过）。 */
+    private void mergeCandidates(List<WikiPageLite> pages,
+                                 Map<String, WikiPageLite> candidatePages,
+                                 Set<String> own) {
+        for (WikiPageLite p : pages) {
+            if (p == null || p.getSlug().isEmpty()) {
+                continue;
+            }
+            candidatePages.putIfAbsent(p.getSlug(), p);
+            own.add(p.getSlug());
+        }
+    }
+
     public ExtractedProjection deduplicateExtractedBatch(LlmChatClient chatModel,
                                                          String kbId,
                                                          List<ExtractedItem> entities,
@@ -169,22 +194,7 @@ final class WikiIngestExtractDedup {
                 }
                 Set<String> own = itemCandidates.computeIfAbsent(item.getSlug(), k -> new LinkedHashSet<>());
                 for (String q : queries) {
-                    List<WikiPageLite> pages;
-                    try {
-                        pages = wikiService.findSimilarPages(kbId, q,
-                                List.of(WikiConstants.PAGE_TYPE_ENTITY, WikiConstants.PAGE_TYPE_CONCEPT),
-                                WikiDedupSupport.DEDUP_CANDIDATE_TOP_K);
-                    } catch (Exception e) {
-                        log.warn("wiki ingest: dedup FindSimilarPages({}) failed", q, e);
-                        continue;
-                    }
-                    for (WikiPageLite p : pages) {
-                        if (p == null || p.getSlug().isEmpty()) {
-                            continue;
-                        }
-                        candidatePages.putIfAbsent(p.getSlug(), p);
-                        own.add(p.getSlug());
-                    }
+                    mergeCandidates(findSimilarQuietly(kbId, q), candidatePages, own);
                 }
             }
         }

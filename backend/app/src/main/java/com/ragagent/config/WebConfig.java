@@ -72,7 +72,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * CORS：通配 Origin、显式头清单、MaxAge 12h。
-     * 通配 Origin 与 allowCredentials(true) 并存是已知收紧点，见 HANDOFF §11.1。
+     * 通配 Origin 与 allowCredentials(true) 并存是已知收紧点，登记在交接文档的已知缺口表。
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

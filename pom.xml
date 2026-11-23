@@ -71,6 +71,8 @@
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
     <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
     <spotless-maven-plugin.version>3.10.4</spotless-maven-plugin.version>
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <checkstyle.version>10.21.4</checkstyle.version>
     <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
   </properties>
 
@@ -323,6 +325,24 @@
           <version>${spotless-maven-plugin.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${maven-checkstyle-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>${checkstyle.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <configLocation>${maven.multiModuleProjectDirectory}/backend/config/checkstyle.xml</configLocation>
+            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+            <consoleOutput>true</consoleOutput>
+          </configuration>
+        </plugin>
+
         <!-- 守卫：单入口 scripts/run-guards.sh（本地与 CI 同口径） -->
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -373,6 +393,21 @@
     <plugins>
       <!-- 格式检查：ratchet 从 seed 起只检查后续触碰的文件（与 Gradle 的 spotless 同口径）。
            根模块无 java 源码 ⇒ 自动跳过；子模块继承本配置。 -->
+      <!-- 嵌套深度硬门（蓝图 3.11）：validate 阶段拦截，零抑制——超标先拆，不加例外。
+           configLocation 经 multiModuleProjectDirectory 指根 config/，子模块继承生效。 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>checkstyle-nesting-depth</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>

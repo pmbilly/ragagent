@@ -9,3 +9,5 @@ X-Content-Type-Options: nosniff
 X-Request-Id: 6935cfa2-686a-41c8-bcd8-6ce109aa8f1a
 Date: Mon, 21 Sep 2026 03:46:05 GMT
 
+Referrer-Policy: no-referrer
+X-Frame-Options: SAMEORIGIN

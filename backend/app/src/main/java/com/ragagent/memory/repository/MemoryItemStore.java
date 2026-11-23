@@ -277,19 +277,19 @@ final class MemoryItemStore {
                 target = found;
                 boolean stillReplaceable = MemoryKinds.STATUS_ACTIVE.equals(target.getStatus())
                         || MemoryKinds.STATUS_PENDING.equals(target.getStatus());
-                if (!stillReplaceable) {
+                if (!stillReplaceable && !target.getSupersededBy().isEmpty()) {
                     // 一次已经成功应用的决策，可能在 checkpoint 失败后被重放。
                     // 返还它的替换者，而不是写第二遍。
-                    if (!target.getSupersededBy().isEmpty()) {
-                        MemoryItem replacement =
-                                itemMapper.selectScoped(tenantId, subjectId, target.getSupersededBy());
-                        if (replacement != null
-                                && replacement.getStatus().equals(item.getStatus())
-                                && replacement.getContent().equals(item.getContent())) {
-                            MemoryIndexStore.copyInto(item, replacement);
-                            return null;
-                        }
+                    MemoryItem replacement =
+                            itemMapper.selectScoped(tenantId, subjectId, target.getSupersededBy());
+                    if (replacement != null
+                            && replacement.getStatus().equals(item.getStatus())
+                            && replacement.getContent().equals(item.getContent())) {
+                        MemoryIndexStore.copyInto(item, replacement);
+                        return null;
                     }
+                }
+                if (!stillReplaceable) {
                     throw new MemoryConflictException();
                 }
             }

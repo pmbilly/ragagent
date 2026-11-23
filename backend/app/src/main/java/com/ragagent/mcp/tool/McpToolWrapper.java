@@ -232,26 +232,27 @@ public class McpToolWrapper implements AgentTool {
                                 .toolCallId(meta.toolCallId())
                                 .build());
                 if (!decision.approved()) {
-                    String msg = decision.reason();
-                    if (msg.isEmpty()) {
-                        msg = "tool execution rejected by user";
-                    }
+                    String msg = decision.reason().isEmpty()
+                            ? "tool execution rejected by user"
+                            : decision.reason();
                     ToolResult r = new ToolResult();
                     r.setSuccess(false);
                     r.setError(msg);
                     return r;
                 }
-                if (decision.modifiedArgs() != null && !decision.modifiedArgs().isEmpty()) {
-                    String validateErr = validateArguments(decision.modifiedArgs());
-                    if (validateErr != null) {
-                        ToolResult r = new ToolResult();
-                        r.setSuccess(false);
-                        r.setError("Invalid modified_args after approval: " + validateErr);
-                        return r;
-                    }
+                String modifiedArgs = decision.modifiedArgs();
+                boolean hasModifiedArgs = modifiedArgs != null && !modifiedArgs.isEmpty();
+                String validateErr = hasModifiedArgs ? validateArguments(modifiedArgs) : null;
+                if (validateErr != null) {
+                    ToolResult r = new ToolResult();
+                    r.setSuccess(false);
+                    r.setError("Invalid modified_args after approval: " + validateErr);
+                    return r;
+                }
+                if (hasModifiedArgs) {
                     // 批准的替换不得保留旧对象的键：整棵重解析。
                     try {
-                        input = MCP_JSON.convertValue(MCP_JSON.readTree(decision.modifiedArgs()),
+                        input = MCP_JSON.convertValue(MCP_JSON.readTree(modifiedArgs),
                                 MCP_JSON.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class));
                     } catch (Exception e) {
                         ToolResult r = new ToolResult();

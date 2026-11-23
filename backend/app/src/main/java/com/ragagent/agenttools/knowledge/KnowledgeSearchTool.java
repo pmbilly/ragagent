@@ -408,6 +408,18 @@ public class KnowledgeSearchTool extends BaseTool {
         return r;
     }
 
+    /** 命中结果进累积列表（kbResults 为空跳过；KB 类型缺省走 nz 回落）。 */
+    private static void collectHybridResults(List<SearchResultView> kbResults, String q,
+            Map<String, String> kbTypeMap, List<ResultWithMeta> allResults) {
+        if (kbResults == null) {
+            return;
+        }
+        for (SearchResultView r : kbResults) {
+            allResults.add(new ResultWithMeta(r, q, "hybrid",
+                    nz(kbTypeMap.get(nz(r.knowledgeBaseId)))));
+        }
+    }
+
     static String nz(String v) {
         return v == null ? "" : v;
     }
@@ -544,12 +556,7 @@ public class KnowledgeSearchTool extends BaseTool {
                                 new HybridParams(
                                         q, queryEmbedding, fullKBIDs, null, null, null,
                                         topK, vectorThreshold, keywordThreshold));
-                        if (kbResults != null) {
-                            for (SearchResultView r : kbResults) {
-                                allResults.add(new ResultWithMeta(r, q, "hybrid",
-                                        nz(kbTypeMap.get(nz(r.knowledgeBaseId)))));
-                            }
-                        }
+                        collectHybridResults(kbResults, q, kbTypeMap, allResults);
                     } catch (RuntimeException e) {
                         log.warn("[Tool][KnowledgeSearch] Combined search failed for KBs {}", fullKBIDs, e);
                     }
@@ -563,12 +570,7 @@ public class KnowledgeSearchTool extends BaseTool {
                                 new HybridParams(
                                         q, queryEmbedding, null, st.knowledgeIds(), st.tagIds(),
                                         st.scopeTagIds(), topK, thresholds[0], thresholds[1]));
-                        if (kbResults != null) {
-                            for (SearchResultView r : kbResults) {
-                                allResults.add(new ResultWithMeta(r, q, "hybrid",
-                                        nz(kbTypeMap.get(nz(r.knowledgeBaseId)))));
-                            }
-                        }
+                        collectHybridResults(kbResults, q, kbTypeMap, allResults);
                     } catch (RuntimeException e) {
                         log.warn("[Tool][KnowledgeSearch] Failed to search KB {}", st.knowledgeBaseId(), e);
                     }

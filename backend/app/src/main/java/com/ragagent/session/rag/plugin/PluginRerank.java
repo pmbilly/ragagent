@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
@@ -625,11 +626,10 @@ public final class PluginRerank implements Plugin {
             } else {
                 List<String> questionStrings = new ArrayList<>();
                 if (docMeta.getGeneratedQuestions() != null) {
-                    for (GeneratedQuestion q : docMeta.getGeneratedQuestions()) {
-                        if (q != null) {
-                            questionStrings.add(q.getQuestion());
-                        }
-                    }
+                    docMeta.getGeneratedQuestions().stream()
+                            .filter(Objects::nonNull)
+                            .map(GeneratedQuestion::getQuestion)
+                            .forEach(questionStrings::add);
                 }
                 if (!questionStrings.isEmpty()) {
                     enrichments.add(String.join("; ", questionStrings));

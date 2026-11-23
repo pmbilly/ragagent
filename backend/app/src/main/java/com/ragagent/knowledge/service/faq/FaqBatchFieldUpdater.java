@@ -130,11 +130,8 @@ final class FaqBatchFieldUpdater {
                 if (update.recommended() != null) {
                     boolean currentRecommended = (chunk.getFlags() & 1) != 0;
                     if (currentRecommended != update.recommended()) {
-                        if (update.recommended()) {
-                            setFlags.put(chunk.getId(), 1);
-                        } else {
-                            clearFlags.put(chunk.getId(), 1);
-                        }
+                        Map<String, Integer> target = update.recommended() ? setFlags : clearFlags;
+                        target.put(chunk.getId(), 1);
                     }
                 }
                 if (update.tagId() != null) {

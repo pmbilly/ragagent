@@ -283,13 +283,11 @@ public class ListKnowledgeChunksTool extends BaseTool {
             if (effectiveTenantId > 0 && imageCollector != null) {
                 Map<String, String> infoMap = imageCollector.collect(effectiveTenantId,
                         List.of(chunk.id()));
-                if (infoMap != null) {
-                    String merged = infoMap.get(chunk.id());
-                    if (merged != null && !merged.isEmpty()) {
-                        // L1 载荷不可变：富化 = 复制-替换
-                        chunk = DocChunkSupport.withImageInfo(chunk, merged);
-                        chunks = List.of(chunk);
-                    }
+                String merged = infoMap == null ? null : infoMap.get(chunk.id());
+                if (merged != null && !merged.isEmpty()) {
+                    // L1 载荷不可变：富化 = 复制-替换
+                    chunk = DocChunkSupport.withImageInfo(chunk, merged);
+                    chunks = List.of(chunk);
                 }
             }
         }

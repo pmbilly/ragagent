@@ -93,16 +93,16 @@ public final class AgentSuggestedQuestions {
             }
             String mode = starters.path("mode").asText("");
             starterMode = mode;
-            if (AgentConfigJson.SUGGESTION_CURATED.equals(mode) || AgentConfigJson.SUGGESTION_HYBRID.equals(mode)) {
-                JsonNode items = starters.get("items");
-                if (items != null && items.isArray()) {
-                    for (JsonNode item : items) {
-                        String prompt = item.asText("");
-                        if (prompt.trim().isEmpty()) {
-                            continue;
-                        }
-                        curated.add(new Object[] {prompt, "agent_config", ""});
+            boolean curatedOrHybrid = AgentConfigJson.SUGGESTION_CURATED.equals(mode)
+                    || AgentConfigJson.SUGGESTION_HYBRID.equals(mode);
+            JsonNode items = curatedOrHybrid ? starters.get("items") : null;
+            if (items != null && items.isArray()) {
+                for (JsonNode item : items) {
+                    String prompt = item.asText("");
+                    if (prompt.trim().isEmpty()) {
+                        continue;
                     }
+                    curated.add(new Object[] {prompt, "agent_config", ""});
                 }
             }
             if (AgentConfigJson.SUGGESTION_CURATED.equals(mode)) {

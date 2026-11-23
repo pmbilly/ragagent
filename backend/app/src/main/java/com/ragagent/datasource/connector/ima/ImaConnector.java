@@ -312,19 +312,17 @@ public class ImaConnector implements Connector {
                 String key = keys.get(i);
 
                 // 增量跳过 / 替换检测。
-                if (incremental && prev != null && prev.getKbLogical() != null) {
-                    Map<String, String> prevSet = prev.getKbLogical().get(kbId);
-                    if (prevSet != null) {
-                        String prevMediaId = prevSet.get(key);
-                        if (prevMediaId != null) {
-                            if (prevMediaId.equals(f.getMediaId())) {
-                                // 未变：把条目带进新 cursor，下一轮同样不必再抓。
-                                syncedLogical.put(key, f.getMediaId());
-                                continue;
-                            }
-                            replaced++; // media_id 变了 → 替换，继续往下重抓
-                        }
-                    }
+                Map<String, String> prevSet = incremental && prev != null && prev.getKbLogical() != null
+                        ? prev.getKbLogical().get(kbId)
+                        : null;
+                String prevMediaId = prevSet != null ? prevSet.get(key) : null;
+                if (prevMediaId != null && prevMediaId.equals(f.getMediaId())) {
+                    // 未变：把条目带进新 cursor，下一轮同样不必再抓。
+                    syncedLogical.put(key, f.getMediaId());
+                    continue;
+                }
+                if (prevMediaId != null) {
+                    replaced++; // media_id 变了 → 替换，继续往下重抓
                 }
 
                 FetchOne fetched = fetchOneMedia(cli, kbId, key, f, folderPath);

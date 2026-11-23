@@ -260,22 +260,33 @@ public class WikiReadPageTool extends BaseTool {
 
         if (WikiIndexOverview.WIKI_PAGE_TYPE_INDEX.equals(page.pageType())) {
             IndexOverviewView overview = wikiService.getIndexView(kbId, WikiIndexOverview.WIKI_INDEX_AGENT_TOP_K);
-            if (overview != null) {
-                body = WikiIndexOverview.renderIndexOverviewForAgent(overview);
-                if (overview.groups() != null) {
-                    for (IndexGroupView group : overview.groups()) {
-                        if (group.items() == null) {
-                            continue;
-                        }
-                        for (var item : group.items()) {
-                            routes.remember(item.slug(), kbId);
-                        }
-                    }
-                }
+            String rendered = renderIndexOverviewBody(overview, kbId);
+            if (rendered != null) {
+                body = rendered;
             }
         }
 
         return new PendingWikiPage(page, kbId, outLinks, inLinks, sources, body);
+    }
+
+    /** 索引页渲染：概览缺失返回 null（调用方保留原内容）；各组条目记入路由表（组条目缺失跳过）。 */
+    private String renderIndexOverviewBody(IndexOverviewView overview, String kbId) {
+        if (overview == null) {
+            return null;
+        }
+        String body = WikiIndexOverview.renderIndexOverviewForAgent(overview);
+        if (overview.groups() == null) {
+            return body;
+        }
+        for (IndexGroupView group : overview.groups()) {
+            if (group.items() == null) {
+                continue;
+            }
+            for (var item : group.items()) {
+                routes.remember(item.slug(), kbId);
+            }
+        }
+        return body;
     }
 
     /** 把页的出链/入链 slug 记入 foundKBs（去重追加）。 */

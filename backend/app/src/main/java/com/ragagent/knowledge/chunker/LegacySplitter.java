@@ -330,10 +330,7 @@ public final class LegacySplitter {
                     String overlapText = unitsText(current);
                     if (!HeaderTracker.headerAlreadyPresent(headers, overlapText, u.text)
                             && !HeaderTracker.headerColumnMismatch(headers, u.text)) {
-                        int startPos = u.start;
-                        if (!current.isEmpty()) {
-                            startPos = current.get(0).start;
-                        }
+                        int startPos = current.isEmpty() ? u.start : current.get(0).start;
                         SplitUnit hUnit = new SplitUnit(headers, startPos, startPos);
                         current.add(0, hUnit);
                         curLen += headersLen;

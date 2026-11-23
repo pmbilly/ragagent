@@ -266,15 +266,13 @@ public final class QaRequestParser {
             }
             if (rc.agentConfig != null) {
                 List<String> supported = QaTurnSupport.stringListOf(rc.agentConfig.get("supportedFileTypes"));
-                if (!supported.isEmpty()) {
-                    String ext = doc.getFileType() == null ? ""
-                            : (doc.getFileType().startsWith(".")
-                                    ? doc.getFileType().substring(1).toLowerCase()
-                                    : doc.getFileType().toLowerCase());
-                    if (!supported.contains(ext)) {
-                        throw BizException.badRequest(
-                                "file type " + ext + " is not supported by this agent");
-                    }
+                String ext = doc.getFileType() == null ? ""
+                        : (doc.getFileType().startsWith(".")
+                                ? doc.getFileType().substring(1).toLowerCase()
+                                : doc.getFileType().toLowerCase());
+                if (!supported.isEmpty() && !supported.contains(ext)) {
+                    throw BizException.badRequest(
+                            "file type " + ext + " is not supported by this agent");
                 }
             }
             MessageAttachment meta = new MessageAttachment();

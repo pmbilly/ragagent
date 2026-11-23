@@ -153,21 +153,14 @@ final class TenantCreateOps {
                 throw new BizException(AppError.internal("Failed to finalise workspace ownership")
                         .withDetails(e.getMessage()));
             }
-            // TOCTOU 复检：提交后再数一遍，超帽回滚
+            // TOCTOU 复检：提交后再数一遍，超帽回滚（cap<=0 表示不限帽，不触发）
             if (!caller.isCanAccessAllTenants()) {
                 int cap = resolveMaxOwnedTenantsPerUser();
-                if (cap > 0) {
-                    int ownedNow = 0;
-                    for (TenantMember m : memberService.listByUser(caller.getId())) {
-                        if (m != null && TenantRole.OWNER.value().equals(m.getRole())) {
-                            ownedNow++;
-                        }
-                    }
-                    if (ownedNow > cap) {
-                        memberService.removeMember(caller.getId(), created.getId());
-                        tenantService.deleteTenant(created.getId());
-                        throw quotaExceeded();
-                    }
+                int ownedNow = cap > 0 ? countOwnedTenants(caller.getId()) : 0;
+                if (ownedNow > cap) {
+                    memberService.removeMember(caller.getId(), created.getId());
+                    tenantService.deleteTenant(created.getId());
+                    throw quotaExceeded();
                 }
             }
         }
@@ -238,6 +231,17 @@ final class TenantCreateOps {
     }
 
     /** 每用户可拥有的租户数上限：cfg 底座 → 三层解析 */
+    /** 该用户名下 OWNER 角色的空间数（TOCTOU 复检用）。 */
+    private int countOwnedTenants(String userId) {
+        int ownedNow = 0;
+        for (TenantMember m : memberService.listByUser(userId)) {
+            if (m != null && TenantRole.OWNER.value().equals(m.getRole())) {
+                ownedNow++;
+            }
+        }
+        return ownedNow;
+    }
+
     private int resolveMaxOwnedTenantsPerUser() {
         long fallback = DEFAULT_MAX_OWNED_PER_USER;
         if (tenantProperties.maxOwnedPerUser() != null && tenantProperties.maxOwnedPerUser() != 0) {

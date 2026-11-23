@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!-- 嵌套深度硬门（蓝图 3.11「嵌套合计 3 层」的等价设置）。
+     Checkstyle 没有跨 if/for/try 合计的检查，三条各自独立：每类块最深一层判定，
+     最外层为第 1 层，max=2 即允许三层。只管结构不管尺寸——方法/文件长度与参数
+     数量由 scripts/ 的棘轮守卫承担（check-method-length.py 等），两套数字不并轨。
+     蓝图北极星（方法 40 行/参数 5 个/圈复杂度 10）是长期方向，不是本门的阈值。 -->
+<module name="Checker">
+  <module name="TreeWalker">
+    <module name="NestedIfDepth">
+      <property name="max" value="2"/>
+    </module>
+    <module name="NestedForDepth">
+      <property name="max" value="2"/>
+    </module>
+    <module name="NestedTryDepth">
+      <property name="max" value="2"/>
+    </module>
+  </module>
+</module>

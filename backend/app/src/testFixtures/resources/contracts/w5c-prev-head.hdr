@@ -4,3 +4,6 @@ X-Request-Id: 5cc3d1c6-67f1-4a6f-92be-140fa114d714
 Date: Mon, 21 Sep 2026 03:46:05 GMT
 Content-Length: 18
 
+Referrer-Policy: no-referrer
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff

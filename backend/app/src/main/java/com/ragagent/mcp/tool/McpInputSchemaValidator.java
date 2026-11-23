@@ -119,11 +119,12 @@ public final class McpInputSchemaValidator {
             JsonNode defs = doc.get("$defs");
             if (defs != null && defs.isObject()) {
                 for (JsonNode def : defs) {
-                    if (def.isObject()) {
-                        String err = checkCompilable(def, seen);
-                        if (err != null) {
-                            return err;
-                        }
+                    if (!def.isObject()) {
+                        continue;
+                    }
+                    String err = checkCompilable(def, seen);
+                    if (err != null) {
+                        return err;
                     }
                 }
             }
@@ -316,22 +317,10 @@ public final class McpInputSchemaValidator {
         JsonNode ifNode = schema.get("if");
         if (ifNode != null) {
             boolean ifHolds = validate(ifNode, value, root, depth + 1) == null;
-            if (ifHolds) {
-                JsonNode thenNode = schema.get("then");
-                if (thenNode != null) {
-                    err = validate(thenNode, value, root, depth + 1);
-                    if (err != null) {
-                        return "if/then: " + err;
-                    }
-                }
-            } else {
-                JsonNode elseNode = schema.get("else");
-                if (elseNode != null) {
-                    err = validate(elseNode, value, root, depth + 1);
-                    if (err != null) {
-                        return "if/else: " + err;
-                    }
-                }
+            JsonNode branch = ifHolds ? schema.get("then") : schema.get("else");
+            err = branch == null ? null : validate(branch, value, root, depth + 1);
+            if (err != null) {
+                return (ifHolds ? "if/then: " : "if/else: ") + err;
             }
         }
 

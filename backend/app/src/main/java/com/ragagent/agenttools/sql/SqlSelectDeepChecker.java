@@ -117,16 +117,17 @@ final class SqlSelectDeepChecker {
                                 parts.add(tokens.get(j).text);
                             }
                             j++;
-                            if (j < tokens.size() && tokens.get(j).kind == SqlTokenizer.TokKind.PUNCT
-                                    && tokens.get(j).text.equals("(")) {
-                                int close = matchingParen(tokens, j);
-                                if (close < 0) {
-                                    error = "unbalanced parentheses";
-                                    return;
-                                }
-                                j = close + 1;
-                                break;
+                            boolean paren = j < tokens.size() && tokens.get(j).kind == SqlTokenizer.TokKind.PUNCT && tokens.get(j).text.equals("(");
+                            if (!paren) {
+                                continue;
                             }
+                            int close = matchingParen(tokens, j);
+                            if (close < 0) {
+                                error = "unbalanced parentheses";
+                                return;
+                            }
+                            j = close + 1;
+                            break;
                         }
                         String typeName = SqlGuard.normalizeCastTypeName(parts);
                         if (typeName.toLowerCase(Locale.ROOT).startsWith("pg_")) {
@@ -144,35 +145,9 @@ final class SqlSelectDeepChecker {
                     SqlTokenizer.Token next = i + 1 < tokens.size() ? tokens.get(i + 1) : null;
                     boolean isFuncCall = next != null && next.text.equals("(");
                     if (isFuncCall) {
-                        // schema 限定函数调用：a.b(...)
-                        // （仅 checkSchemaAccess 时拒绝非 pg_catalog 限定）
-                        String funcName = t.text;
-                        if (cfg.checkSchemaAccess && i - 1 >= 0
-                                && tokens.get(i - 1).kind == SqlTokenizer.TokKind.PUNCT
-                                && tokens.get(i - 1).text.equals(".") && i - 2 >= 0
-                                && (tokens.get(i - 2).kind == SqlTokenizer.TokKind.IDENT
-                                        || tokens.get(i - 2).kind == SqlTokenizer.TokKind.QIDENT)) {
-                            String schema = tokens.get(i - 2).text.toLowerCase(Locale.ROOT);
-                            if (!schema.equals("pg_catalog")) {
-                                error = String.format("schema-qualified function calls are not allowed: %s", schema);
-                                return;
-                            }
-                        }
-                        funcName = t.text.toLowerCase(Locale.ROOT);
-                        if (cfg.checkDangerousFuncs) {
-                            for (String prefix : SqlGuard.DANGEROUS_PREFIXES) {
-                                if (funcName.startsWith(prefix)) {
-                                    error = String.format("function '%s' is not allowed (dangerous prefix)", funcName);
-                                    return;
-                                }
-                            }
-                            if (SqlGuard.DANGEROUS_FUNCTIONS.containsKey(funcName)) {
-                                error = String.format("function '%s' is not allowed", funcName);
-                                return;
-                            }
-                        }
-                        if (cfg.checkFunctionNames && !cfg.allowedFunctions.contains(funcName)) {
-                            error = String.format("function not allowed: %s", funcName);
+                        // schema 限定函数调用 a.b(...)（仅 checkSchemaAccess 时拒绝非 pg_catalog 限定）
+                        checkFunctionCall(tokens, i, t);
+                        if (error != null) {
                             return;
                         }
                         continue;
@@ -197,6 +172,35 @@ final class SqlSelectDeepChecker {
         }
 
         /** CAST(x AS type) 的类型名检查（拒绝 pg_ 前缀系统类型）。 */
+        /** 函数调用检查（i 指向函数名 token）：schema 限定/危险函数/白名单，命中即置 {@code error}。 */
+        private void checkFunctionCall(List<SqlTokenizer.Token> tokens, int i, SqlTokenizer.Token t) {
+            if (cfg.checkSchemaAccess && i - 1 >= 0 && tokens.get(i - 1).kind == SqlTokenizer.TokKind.PUNCT
+                    && tokens.get(i - 1).text.equals(".") && i - 2 >= 0 && (tokens.get(i - 2).kind == SqlTokenizer.TokKind.IDENT
+                    || tokens.get(i - 2).kind == SqlTokenizer.TokKind.QIDENT)) {
+                String schema = tokens.get(i - 2).text.toLowerCase(Locale.ROOT);
+                if (!schema.equals("pg_catalog")) {
+                    error = String.format("schema-qualified function calls are not allowed: %s", schema);
+                    return;
+                }
+            }
+            String funcName = t.text.toLowerCase(Locale.ROOT);
+            if (cfg.checkDangerousFuncs) {
+                for (String prefix : SqlGuard.DANGEROUS_PREFIXES) {
+                    if (funcName.startsWith(prefix)) {
+                        error = String.format("function '%s' is not allowed (dangerous prefix)", funcName);
+                        return;
+                    }
+                }
+                if (SqlGuard.DANGEROUS_FUNCTIONS.containsKey(funcName)) {
+                    error = String.format("function '%s' is not allowed", funcName);
+                    return;
+                }
+            }
+            if (cfg.checkFunctionNames && !cfg.allowedFunctions.contains(funcName)) {
+                error = String.format("function not allowed: %s", funcName);
+            }
+        }
+
         private void checkCastType(List<SqlTokenizer.Token> tokens, int from, int to) {
             // 类型名是 AS 之后的部分（AS 之前是参数表达式）。
             int typeStart = from;

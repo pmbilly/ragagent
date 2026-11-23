@@ -238,24 +238,13 @@ final class ReActIteration {
             }
             // 循环结束注入：本轮收束期间排进来的用户消息让 agent 继续而不是收束答案。
             // content_filter 停止是终态，不走这条路。
-            if (!"content_filter".equals(response.getFinishReason())) {
-                int nextRound = state.getCurrentRound() + 1;
-                boolean canContinue = engine.withinIterationBudget(nextRound) || engine.steerOverruns < AgentEngine.MAX_STEER_OVERRUNS;
-                if (canContinue) {
-                    ChatMessage assistant = new ChatMessage("assistant", verdict.finalAnswer);
-                    assistant.setReasoningContent(response.getReasoningContent());
-                    messagesRef.items.add(assistant);
-                    int injected = engine.steer.drainSteerMessages(state, messagesRef, sessionId, assistantMessageId);
-                    if (injected > 0) {
-                        verdict.step.setIntermediateAnswer(true);
-                        state.getRoundSteps().add(verdict.step);
-                        if (!engine.withinIterationBudget(nextRound)) {
-                            engine.steerOverruns++;
-                            engine.allowSteerOverrun = true;
-                        }
-                        return AgentEngine.IterOutcome.NEXT;
-                    }
-                }
+            int steerNextRound = steerContinuationRound(state, messagesRef, response, verdict.finalAnswer,
+                    response.getReasoningContent(), sessionId, assistantMessageId);
+            if (steerNextRound >= 0) {
+                verdict.step.setIntermediateAnswer(true);
+                state.getRoundSteps().add(verdict.step);
+                bumpSteerOverrunIfNeeded(steerNextRound);
+                return AgentEngine.IterOutcome.NEXT;
             }
             state.setFinalAnswer(verdict.finalAnswer);
             state.setComplete(true);
@@ -279,5 +268,36 @@ final class ReActIteration {
                 state.getCurrentRound(), round, toolCallCount[0], step.getThought().length());
 
         return AgentEngine.IterOutcome.NEXT;
+    }
+
+    /**
+     * 收束前的 steer 注入决策：返回续跑的轮号。content_filter 停止（终态）、
+     * 超预算且无 overrun 余量、或本轮没有注入任何 steer 消息时返回 {@code -1}
+     * （调用方收束答案）。副作用：决定继续时先把 assistant 回复写进消息列表，
+     * 再 drain 排队的 steer 消息——与原内联实现的行为与顺序一致。
+     */
+    private int steerContinuationRound(AgentState state, AgentEngine.MsgRef messagesRef, ChatResponse response,
+            String finalAnswer, String reasoningContent, String sessionId, String assistantMessageId) {
+        if ("content_filter".equals(response.getFinishReason())) {
+            return -1;
+        }
+        int nextRound = state.getCurrentRound() + 1;
+        boolean canContinue = engine.withinIterationBudget(nextRound) || engine.steerOverruns < AgentEngine.MAX_STEER_OVERRUNS;
+        if (!canContinue) {
+            return -1;
+        }
+        ChatMessage assistant = new ChatMessage("assistant", finalAnswer);
+        assistant.setReasoningContent(reasoningContent);
+        messagesRef.items.add(assistant);
+        int injected = engine.steer.drainSteerMessages(state, messagesRef, sessionId, assistantMessageId);
+        return injected > 0 ? nextRound : -1;
+    }
+
+    /** 超出迭代预算仍续跑（steer overrun）：计数一次并放行后续 overrun。 */
+    private void bumpSteerOverrunIfNeeded(int nextRound) {
+        if (!engine.withinIterationBudget(nextRound)) {
+            engine.steerOverruns++;
+            engine.allowSteerOverrun = true;
+        }
     }
 }

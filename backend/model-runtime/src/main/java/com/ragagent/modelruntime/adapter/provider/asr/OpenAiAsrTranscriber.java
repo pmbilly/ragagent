@@ -173,31 +173,43 @@ public class OpenAiAsrTranscriber implements AsrTranscriber {
     public static String openAiErrorText(int statusCode, byte[] body) {
         String statusLine = statusCode + " " + reasonPhrase(statusCode);
         String rawBody = new String(body, StandardCharsets.UTF_8);
-        String detail = null;
-        if (body.length > 0) {
-            try {
-                JsonNode root = MAPPER.readTree(body);
-                JsonNode err = root == null ? null : root.get("error");
-                if (err != null && err.isObject()) {
-                    JsonNode msg = err.get("message");
-                    if (msg != null && !msg.isNull()) {
-                        if (msg.isTextual()) {
-                            detail = msg.asText();
-                        } else if (msg.isArray()) {
-                            List<String> parts = new ArrayList<>();
-                            msg.forEach(m -> parts.add(m.asText()));
-                            detail = String.join(", ", parts);
-                        }
-                    }
-                }
-            } catch (IOException ignored) {
-                detail = null;
-            }
-        }
+        String detail = errorDetail(body);
         if (detail == null || detail.isEmpty()) {
             detail = rawBody;
         }
         return "HTTP " + statusLine + ": " + detail;
+    }
+
+    /**
+     * 错误体里的 {@code error.message} 文本：字符串原样返回、数组逗号拼接；
+     * 空体 / 解析失败 / 字段缺失或非文本非数组时返回 null（调用方退回 body 原文）。
+     */
+    private static String errorDetail(byte[] body) {
+        if (body.length == 0) {
+            return null;
+        }
+        try {
+            JsonNode root = MAPPER.readTree(body);
+            JsonNode err = root == null ? null : root.get("error");
+            if (err == null || !err.isObject()) {
+                return null;
+            }
+            JsonNode msg = err.get("message");
+            if (msg == null || msg.isNull()) {
+                return null;
+            }
+            if (msg.isTextual()) {
+                return msg.asText();
+            }
+            if (msg.isArray()) {
+                List<String> parts = new ArrayList<>();
+                msg.forEach(m -> parts.add(m.asText()));
+                return String.join(", ", parts);
+            }
+            return null;
+        } catch (IOException ignored) {
+            return null;
+        }
     }
 
     /** status 行短语表（"status: 200 OK" 段用）。 */

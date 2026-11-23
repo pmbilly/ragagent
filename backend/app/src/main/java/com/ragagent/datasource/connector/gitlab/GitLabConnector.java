@@ -261,10 +261,11 @@ public class GitLabConnector implements StreamingConnector {
                     }
                 } else {
                     for (GitLabClient.Comparison.Diff d : diff.diffs()) {
-                        if (d.deletedFile()) {
-                            if (inScope(d.oldPath(), selection.paths()) && isSupportedFile(d.oldPath())) {
-                                out = append(out, deleted(c, p, ref, d.oldPath()));
-                            }
+                        boolean deleted = d.deletedFile();
+                        if (deleted && inScope(d.oldPath(), selection.paths()) && isSupportedFile(d.oldPath())) {
+                            out = append(out, deleted(c, p, ref, d.oldPath()));
+                        }
+                        if (deleted) {
                             continue;
                         }
                         if (d.renamedFile() && inScope(d.oldPath(), selection.paths())
