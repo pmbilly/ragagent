@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+359 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -305,10 +305,12 @@
 | `:backend` | `com.ragagent.session` | 会话域：会话与消息读写（conversation/）、两条问答入口（知识库问答 / Agent 问答）、 SSE 流桥、附件（attachment/）与会话侧管线（rag/ + assembly/）。 |
 | `:backend` | `com.ragagent.session.adapter` | 会话 · 端口实现：SessionQaAdapter / EmbedSessionAdapter / EmbedSessionOpsAdapter / KnowledgeQaEventAdapter |
 | `:backend` | `com.ragagent.session.api` | 种类：产品能力（编排域） 入口：会话域跨域形状（com.ragagent.session.api.StopData） 对外契约面：会话编排对外暴露的事件载荷（continue-stream 的停止请求 |
+| `:backend` | `com.ragagent.session.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.session.assembly` | 会话侧装配：问答管线注册（QaWiring）与跨域协作件的接线点。 |
 | `:backend` | `com.ragagent.session.attachment` | 会话附件：临时文档的落盘、解析、提示词渲染与生命周期。 |
 | `:backend` | `com.ragagent.session.controller` | session 域控制器的 HTTP 端点（协议适配层）。 |
 | `:backend` | `com.ragagent.session.controller.sse` | SSE 控制器辅助（探针 EmitterFrameBytesTest 所在包）：帧出口实现与契约 已迁 framework.web（SseSink/EmitterSseSink/SseEndpoint |
+| `:backend` | `com.ragagent.session.controller.vo` | 会话模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.session.conversation` | 会话与消息生命周期：会话/消息读写、消息检索、停止会话与 SSE 流桥 （AgentStreamBridge / AgentStreamEmitter）。 |
 | `:backend` | `com.ragagent.session.domain` | 会话域实体（留存面；已切出三簇：conversation/（会话与分页）、 document/（临时文档）、message/（消息族 + artifact 版本化））。 |
 | `:backend` | `com.ragagent.session.domain.conversation` | 会话实体面（由 session.domain 切出，对齐方案）： Session 及其列表/分页/状态（SessionListItem / SessionListQuery / SessionPage |

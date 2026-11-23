@@ -154,6 +154,7 @@ backend/app/src/main/java/com/ragagent/knowledge/
 | `agentmanagement` | 2 | 1 | 5 | VO 必须复制源 record 的 `@JsonPropertyOrder` / `NON_NULL` 注解，否则线格式变 |
 | `channel` | 2 | 1 | 4 | 另有 28 个端点是 `SseEmitter` / 手搓 `Map` / 控制器包内响应类，按 §2 不动 |
 | `model` | 7 | 1 | 7 | 嵌套两层（参数 → 向量参数）；权限投影留在源 DTO，装配层只搬运 |
+| `session` | 11 | 1 | 13 | VO 必须复制 `@JsonRawValue` 等线格式注解；实体兼响应行（`SessionListItem`）要平铺保键序 |
 
 已知盲区：本手册 §3.1 的 grep 只抓 `ResponseEntity<...>` / `ApiResponse<...>`，**裸返回类型会漏**（`memory` 的 `MemoryListResponse<T>`、`MemoryTopicView` 等就是这样漏掉的）。侦察时补一条：`grep -E "public [A-Z][A-Za-z]+<" 控制器`。
 

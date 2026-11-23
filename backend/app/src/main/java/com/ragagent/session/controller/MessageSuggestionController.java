@@ -2,6 +2,8 @@ package com.ragagent.session.controller;
 
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
+import com.ragagent.session.assembler.SessionAssembler;
+import com.ragagent.session.controller.vo.MessageSuggestionRespVo;
 import com.ragagent.session.dto.MessageSuggestionResponse;
 import com.ragagent.session.service.suggestion.MessageSuggestionFacade;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,13 +45,13 @@ public class MessageSuggestionController {
      * （不是解析器原文，与其他端点不同）。
      */
     @PostMapping("/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions")
-    public ResponseEntity<MessageSuggestionResponse> ensure(
+    public ResponseEntity<MessageSuggestionRespVo> ensure(
             @PathVariable("sessionId") String sessionId,
             @PathVariable("messageId") String messageId,
             @RequestBody(required = false) String rawBody) {
         var set = suggestionFacade.ensureFollowUpsBody(sessionId, messageId, rawBody);
         return ResponseEntity.status(MessageSuggestionFacade.statusFor(set))
-                .body(MessageSuggestionResponse.from(set));
+                .body(SessionAssembler.toSuggestionVo(MessageSuggestionResponse.from(set)));
     }
 
     /**
@@ -58,14 +60,14 @@ public class MessageSuggestionController {
      */
     @GetMapping({"/api/v1/sessions/{sessionId}/messages/{messageId}/suggestions",
             "/api/v1/sessions/{id}/messages/{messageId}/suggestions"})
-    public ResponseEntity<MessageSuggestionResponse> get(
+    public ResponseEntity<MessageSuggestionRespVo> get(
             @PathVariable(value = "sessionId", required = false) String sessionId,
             @PathVariable(value = "id", required = false) String idFallback,
             @PathVariable("messageId") String messageId) {
         String sid = sessionId == null || sessionId.isEmpty() ? idFallback : sessionId;
         var set = suggestionFacade.getFollowUpsSanitized(sid, messageId);
         return ResponseEntity.status(MessageSuggestionFacade.statusFor(set))
-                .body(MessageSuggestionResponse.from(set));
+                .body(SessionAssembler.toSuggestionVo(MessageSuggestionResponse.from(set)));
     }
 
     /**

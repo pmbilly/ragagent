@@ -9,7 +9,9 @@ import com.ragagent.framework.text.ContentTypeByFilename;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.knowledge.api.ParserEngineRules;
+import com.ragagent.session.assembler.SessionAssembler;
 import com.ragagent.session.attachment.TemporaryDocumentService;
+import com.ragagent.session.controller.vo.TemporaryDocumentRespVo;
 import com.ragagent.session.conversation.SessionService;
 import com.ragagent.session.dto.TemporaryDocumentResponse;
 import com.ragagent.session.service.AgentResolver;
@@ -63,7 +65,7 @@ public class TemporaryDocumentController {
 
     /** 上传附件（202 受理，解析异步）。 */
     @PostMapping("/api/v1/sessions/{sessionId}/attachments")
-    public ResponseEntity<TemporaryDocumentResponse> upload(
+    public ResponseEntity<TemporaryDocumentRespVo> upload(
             @PathVariable("sessionId") String sessionId,
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "agentId", required = false) String agentId,
@@ -134,7 +136,7 @@ public class TemporaryDocumentController {
                     file.getOriginalFilename(), file.getContentType(), file.getSize(), data,
                     options);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(TemporaryDocumentResponse.from(document));
+                    .body(SessionAssembler.toTemporaryDocumentVo(TemporaryDocumentResponse.from(document)));
         } catch (IllegalArgumentException e) {
             throw new BizException(AppError.badRequest(e.getMessage()));
         } catch (RuntimeException e) {
@@ -150,7 +152,7 @@ public class TemporaryDocumentController {
     }
 
     @GetMapping({"/api/v1/sessions/{id}/attachments", "/api/v1/sessions/{sessionId}/attachments"})
-    public ResponseEntity<List<TemporaryDocumentResponse>> list(
+    public ResponseEntity<List<TemporaryDocumentRespVo>> list(
             @PathVariable(value = "id", required = false) String id,
             @PathVariable(value = "sessionId", required = false) String sessionIdFallback) {
         String sid = sessionParam(id, sessionIdFallback);
@@ -161,13 +163,14 @@ public class TemporaryDocumentController {
         } catch (RuntimeException e) {
             throw toInternal(e);
         }
-        return ResponseEntity.ok(temporaryDocuments.list(currentTenantId(), sid).stream()
-                .map(TemporaryDocumentResponse::from).toList());
+        return ResponseEntity.ok(SessionAssembler.toTemporaryDocumentVoList(
+                temporaryDocuments.list(currentTenantId(), sid).stream()
+                        .map(TemporaryDocumentResponse::from).toList()));
     }
 
     @GetMapping({"/api/v1/sessions/{id}/attachments/{attachmentId}",
             "/api/v1/sessions/{sessionId}/attachments/{attachmentId}"})
-    public ResponseEntity<TemporaryDocumentResponse> get(
+    public ResponseEntity<TemporaryDocumentRespVo> get(
             @PathVariable(value = "id", required = false) String id,
             @PathVariable(value = "sessionId", required = false) String sessionIdFallback,
             @PathVariable("attachmentId") String attachmentId) {
@@ -183,7 +186,8 @@ public class TemporaryDocumentController {
         if (document == null) {
             throw BizException.notFound("Attachment not found");
         }
-        return ResponseEntity.ok(TemporaryDocumentResponse.from(document));
+        return ResponseEntity.ok(SessionAssembler.toTemporaryDocumentVo(
+                TemporaryDocumentResponse.from(document)));
     }
 
     /**

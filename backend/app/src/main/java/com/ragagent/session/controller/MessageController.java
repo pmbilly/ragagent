@@ -5,6 +5,9 @@ import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.security.LogSanitizer;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
+import com.ragagent.session.assembler.SessionAssembler;
+import com.ragagent.session.controller.vo.ChatHistoryKbStatsRespVo;
+import com.ragagent.session.controller.vo.MessageSearchRespVo;
 import com.ragagent.session.conversation.MessageHistoryService;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.dto.ChatHistoryKbStats;
@@ -120,7 +123,7 @@ public class MessageController {
      * <p>{@code query} 进搜索前还要过一遍 {@code SanitizeForLog}。</p>
      */
     @PostMapping("/api/v1/messages/search")
-    public ResponseEntity<MessageSearchResult> searchMessages(
+    public ResponseEntity<MessageSearchRespVo> searchMessages(
             @RequestBody @Valid SearchMessagesRequest request) {
         MessageSearchResult result;
         result = messageService.searchMessages(
@@ -129,16 +132,16 @@ public class MessageController {
                 request.limit() == null ? 0 : request.limit(),
                 request.sessionIds());
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(SessionAssembler.toMessageSearchVo(result));
     }
 
     // ── 聊天历史统计 ──
 
     @GetMapping("/api/v1/messages/chat-history-stats")
-    public ResponseEntity<ChatHistoryKbStats> getChatHistoryKbStats() {
+    public ResponseEntity<ChatHistoryKbStatsRespVo> getChatHistoryKbStats() {
         ChatHistoryKbStats stats;
         stats = messageService.getChatHistoryKbStats();
-        return ResponseEntity.ok(stats);
+        return ResponseEntity.ok(SessionAssembler.toChatHistoryKbStatsVo(stats));
     }
 
     // ── 公共 ──

@@ -13,7 +13,7 @@
 | `:model-runtime` | `embedding`、`llm`、`modelcontext`、`modelruntime`、`rerank` | 25 | 234 | 0 |
 | `:retrieval-engine` | `retrieval` | 17 | 141 | 0 |
 | `:agent-engine` | `agent`、`agentengine` | 11 | 126 | 0 |
-| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 282 | 1935 | 51 |
+| `:app` | `(根包)`、`agentmanagement`、`agenttools`、`audit`、`auth`、`channel`、`config`、`datasource`、`favorite`、`initialization`、`knowledge`、`mcp`、`memory`、`model`、`session`、`storage`、`vectorstore`、`websearch` | 284 | 1948 | 51 |
 
 ## 17 个业务域（domains）
 
@@ -32,7 +32,7 @@
 | `mcp` | `com.ragagent.mcp` | 176 | 4 |
 | `memory` | `com.ragagent.memory` | 110 | 1 |
 | `model` | `com.ragagent.model` | 47 | 4 |
-| `session` | `com.ragagent.session` | 215 | 8 |
+| `session` | `com.ragagent.session` | 228 | 8 |
 | `storage` | `com.ragagent.storage` | 103 | 3 |
 | `vectorstore` | `com.ragagent.vectorstore` | 20 | 1 |
 | `websearch` | `com.ragagent.websearch` | 63 | 3 |
@@ -61,5 +61,5 @@
 
 ## 相关
 
-- [`packages.md`](packages.md)：357 份 `package-info` 的包级职责索引。
+- [`packages.md`](packages.md)：359 份 `package-info` 的包级职责索引。
 - [`overview.md`](overview.md)：模块依赖图、设计原则、代码在哪。

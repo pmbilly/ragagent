@@ -9,6 +9,11 @@ import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.retrieval.api.MessageArtifact;
+import com.ragagent.session.assembler.SessionAssembler;
+import com.ragagent.session.controller.vo.ArtifactRespVo;
+import com.ragagent.session.controller.vo.GenerateTitleRespVo;
+import com.ragagent.session.controller.vo.SessionListRespVo;
+import com.ragagent.session.controller.vo.SessionPinRespVo;
 import com.ragagent.session.conversation.MessageService;
 import com.ragagent.session.conversation.SessionReadService;
 import com.ragagent.session.conversation.SessionService;
@@ -17,7 +22,6 @@ import com.ragagent.session.dto.ArtifactView;
 import com.ragagent.session.dto.BatchDeleteSessionsRequest;
 import com.ragagent.session.dto.CreateSessionRequest;
 import com.ragagent.session.dto.GenerateTitleRequest;
-import com.ragagent.session.dto.GenerateTitleResponse;
 import com.ragagent.session.dto.SessionListItem;
 import com.ragagent.session.dto.SessionListQuery;
 import com.ragagent.session.dto.SessionListResponse;
@@ -150,7 +154,7 @@ public class SessionController {
  * 响应是 {@link SessionListResponse}。</p>
  */
     @GetMapping("/api/v1/sessions")
-    public SessionListResponse getSessionsByTenant(
+    public SessionListRespVo getSessionsByTenant(
             @RequestParam(name = "page", required = false) String page,
             @RequestParam(name = "pageSize", required = false) String pageSize,
             @RequestParam(name = "keyword", required = false) String keyword,
@@ -163,8 +167,8 @@ public class SessionController {
         result = sessionService.listSessions(
                 SessionListQuery.of(keyword, source, agentId, p, size));
 
-        return new SessionListResponse(result.items(), result.page(), result.pageSize(),
-                result.total());
+        return SessionAssembler.toSessionListVo(new SessionListResponse(
+                result.items(), result.page(), result.pageSize(), result.total()));
     }
 
     /**
@@ -322,12 +326,12 @@ public class SessionController {
 
     /** 置顶：200 + {@code {"pinned":true}}。 */
     @PostMapping("/api/v1/sessions/{sessionId}/pin")
-    public SessionPinResponse pinSession(@PathVariable("sessionId") String sessionId) {
+    public SessionPinRespVo pinSession(@PathVariable("sessionId") String sessionId) {
         return setSessionPinned(sessionId, true);
     }
 
     @DeleteMapping("/api/v1/sessions/{id}/pin")
-    public SessionPinResponse unpinSession(@PathVariable("id") String id) {
+    public SessionPinRespVo unpinSession(@PathVariable("id") String id) {
         return setSessionPinned(id, false);
     }
 
@@ -335,7 +339,7 @@ public class SessionController {
      * 服务层报错 → 500（不是 404）；
      * 0 行受影响（不存在/不可见）→ 404 {@code "session not found"}。
      */
-    private SessionPinResponse setSessionPinned(String rawId, boolean pinned) {
+    private SessionPinRespVo setSessionPinned(String rawId, boolean pinned) {
         String id = LogSanitizer.sanitize(rawId);
         if (id.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -345,7 +349,7 @@ public class SessionController {
         if (rows == 0) {
             throw BizException.notFound("session not found");
         }
-        return new SessionPinResponse(pinned);
+        return SessionAssembler.toPinVo(pinned);
     }
 
     // ── 产物 ──
@@ -355,7 +359,7 @@ public class SessionController {
      * download 端点直接读 provider:// 路径。
      */
     @GetMapping("/api/v1/sessions/{id}/artifacts")
-    public List<ArtifactView> listSessionArtifacts(@PathVariable("id") String id) {
+    public List<ArtifactRespVo> listSessionArtifacts(@PathVariable("id") String id) {
         String sessionId = LogSanitizer.sanitize(id);
         if (sessionId.isEmpty()) {
             throw new BizException(AppError.badRequest("invalid session id"));
@@ -375,7 +379,7 @@ public class SessionController {
 
     /** 消息产物列表：裸数组。 */
     @GetMapping("/api/v1/sessions/{id}/messages/{messageId}/artifacts")
-    public List<ArtifactView> listMessageArtifacts(
+    public List<ArtifactRespVo> listMessageArtifacts(
             @PathVariable("id") String id,
             @PathVariable("messageId") String messageId) {
         String sessionId = LogSanitizer.sanitize(id);
@@ -454,13 +458,13 @@ public class SessionController {
     }
 
     /** {@code index} 是列表下标，其余字段取自产物本体。 */
-    private static List<ArtifactView> artifactListItems(
+    private static List<ArtifactRespVo> artifactListItems(
             List<MessageArtifact> artifacts) {
         List<ArtifactView> items = new ArrayList<>(artifacts.size());
         for (int i = 0; i < artifacts.size(); i++) {
             items.add(ArtifactView.of(i, artifacts.get(i)));
         }
-        return items;
+        return SessionAssembler.toArtifactVoList(items);
     }
 
 
@@ -472,7 +476,7 @@ public class SessionController {
      * （GetOwnedSession——管理员可读不可改）。响应 {@code {"title":"…"}}。
      */
     @PostMapping("/api/v1/sessions/{sessionId}/generate_title")
-    public GenerateTitleResponse generateTitle(
+    public GenerateTitleRespVo generateTitle(
             @PathVariable("sessionId") String sessionId,
             @RequestBody @Valid GenerateTitleRequest request) {
         if (sessionId == null || sessionId.isEmpty()) {
@@ -481,7 +485,7 @@ public class SessionController {
         try {
             String title = sessionReadService.generateTitleForOwnedSession(
                     sessionId, request.messages());
-            return new GenerateTitleResponse(title);
+            return SessionAssembler.toGenerateTitleVo(title);
         } catch (SessionNotFoundException e) {
             log.debug("Session not found, ID: {}", sessionId);
             throw BizException.notFound(e.getMessage());
