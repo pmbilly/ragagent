@@ -13,7 +13,10 @@ import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.JsonBodyErrors;
 import com.ragagent.framework.web.RequestFields;
 import com.ragagent.retrieval.api.WebSearchResult;
+import com.ragagent.websearch.assembler.WebSearchAssembler;
 import com.ragagent.websearch.config.WebSearchProviderParams;
+import com.ragagent.websearch.controller.vo.WebSearchProviderRespVo;
+import com.ragagent.websearch.controller.vo.WebSearchProviderTypeVo;
 import com.ragagent.websearch.dto.WebSearchProviderResponse;
 import com.ragagent.websearch.dto.WebSearchProviderTestTarget;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
@@ -75,8 +78,8 @@ public class WebSearchProviderController {
     // ── /types（Viewer+）：静态元数据 ──────────────────────────────────
 
     @GetMapping("/types")
-    public ResponseEntity<?> listProviderTypes() {
-        return ResponseEntity.ok(WebSearchProviderTypes.all());
+    public ResponseEntity<List<WebSearchProviderTypeVo>> listProviderTypes() {
+        return ResponseEntity.ok(WebSearchAssembler.toTypeVoList(WebSearchProviderTypes.all()));
     }
 
     // ── POST /test（Admin+）：原始凭据连通性 ───────────────────────────
@@ -100,7 +103,7 @@ public class WebSearchProviderController {
 
     /** 创建请求：name/provider required（校验失败按字段声明序用 \n 拼接） */
     @PostMapping
-    public ResponseEntity<?> createProvider(@RequestBody(required = false) String rawBody) {
+    public ResponseEntity<WebSearchProviderRespVo> createProvider(@RequestBody(required = false) String rawBody) {
         long tenantId = requireTenant();
         JsonNode body = parseBody(rawBody);
         String name = textOrNull(body, "name");
@@ -126,24 +129,25 @@ public class WebSearchProviderController {
             // 与「内部故障不可外泄」不同批处理：先把入参校验从 internal 里分出来，才能换固定文案。
             throw BizException.internal(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(WebSearchAssembler.toProviderVo(created));
     }
 
     @GetMapping
-    public ResponseEntity<?> listProviders() {
+    public ResponseEntity<List<WebSearchProviderRespVo>> listProviders() {
         long tenantId = requireTenant();
-        return ResponseEntity.ok(service.listResponses(tenantId, canViewIntegrationSecrets()));
+        return ResponseEntity.ok(WebSearchAssembler.toProviderVoList(
+                service.listResponses(tenantId, canViewIntegrationSecrets())));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProvider(@PathVariable("id") String id) {
+    public ResponseEntity<WebSearchProviderRespVo> getProvider(@PathVariable("id") String id) {
         long tenantId = requireTenant();
         WebSearchProviderResponse provider = service.getResponse(
                 tenantId, id, canViewIntegrationSecrets());
         if (provider == null) {
             throw notFoundPure("web search provider not found");
         }
-        return ResponseEntity.ok(provider);
+        return ResponseEntity.ok(WebSearchAssembler.toProviderVo(provider));
     }
 
     /** 更新请求：无 required 字段；merge 规则见下 */
@@ -168,7 +172,7 @@ public class WebSearchProviderController {
             WebSearchProviderResponse updated = service.updateResponse(tenantId, id, name,
                     description, req.parameters(), req.isDefault(), canViewIntegrationSecrets());
             if (updated != null) {
-                return ResponseEntity.ok(updated);
+                return ResponseEntity.ok(WebSearchAssembler.toProviderVo(updated));
             }
         } catch (RuntimeException e) {
             log.warn("Failed to update web search provider {}", id, e);

@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-363 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+365 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -358,8 +358,10 @@
 | `:backend` | `com.ragagent.websearch` | 联网搜索域：搜索 provider 目录与凭据（对外 /api/v1/web-search-providers）、 搜索执行与各家 provider 适配。 |
 | `:backend` | `com.ragagent.websearch.adapter` | 网页搜索 · 端口实现：WebSearchBackendsAdapter / WebSearchSupportAdapter。 |
 | `:backend` | `com.ragagent.websearch.api` | websearch 域对外契约。 |
+| `:backend` | `com.ragagent.websearch.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.websearch.config` | 网页搜索 · 配置值：WebSearchProviderParams（provider 的 parameters 载荷）。 |
 | `:backend` | `com.ragagent.websearch.controller` | 网页搜索 · HTTP 层：WebSearchProviderCredentialsController / WebSearchProviderController / WebSearchController。 |
+| `:backend` | `com.ragagent.websearch.controller.vo` | 搜索模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.websearch.domain` | 网页搜索 · 领域模型：WebSearchParamsTypeHandler / WebSearchProviderEntity。 |
 | `:backend` | `com.ragagent.websearch.dto` | 网页搜索 · 数据传输：WebSearchProviderResponse / WebSearchProviderTypes。 |
 | `:backend` | `com.ragagent.websearch.fetch` | 网页搜索 · 抓取：PipelinePageFetcherImpl / ToolPageFetcherImpl / BrowserRenderer…。 |

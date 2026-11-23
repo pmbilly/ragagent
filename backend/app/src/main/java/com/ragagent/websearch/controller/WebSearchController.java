@@ -1,8 +1,11 @@
 package com.ragagent.websearch.controller;
 
 import com.ragagent.framework.web.ApiResult;
+import com.ragagent.websearch.assembler.WebSearchAssembler;
+import com.ragagent.websearch.controller.vo.WebSearchProviderTypeVo;
 import com.ragagent.websearch.dto.WebSearchProviderTypes;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebSearchController {
 
     @GetMapping("/api/v1/web-search/providers")
-    public ResponseEntity<?> getProviders() {
-        return ResponseEntity.ok(WebSearchProviderTypes.all());   // 外壳交给 advice
+    public ResponseEntity<List<WebSearchProviderTypeVo>> getProviders() {
+        return ResponseEntity.ok(WebSearchAssembler.toTypeVoList(WebSearchProviderTypes.all()));   // 外壳交给 advice
     }
 }

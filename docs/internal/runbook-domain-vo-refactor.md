@@ -158,6 +158,7 @@ backend/app/src/main/java/com/ragagent/knowledge/
 | `auth`（认证面） | 11 | 1 | 11 | 大域分两批：本批只做 login/me/oidc 面；`AuthLoginRespVo.user` 保留实体类型以保字节，权限裁剪留在源 DTO |
 | `auth`（管理面） | 4 | 0（复用） | 4 | 邀请/成员**列表**端点是 Map 包裹，按 §2 不动；`TenantRowView` 是 L1 行视图不 VO 化 |
 | `audit` | 2 | 1 | 3 | 原响应 `items` 是实体直出（`List<AuditLog>`），本批一并切断；无金片但有 standalone 契约测试 |
+| `websearch` | 3 | 1 | 5 | 先显式化 `ResponseEntity<?>`；`updateProvider` 因两条返回形状不同，保持 `?` 是正确解 |
 
 已知盲区：本手册 §3.1 的 grep 只抓 `ResponseEntity<...>` / `ApiResponse<...>`，**裸返回类型会漏**（`memory` 的 `MemoryListResponse<T>`、`MemoryTopicView` 等就是这样漏掉的）。侦察时补一条：`grep -E "public [A-Z][A-Za-z]+<" 控制器`。
 
