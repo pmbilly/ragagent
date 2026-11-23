@@ -1,9 +1,28 @@
 # WP3 Sa-Token 替换批——详细执行计划
 
-- **日期**：2026-11-22　**状态**：待评审（评审通过才动手）
+- **日期**：2026-11-22　**状态**：已评审并拆分（2026-11-23 用户拍板）——**前半独立为 W1 批先行，Sa-Token 替换（3-B）缓做**
 - **上游**：framework-optimization-roadmap-2026-11-22.md §4 WP3（WP 级方案）；蓝图 D20 / §5.3 / §5.6 / §5.9
 - **性质**：触发式替换批，独立于 WP4（RLS）/WP5（JobRunr）
 - **规模预估**：3~5 天，5 个提交批（WP3a~3e）
+
+---
+
+## 评审结论与拆分拍板（2026-11-23，先于下文一切批次）
+
+**评审实测修正**：规则表实测 **375** 条 addRule（本文写 373）+ **291** 条 registerGin（写 290）；`TenantContext` 为 **8** 个 ThreadLocal（写 7，多 requestId）。jjwt 主码影响面仅 4 个文件（JwtService/UserSessionOps/UserService/TenantAPIPrincipalController）。蓝图 D20 的否决理由「权限规则散落难测试」在当前仓库已由集中策略表 + `check-route-policy.py` + auth 22 测试类 + 1422 金片解决。
+
+**拍板：WP3 拆为两半，不一次全做。**
+
+| 半 | 内容 | 状态 |
+|---|---|---|
+| **W1（先做，无新依赖）** | 规则面收敛：375+291 两表并一处注册 + 单一拦截器（普通 HandlerInterceptor，**不引 Sa-Token**）；framework 的 RbacInterceptor/RbacRules 删除 → 5 类迁 auth/api、tenant 包 12→7。流程复用本文 WP3b/WP3c（双锚 diff=0 → 一次切换 → 删旧） | 进行中 |
+| **3-B（缓做，触发式）** | jjwt→Sa-Token（本文 WP3a/d/e：会话切轨、jjwt 清零、auth_tokens DROP、文档台账） | 触发条件：C 端客户登录立项 / 需多端会话管理 / 团队拍板与 furnace 对齐 |
+
+**3-B 缓做的依据**：① 换 Sa-Token+Redis 会话会把「Redis 故障」影响面从 embed/限流扩大到控制台全挂（K5），当前 web JWT 无状态不受影响；② 对易读性/架构清晰的收益集中在规则面（已由 W1 获得）；③ 三账号完整体系属第二阶段 C 端域（本文 P3 已推迟）。
+
+**W1 验收继承本文全部等价约束**：§0 行为等价矩阵（权限 diff=0 机器证明、HTTP 契约逐字、放行面原样、隐性语义含 HEAD/ASYNC/PathTenantMatch）、§5 风险 K1/K2/K3/K4/K7/K10、§6 显式不做（三 URL 组、PermissionCatalog、注解式鉴权均不做）。本文 WP3b/WP3c 的 `SaInterceptor` 在 W1 中以普通 `HandlerInterceptor` 实现，无 Sa-Token 依赖。
+
+---
 
 ---
 
