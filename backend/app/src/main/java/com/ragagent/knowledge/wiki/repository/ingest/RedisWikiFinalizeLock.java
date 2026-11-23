@@ -1,8 +1,12 @@
 package com.ragagent.knowledge.wiki.repository.ingest;
 
+import com.ragagent.framework.concurrent.DistributedLock;
+import com.ragagent.framework.concurrent.RedisDistributedLock;
 import com.ragagent.knowledge.wiki.domain.ingest.WikiIngestConstants;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -40,8 +44,11 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
     private static final Logger log = LoggerFactory.getLogger(RedisWikiFinalizeLock.class);
 
     private final StringRedisTemplate template;
+    private final DistributedLock lock;
     private final Duration ttl;
     private final Duration renew;
+    private final ConcurrentHashMap<String, DistributedLock.LockHandle> handles =
+            new ConcurrentHashMap<>();
 
     /**
      * 续期线程池。守护线程，单个 finalize 的续期任务极轻（每 20 秒一次 EXPIRE），
@@ -56,7 +63,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
 
     /** kbID → 当前持有者的续期任务（用于 release 时取消） */
     private final java.util.concurrent.ConcurrentHashMap<String, ScheduledFuture<?>> renewals =
-            new java.util.concurrent.ConcurrentHashMap<>();
+            new ConcurrentHashMap<>();
 
     public RedisWikiFinalizeLock(StringRedisTemplate template) {
         this(template, WikiIngestConstants.FINALIZE_LOCK_TTL,
@@ -65,6 +72,7 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
 
     public RedisWikiFinalizeLock(StringRedisTemplate template, Duration ttl, Duration renew) {
         this.template = template;
+        this.lock = new RedisDistributedLock(template);
         this.ttl = ttl;
         this.renew = renew;
     }
@@ -75,18 +83,19 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
             return AcquireResult.BUSY;
         }
         String key = WikiFinalizeLock.lockKey(kbId);
-        Boolean acquired;
+        Optional<DistributedLock.LockHandle> handle;
         try {
-            acquired = template.opsForValue().setIfAbsent(key, "1", ttl);
+            handle = lock.tryLock(key, ttl);
         } catch (RuntimeException e) {
             // fail CLOSED：无锁放行会让两个 finalize 批次排空同一批待办、重复重建索引页
             log.warn("wiki finalize: SetNX failed for KB {} (retrying)", kbId, e);
             return AcquireResult.FAILED;
         }
-        if (!Boolean.TRUE.equals(acquired)) {
+        if (handle.isEmpty()) {
             // 另一个 finalize 正在跑；它会排空通道并在还有行时重排。安全地 no-op。
             return AcquireResult.BUSY;
         }
+        handles.put(kbId, handle.get());
         // 续期：每 renew 一次 EXPIRE，上限 ttl
         ScheduledFuture<?> task = renewer.scheduleAtFixedRate(() -> {
             try {
@@ -104,15 +113,18 @@ public class RedisWikiFinalizeLock implements WikiFinalizeLock {
         if (kbId == null || kbId.isEmpty()) {
             return;
         }
-        // 先停续期，再删键。
-        // 用 token 无关的 DEL：finalize 锁是"至多一个"语义，
-        // 不像 slug 锁那样需要防误删他人锁——持有者之间不会重入。
+        // 先停续期，再释放锁（token 比对 DEL：TTL 到期后锁被别的 finalize 重建时，
+        // 原持有者的 close 不会删掉新持有者的锁）。
         ScheduledFuture<?> task = renewals.remove(kbId);
         if (task != null) {
             task.cancel(false);
         }
+        DistributedLock.LockHandle handle = handles.remove(kbId);
+        if (handle == null) {
+            return;
+        }
         try {
-            template.delete(WikiFinalizeLock.lockKey(kbId));
+            handle.close();
         } catch (RuntimeException e) {
             log.warn("wiki finalize: lock release failed for KB {}", kbId, e);
         }

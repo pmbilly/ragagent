@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.concurrent.DistributedLock;
+import com.ragagent.framework.concurrent.RedisDistributedLock;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.dto.faq.FaqImportProgress;
 import com.ragagent.knowledge.support.FaqImportTaskStore;
@@ -84,8 +86,11 @@ public class RedisFaqImportTaskStore implements FaqImportTaskStore {
 
     private final StringRedisTemplate template;
 
+    private final DistributedLock lock;
+
     public RedisFaqImportTaskStore(StringRedisTemplate template) {
         this.template = template;
+        this.lock = new RedisDistributedLock(template);
     }
 
     // ── 进度 ──────────────────────────────────────────────────────────

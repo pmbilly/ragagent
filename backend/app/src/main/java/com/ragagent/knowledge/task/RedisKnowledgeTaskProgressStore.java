@@ -1,6 +1,8 @@
 package com.ragagent.knowledge.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.framework.concurrent.DistributedLock;
+import com.ragagent.framework.concurrent.RedisDistributedLock;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.knowledge.dto.doc.KnowledgeMoveProgress;
 import com.ragagent.knowledge.dto.kb.KBCloneProgress;
@@ -36,8 +38,11 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
 
     private final StringRedisTemplate template;
 
+    private final DistributedLock lock;
+
     public RedisKnowledgeTaskProgressStore(StringRedisTemplate template) {
         this.template = template;
+        this.lock = new RedisDistributedLock(template);
     }
 
     // ── move ──────────────────────────────────────────────────────────
@@ -46,7 +51,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
     public void saveMoveInitial(KnowledgeMoveProgress progress) {
         try {
             // NX = putIfAbsent 语义：只在键不存在时落初始进度
-            template.opsForValue().setIfAbsent(MOVE_PREFIX + progress.taskId(),
+            lock.markOnce(MOVE_PREFIX + progress.taskId(),
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
             log.warn("[KnowledgeProgressRedis] save move initial failed for {}", progress.taskId(), e);
@@ -74,7 +79,7 @@ public class RedisKnowledgeTaskProgressStore implements KnowledgeTaskProgressSto
     @Override
     public void saveCloneInitial(KBCloneProgress progress) {
         try {
-            template.opsForValue().setIfAbsent(CLONE_PREFIX + progress.taskId(),
+            lock.markOnce(CLONE_PREFIX + progress.taskId(),
                     toJson(progress), Duration.ofSeconds(TTL_SECONDS));
         } catch (RuntimeException e) {
             log.warn("[KnowledgeProgressRedis] save clone initial failed for {}", progress.taskId(), e);

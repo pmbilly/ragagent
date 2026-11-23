@@ -5,6 +5,10 @@
       "kind": "domain-internal",
       "why": "嵌入渠道运行时装配：消费会话域端口，装配的是本域入口流程"
     },
+    "com.ragagent.config.ConcurrentWiring": {
+      "kind": "composition-root",
+      "why": "并发原语装配：分布式锁与去重标记的统一端口（DistributedLock/RedisDistributedLock）"
+    },
     "com.ragagent.config.EnvLookupWiring": {
       "kind": "composition-root",
       "why": "向量库 env 族的查找面：把 System::getenv 收敛到 Spring Environment，测试可覆盖"

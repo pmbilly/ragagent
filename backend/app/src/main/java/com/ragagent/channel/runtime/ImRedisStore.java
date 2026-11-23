@@ -1,5 +1,7 @@
 package com.ragagent.channel.runtime;
 
+import com.ragagent.framework.concurrent.DistributedLock;
+import com.ragagent.framework.concurrent.RedisDistributedLock;
 import java.time.Duration;
 import java.util.List;
 import org.slf4j.Logger;
@@ -92,8 +94,11 @@ public class ImRedisStore implements QaQueue.RedisPort {
     private static final RedisScript<Long> RELEASE_LEADER =
             new DefaultRedisScript<>(RELEASE_LEADER_LUA, Long.class);
 
+    private final DistributedLock lock;
+
     public ImRedisStore(StringRedisTemplate template) {
         this.template = template;
+        this.lock = new RedisDistributedLock(template);
     }
 
     @Override

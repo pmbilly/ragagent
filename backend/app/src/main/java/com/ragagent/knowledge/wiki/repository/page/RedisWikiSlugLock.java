@@ -1,10 +1,11 @@
 package com.ragagent.knowledge.wiki.repository.page;
 
+import com.ragagent.framework.concurrent.DistributedLock;
+import com.ragagent.framework.concurrent.RedisDistributedLock;
 import com.ragagent.knowledge.wiki.domain.page.WikiSlugLock;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,6 +49,7 @@ public class RedisWikiSlugLock implements WikiSlugLock {
             Long.class);
 
     private final StringRedisTemplate template;
+    private final DistributedLock lock;
     private final Duration ttl;
 
     public RedisWikiSlugLock(StringRedisTemplate template) {
@@ -56,26 +58,25 @@ public class RedisWikiSlugLock implements WikiSlugLock {
 
     public RedisWikiSlugLock(StringRedisTemplate template, Duration ttl) {
         this.template = template;
+        this.lock = new RedisDistributedLock(template);
         this.ttl = ttl;
     }
 
     @Override
     public boolean tryLock(String kbId, String slug, Duration wait) {
         String key = WikiSlugLock.lockKey(kbId, slug);
-        // token 唯一标识"本次持有"，供解锁脚本比对
-        String token = java.util.UUID.randomUUID().toString();
         long deadline = System.currentTimeMillis() + Math.max(wait.toMillis(), 0);
         while (true) {
-            Boolean ok;
+            Optional<DistributedLock.LockHandle> handle;
             try {
-                ok = template.opsForValue().setIfAbsent(key, token, ttl);
+                handle = lock.tryLock(key, ttl);
             } catch (RuntimeException e) {
                 // SetNX 报错 → fail-open，不加锁直接跑
                 log.warn("wiki slug lock: SetNX failed for {} (running unlocked)", slug, e);
                 return true;
             }
-            if (Boolean.TRUE.equals(ok)) {
-                tokens.get().put(key, token);
+            if (handle.isPresent()) {
+                tokens.get().put(key, handle.get());
                 return true;
             }
             if (System.currentTimeMillis() >= deadline) {
@@ -95,13 +96,12 @@ public class RedisWikiSlugLock implements WikiSlugLock {
     @Override
     public void unlock(String kbId, String slug) {
         String key = WikiSlugLock.lockKey(kbId, slug);
-        String token = tokens.get().remove(key);
-        if (token == null) {
+        DistributedLock.LockHandle handle = tokens.get().remove(key);
+        if (handle == null) {
             return;
         }
         try {
-            List<String> keys = Collections.singletonList(key);
-            template.execute(UNLOCK_SCRIPT, keys, token);
+            handle.close();
         } catch (RuntimeException e) {
             // 释放失败只会让锁自然过期（最多 TTL），不需要让调用方感知
             log.warn("wiki slug lock: release failed for {}", slug, e);
@@ -112,6 +112,6 @@ public class RedisWikiSlugLock implements WikiSlugLock {
      * 本线程写入锁的 token，<b>按锁键记账</b>（供解锁脚本比对，避免误删他人锁）。
      * 按锁键而非单值：同一线程先后/交叉持有多把不同的锁时互不覆盖。
      */
-    private final ThreadLocal<Map<String, String>> tokens =
+    private final ThreadLocal<Map<String, DistributedLock.LockHandle>> tokens =
             ThreadLocal.withInitial(java.util.HashMap::new);
 }
