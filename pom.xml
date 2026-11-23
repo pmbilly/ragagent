@@ -387,6 +387,35 @@
           <artifactId>maven-jar-plugin</artifactId>
           <version>${maven-jar-plugin.version}</version>
         </plugin>
+
+        <!-- IDE 侧（m2e / jdt.ls）接不进自定义 execution，会对 pom 报
+             "Plugin execution not covered by lifecycle configuration"。
+             这里显式声明 checkstyle:check 的执行由 IDE 忽略：条目只放在 pluginManagement，
+             Maven 不解析它 ⇒ 构建、CI 与本地闸门照常执行 validate 阶段的嵌套深度门。 -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <versionRange>[3.6.0,)</versionRange>
+                    <goals>
+                      <goal>check</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore/>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
 
