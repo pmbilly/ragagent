@@ -23,6 +23,8 @@ import com.ragagent.llm.api.Reranker;
 import com.ragagent.llm.api.ResponseType;
 import com.ragagent.llm.api.StreamResponse;
 import com.ragagent.llm.api.VlmPredictor;
+import com.ragagent.model.assembler.ModelAssembler;
+import com.ragagent.model.controller.vo.ModelDebugRespVo;
 import com.ragagent.model.dto.ModelDebugAsrResponse;
 import com.ragagent.model.dto.ModelDebugChatResponse;
 import com.ragagent.model.dto.ModelDebugResult;
@@ -83,7 +85,7 @@ public class ModelDebugController {
     }
 
     @PostMapping("/{id}/debug")
-    public ResponseEntity<ModelDebugResult> debugModel(@PathVariable("id") String id,
+    public ResponseEntity<ModelDebugRespVo> debugModel(@PathVariable("id") String id,
                                         @RequestParam(value = "input", required = false) String input,
                                         @RequestParam(value = "options", required = false) String optionsRaw,
                                         @RequestParam(value = "documents", required = false) String documentsRaw,
@@ -157,7 +159,7 @@ public class ModelDebugController {
 
     // ── KnowledgeQA ──────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugChat(ModelDebugTarget model, String input, DebugOptions opts,
+    private ResponseEntity<ModelDebugRespVo> debugChat(ModelDebugTarget model, String input, DebugOptions opts,
                                         long startedNanos, Map<String, Object> requestPreview,
                                         Map<String, Object> observations) {
         if (input.trim().isEmpty()) {
@@ -263,7 +265,7 @@ public class ModelDebugController {
 
     // ── Embedding ────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugEmbedding(ModelDebugTarget model, String input, long startedNanos,
+    private ResponseEntity<ModelDebugRespVo> debugEmbedding(ModelDebugTarget model, String input, long startedNanos,
                                              Map<String, Object> requestPreview, Map<String, Object> observations) {
         if (input.trim().isEmpty()) {
             throw new BizException(AppError.badRequest("input cannot be empty"));
@@ -287,7 +289,7 @@ public class ModelDebugController {
 
     // ── Rerank ───────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugRerank(ModelDebugTarget model, String input, List<String> documents,
+    private ResponseEntity<ModelDebugRespVo> debugRerank(ModelDebugTarget model, String input, List<String> documents,
                                           long startedNanos, Map<String, Object> requestPreview,
                                           Map<String, Object> observations) {
         if (input.trim().isEmpty() || documents == null || documents.isEmpty()) {
@@ -312,7 +314,7 @@ public class ModelDebugController {
 
     // ── VLLM ─────────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugVlm(ModelDebugTarget model, String input, byte[] fileBytes,
+    private ResponseEntity<ModelDebugRespVo> debugVlm(ModelDebugTarget model, String input, byte[] fileBytes,
                                        long startedNanos, Map<String, Object> requestPreview,
                                        Map<String, Object> observations) {
         if (fileBytes == null || fileBytes.length == 0) {
@@ -346,7 +348,7 @@ public class ModelDebugController {
 
     // ── ASR ──────────────────────────────────────────────────────────────
 
-    private ResponseEntity<ModelDebugResult> debugAsr(ModelDebugTarget model, byte[] fileBytes, String fileName,
+    private ResponseEntity<ModelDebugRespVo> debugAsr(ModelDebugTarget model, byte[] fileBytes, String fileName,
                                        long startedNanos, Map<String, Object> requestPreview,
                                        Map<String, Object> observations) {
         if (fileBytes == null || fileBytes.length == 0) {
@@ -389,12 +391,12 @@ public class ModelDebugController {
     // ── 结果整形 ─────────────────────────────────────────────────────────
 
     /** 结果整形：HTTP 恒 200，裸结果对象（无信封）。 */
-    private ResponseEntity<ModelDebugResult> writeResult(long startedNanos, Map<String, Object> request,
+    private ResponseEntity<ModelDebugRespVo> writeResult(long startedNanos, Map<String, Object> request,
                                                          Object rawResponse, String error,
                                                          Map<String, Object> observations) {
         long elapsedMs = (System.nanoTime() - startedNanos) / 1_000_000;
-        return ResponseEntity.ok(new ModelDebugResult(
-                error == null, elapsedMs, error, request, rawResponse, observations));
+        return ResponseEntity.ok(ModelAssembler.toDebugVo(new ModelDebugResult(
+                error == null, elapsedMs, error, request, rawResponse, observations)));
     }
 
     /**

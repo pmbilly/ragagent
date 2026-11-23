@@ -1,7 +1,7 @@
 <!-- 由 scripts/gen-arch-index.py 生成；不要手改。 -->
 # 包索引
 
-355 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
+357 份 `package-info.java` 的首句摘要，按模块分组。找代码时先按模块，再按包名。
 
 | 模块 | 包 | 职责 |
 |---|---|---|
@@ -262,7 +262,9 @@
 | `:backend` | `com.ragagent.memory.support` | 记忆 · 支撑类型：冲突异常等跨层共享但不属于实体的词汇。 |
 | `:backend` | `com.ragagent.model` | 模型配置域：模型条目 CRUD、凭据子资源、Ollama 管理与调试面（embedding 原始响应等）。 |
 | `:backend` | `com.ragagent.model.adapter` | 模型 · 端口实现：ModelCatalogAdapter。 |
+| `:backend` | `com.ragagent.model.assembler` | 领域对象与 HTTP 出入参之间的装配：只做字段搬运与空值处理，不含业务判断。 |
 | `:backend` | `com.ragagent.model.controller` | 模型 · HTTP 层：ModelCredentialsController / ModelDebugController / ModelController。 |
+| `:backend` | `com.ragagent.model.controller.vo` | 模型模块的 HTTP 出参：只承载传输形状，不参与业务判断。 |
 | `:backend` | `com.ragagent.model.domain` | 模型 · 领域模型：ModelParametersTypeHandler / Model。 |
 | `:backend` | `com.ragagent.model.dto` | 模型 · 数据传输：ModelCredentialFieldMetadata / ModelCredentialsPutRequest / ModelCredentialsResponse…。 |
 | `:backend` | `com.ragagent.model.mapper` | 模型 · 映射：ModelUsageMapper / ModelMapper。 |

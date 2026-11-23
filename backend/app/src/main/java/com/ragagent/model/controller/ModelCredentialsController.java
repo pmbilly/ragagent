@@ -5,8 +5,9 @@ import com.ragagent.framework.error.BizException;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
+import com.ragagent.model.assembler.ModelAssembler;
+import com.ragagent.model.controller.vo.ModelCredentialsRespVo;
 import com.ragagent.model.dto.ModelCredentialsPutRequest;
-import com.ragagent.model.dto.ModelCredentialsResponse;
 import com.ragagent.model.service.ModelService;
 import com.ragagent.model.service.ModelService.ModelNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +41,7 @@ public class ModelCredentialsController {
 
     /** 写入/清除凭据（Admin+）；两字段均缺省时返回已配置状态。 */
     @PutMapping("/{id}/credentials")
-    public ResponseEntity<ModelCredentialsResponse> put(@PathVariable("id") String id,
+    public ResponseEntity<ModelCredentialsRespVo> put(@PathVariable("id") String id,
             @RequestBody(required = false) ModelCredentialsPutRequest req) {
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0) {
@@ -51,14 +52,15 @@ public class ModelCredentialsController {
         }
         if (req.apiKey() == null && req.appSecret() == null) {
             try {
-                return ResponseEntity.ok(modelService.credentialsResponse(id));
+                return ResponseEntity.ok(ModelAssembler.toCredentialsVo(
+                        modelService.credentialsResponse(id)));
             } catch (ModelNotFoundException e) {
                 throw new BizException(AppError.notFound("Model not found"));
             }
         }
         try {
-            return ResponseEntity.ok(modelService.updateCredentialsResponse(
-                    id, req.apiKey(), req.appSecret()));
+            return ResponseEntity.ok(ModelAssembler.toCredentialsVo(
+                    modelService.updateCredentialsResponse(id, req.apiKey(), req.appSecret())));
         } catch (ModelNotFoundException e) {
             throw new BizException(AppError.notFound("Model not found"));
         }

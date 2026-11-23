@@ -9,6 +9,9 @@ import com.ragagent.framework.web.ApiResponse;
 import com.ragagent.framework.web.ApiResult;
 import com.ragagent.framework.web.NonNullBody;
 import com.ragagent.framework.web.RejectEmptyBody;
+import com.ragagent.model.assembler.ModelAssembler;
+import com.ragagent.model.controller.vo.ModelDetailRespVo;
+import com.ragagent.model.controller.vo.ModelProviderRespVo;
 import com.ragagent.model.dto.CreateModelRequest;
 import com.ragagent.model.dto.ModelDetailResponse;
 import com.ragagent.model.dto.ModelProviderDto;
@@ -61,7 +64,7 @@ public class ModelController {
 
     /** 创建模型（Admin+）。 */
     @PostMapping
-    public ResponseEntity<ModelDetailResponse> createModel(
+    public ResponseEntity<ModelDetailRespVo> createModel(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) CreateModelRequest req) {
         log.info("Start creating model");
         Long tenantId = TenantContext.currentTenantId();
@@ -82,18 +85,19 @@ public class ModelController {
         ModelDetailResponse created = modelService.createModelResponse(
                 tenantId, req, canViewIntegrationSecrets());
         log.info("Model created successfully, ID: {}, Name: {}", created.id(), created.name());
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ModelAssembler.toDetailVo(created));
     }
 
     /** 读取模型（Viewer+）。 */
     @GetMapping("/{id}")
-    public ResponseEntity<ModelDetailResponse> getModel(@PathVariable("id") String id) {
+    public ResponseEntity<ModelDetailRespVo> getModel(@PathVariable("id") String id) {
         log.info("Start retrieving model");
         if (isBlank(id)) {
             throw new BizException(AppError.badRequest("Model ID cannot be empty"));
         }
         try {
-            return ResponseEntity.ok(modelService.getModelResponse(id, canViewIntegrationSecrets()));
+            return ResponseEntity.ok(ModelAssembler.toDetailVo(
+                    modelService.getModelResponse(id, canViewIntegrationSecrets())));
         } catch (ModelNotFoundException e) {
             log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
@@ -102,13 +106,14 @@ public class ModelController {
 
     /** 模型列表（Viewer+）。 */
     @GetMapping
-    public ResponseEntity<List<ModelDetailResponse>> listModels() {
+    public ResponseEntity<List<ModelDetailRespVo>> listModels() {
         log.info("Start retrieving model list");
         Long tenantId = TenantContext.currentTenantId();
         if (tenantId == null || tenantId == 0) {
             throw new BizException(AppError.badRequest("Workspace ID cannot be empty"));
         }
-        return ResponseEntity.ok(modelService.listModelResponses(canViewIntegrationSecrets()));
+        return ResponseEntity.ok(ModelAssembler.toDetailVoList(
+                modelService.listModelResponses(canViewIntegrationSecrets())));
     }
 
     /**
@@ -116,7 +121,7 @@ public class ModelController {
      * 凭证快照保留 + 后端托管字段保留；type/source/description/parameters 无条件覆盖。
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ModelDetailResponse> updateModel(@PathVariable("id") String id,
+    public ResponseEntity<ModelDetailRespVo> updateModel(@PathVariable("id") String id,
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) UpdateModelRequest req) {
         log.info("Start updating model");
         if (isBlank(id)) {
@@ -136,7 +141,7 @@ public class ModelController {
             ModelDetailResponse updated = modelService.updateModelResponse(
                     id, req, canViewIntegrationSecrets());
             log.info("Model updated successfully, ID: {}", id);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(ModelAssembler.toDetailVo(updated));
         } catch (ModelNotFoundException e) {
             log.debug("Model not found, ID: {}", id);
             throw new BizException(AppError.notFound("Model not found"));
@@ -162,7 +167,7 @@ public class ModelController {
 
     /** 模型提供方列表（Viewer+）；{@code modelType} 支持的取值由 ModelProviderCatalog 映射。 */
     @GetMapping("/providers")
-    public ResponseEntity<List<ModelProviderDto>> listModelProviders(
+    public ResponseEntity<List<ModelProviderRespVo>> listModelProviders(
             @RequestParam(name = "modelType", required = false) String modelType) {
         log.info("Listing model providers for type: {}", modelType);
         List<ModelProviderDto> providers;
@@ -172,7 +177,7 @@ public class ModelController {
             providers = providerRegistry.list();
         }
         log.info("Retrieved {} providers", providers.size());
-        return ResponseEntity.ok(providers);
+        return ResponseEntity.ok(ModelAssembler.toProviderVoList(providers));
     }
 
     // ── 权限投影 ──────────────────────────────────────────────────────────
