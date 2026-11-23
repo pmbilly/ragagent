@@ -3,7 +3,7 @@
   "message": "ok",
   "data": [
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.core_concurrency",
       "value": 8,
       "valueType": "int",
@@ -18,7 +18,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.enrichment_concurrency",
       "value": 12,
       "valueType": "int",
@@ -33,7 +33,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.maintenance_concurrency",
       "value": 4,
       "valueType": "int",
@@ -48,7 +48,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.postprocess_concurrency",
       "value": 2,
       "valueType": "int",
@@ -63,7 +63,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.shared_concurrency",
       "value": 6,
       "valueType": "int",
@@ -78,7 +78,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "asynq.wiki_concurrency",
       "value": 8,
       "valueType": "int",
@@ -93,7 +93,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "auth.complex_password_enabled",
       "value": false,
       "valueType": "bool",
@@ -108,7 +108,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "auth.default_tenant_mode",
       "value": "create_personal",
       "valueType": "string",
@@ -126,7 +126,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "auth.registration_mode",
       "value": "self_serve",
       "valueType": "string",
@@ -144,7 +144,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "model.max_concurrency",
       "value": 32,
       "valueType": "int",
@@ -159,7 +159,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "ssrf.whitelist",
       "value": [],
       "valueType": "string_list",
@@ -174,7 +174,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "tenant.auto_accept_invitation",
       "value": false,
       "valueType": "bool",
@@ -189,7 +189,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "tenant.auto_create_api_key",
       "value": false,
       "valueType": "bool",
@@ -204,7 +204,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "tenant.default_storage_quota_gb",
       "value": 10,
       "valueType": "int",
@@ -219,7 +219,7 @@
       "lastModifiedByName": null
     },
     {
-      "id": 2,
+      "id":"2",
       "key": "tenant.max_owned_per_user",
       "value": 12,
       "valueType": "int",
@@ -234,7 +234,7 @@
       "enumOptions": null
     },
     {
-      "id": 0,
+      "id":"0",
       "key": "tenant.self_service_creation_enabled",
       "value": true,
       "valueType": "bool",

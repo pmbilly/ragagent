@@ -80,7 +80,7 @@ public class TenantInvitationReadService {
                 ? null : usersById.get(inv.getInvitedBy());
         TenantRowView tenant = tenantsById == null ? null : tenantsById.get(inv.getTenantId());
         return new TenantInvitationResponse(
-                inv.getId(), inv.getTenantId(), tenant == null ? "" : tenant.getName(),
+                String.valueOf(inv.getId()), inv.getTenantId(), tenant == null ? "" : tenant.getName(),
                 inv.getInviteeUserId(), invitee == null ? "" : invitee.getEmail(),
                 invitee == null ? "" : invitee.getUsername(), inv.getInvitedBy(),
                 inviter == null ? "" : inviter.getEmail(),

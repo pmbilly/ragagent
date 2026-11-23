@@ -26,7 +26,7 @@ export interface LoginResponse {
     updatedAt: string
   }
   tenant?: {
-    id: number
+    id: string
     name: string
     description: string
     status: string
@@ -40,7 +40,7 @@ export interface LoginResponse {
   // tenant from current tenant (e.g. /auth/register-by-invite). Only
   // one of `tenant` / `activeTenant` is populated by any given endpoint.
   activeTenant?: {
-    id: number
+    id: string
     name: string
     description?: string
     status?: string

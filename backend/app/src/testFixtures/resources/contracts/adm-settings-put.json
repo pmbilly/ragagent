@@ -2,7 +2,7 @@
   "code": 0,
   "message": "ok",
   "data": {
-    "id": 2,
+    "id":"2",
     "key": "tenant.max_owned_per_user",
     "value": 12,
     "valueType": "int",

@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
  * config 字段为 null 时省略；deleted_at 恒输出（null → "deleted_at":null）。
  */
 public record TenantResponse(
-        Long id,
+        String id,
         String name,
         String description,
         String status,
@@ -44,7 +44,7 @@ public record TenantResponse(
      */
     public static TenantResponse from(TenantRowView t, boolean includeSecrets) {
         return new TenantResponse(
-                t.getId() == null ? 0 : t.getId(),
+                t.getId() == null ? "0" : String.valueOf(t.getId()),
                 t.getName() == null ? "" : t.getName(),
                 t.getDescription() == null ? "" : t.getDescription(),
                 t.getStatus() == null ? "" : t.getStatus(),

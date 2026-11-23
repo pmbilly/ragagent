@@ -21,7 +21,7 @@ export type AuditOutcome = 'accepted' | 'success' | 'failed' | 'partial' | 'canc
 // an opaque record so future detail shapes don't need a frontend
 // breaking change.
 export interface AuditLog {
-  id: number
+  id: string
   tenantId: number
   actorUserId: string
   actorRole: string

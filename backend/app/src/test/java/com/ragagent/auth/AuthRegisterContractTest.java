@@ -77,7 +77,7 @@ class AuthRegisterContractTest {
     private static final Pattern REFRESH_VALUE = Pattern.compile("\"refreshToken\":\"[^\"]*\"");
     private static final Pattern TENANT_ID_VALUE = Pattern.compile("\"tenantId\":\\d+");
     private static final Pattern LAST_ACTIVE_VALUE = Pattern.compile("\"lastActiveTenantId\":\\d+");
-    private static final Pattern NUMERIC_ID = Pattern.compile("\"id\":\\d+");
+    private static final Pattern NUMERIC_ID = Pattern.compile("\"id\":(\\d+|\"[^\"]*\")");
 
     @Autowired
     private MockMvc mockMvc;

@@ -5,8 +5,8 @@ const t = (key: string) => tText(key)
 
 // 空间信息接口（**唯一真源**；auth 侧从这里 re-export，不要再另立一份）
 export interface TenantInfo {
-  /** 后端 TenantResponse 的 id 是 Long ⇒ number */
-  id: number
+  /** 后端 TenantResponse 的 id 是 String ⇒ string */
+  id: string
   name: string
   description?: string
   status?: string
@@ -97,7 +97,7 @@ export type TenantAPIKeyCapability =
   | 'system_audit_read'
 
 export interface TenantAPIKey {
-  id: number
+  id: string
   scopeType?: 'tenant' | 'platform'
   name: string
   apiKey: string

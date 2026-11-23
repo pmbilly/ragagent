@@ -75,7 +75,7 @@ class TenantMemberContractTest {
     private static final Pattern TS_VALUE = Pattern.compile(
             "\"([a-zA-Z_]+)\":\"[2-9]\\d{3}-\\d{2}-\\d{2}T[0-9:.+\\-Z]+\"");
     private static final Pattern INV_ID = Pattern.compile(
-            "\"id\":(\\d+)");
+            "\"id\":(\\d+|\"[^\"]*\")");
     private static final Pattern JWT = Pattern.compile(
             "\"token\":\"(eyJ[^\"]+)\"");
     private static final Pattern INVITE_URL = Pattern.compile(
@@ -425,7 +425,7 @@ class TenantMemberContractTest {
         Matcher m = Pattern.compile("\"token\":\"([^\"]+)\"").matcher(raw(r));
         assertThat(m.find()).as("key create 响应应含 token: " + raw(r)).isTrue();
         String token = m.group(1);
-        Matcher id = Pattern.compile("\"id\":(\\d+)").matcher(raw(r));
+        Matcher id = Pattern.compile("\"id\":(\\d+|\"[^\"]*\")").matcher(raw(r));
         assertThat(id.find()).isTrue();
         createdKeyId = id.group(1);
         return token;

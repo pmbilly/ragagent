@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
  * 本 VO 只负责搬运——不做任何裁剪判断。{@code deletedAt} 恒输出。</p>
  */
 public record TenantRespVo(
-        Long id,
+        String id,
         String name,
         String description,
         String status,

@@ -22,7 +22,7 @@ public final class FaqEntryAssembler {
         }
         FaqEntry.FaqMatch match = entry.match();
         return new FaqEntryRespVo(
-                entry.id(),
+                String.valueOf(entry.id()),
                 entry.chunkId(),
                 entry.knowledgeId(),
                 entry.knowledgeBaseId(),

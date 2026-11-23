@@ -14,7 +14,7 @@ import java.util.List;
  * 之后库里只有 SHA-256 摘要（{@code key_hash}）与密文（{@code api_key}）。</p>
  */
 public record TenantAPIKeyCreateResponse(
-        long id,
+        String id,
         String scopeType,
         String name,
         String apiKey,

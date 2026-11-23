@@ -1,5 +1,1 @@
-{
-  "code": 1000,
-  "message": "请求参数不合法",
-  "data": "updates: 不能为空"
-}
+{"code":1000,"message":"请求参数不合法","data":"updates: 不能为空"}

@@ -805,6 +805,7 @@ class SystemContractTest {
         out = Pattern.compile("\"generatedPassword\":\"[^\"]*\"")
                 .matcher(out).replaceAll("\"generatedPassword\":\"<genpw>\"");
         out = UUID_VALUE.matcher(out).replaceAll("\"$1\":\"<uuid>\"");
+        out = out.replaceAll("\"id\":(\\d+|\"[^\"]*\")", "\"id\":<keyid>");
         out = TS_VALUE.matcher(out).replaceAll("\"$1\":\"<ts>\"");
         // 零值时间戳（虚拟设置行）：两侧字节一致，不需掩码——但要压成同一形态防时区漂移
         out = out.replace("0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z");

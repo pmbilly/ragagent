@@ -286,7 +286,7 @@ public class SystemAdminController {
             }
         }
         TenantAPIKeyCreateResponse created = apiKeyAdmin.createPlatformMasked(req.name().trim(), normalized, expiresAt);
-        emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, created.id(), created.capabilities());
+        emitAPIKeyAudit(AuditAction.SYSTEM_API_KEY_CREATED, Long.parseLong(created.id()), created.capabilities());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);   // 脱敏/投影在 port 实现侧
     }
 

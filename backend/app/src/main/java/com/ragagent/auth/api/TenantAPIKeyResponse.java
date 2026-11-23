@@ -24,7 +24,7 @@ import java.util.List;
  * </ul>
  */
 public record TenantAPIKeyResponse(
-        long id,
+        String id,
         String scopeType,
         String name,
         String apiKey,

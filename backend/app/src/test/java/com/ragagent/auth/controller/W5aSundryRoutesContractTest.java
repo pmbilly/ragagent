@@ -58,7 +58,7 @@ class W5aSundryRoutesContractTest {
     private static final Pattern JWT_PATTERN = Pattern.compile(
             "\"(token|refreshToken)\":\"[^\"]*\"");
     private static final Pattern SEQ_PATTERN = Pattern.compile("\"seqId\":\\d+");
-    private static final Pattern NUMERIC_ID_PATTERN = Pattern.compile("\"id\":\\d+");
+    private static final Pattern NUMERIC_ID_PATTERN = Pattern.compile("\"id\":(\\d+|\"[^\"]*\")");
 
     @Autowired
     private MockMvc mockMvc;
@@ -380,6 +380,7 @@ class W5aSundryRoutesContractTest {
         s = JWT_PATTERN.matcher(s).replaceAll("\"$1\":\"<jwt>\"");
         s = UUID_PATTERN.matcher(s).replaceAll("\"<uuid>\"");
         s = SEQ_PATTERN.matcher(s).replaceAll("\"seqId\":<seq>");
+        s = NUMERIC_ID_PATTERN.matcher(s).replaceAll("\"id\":<id>");
         return s;
     }
 

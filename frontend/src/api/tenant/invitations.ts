@@ -16,7 +16,7 @@ export type TenantInvitationStatus =
 // when the backend has them. Missing optional fields render as the
 // raw id in the UI rather than dropping the row.
 export interface TenantInvitation {
-  id: number
+  id: string
   tenantId: number
   tenantName?: string
   inviteeUserId: string

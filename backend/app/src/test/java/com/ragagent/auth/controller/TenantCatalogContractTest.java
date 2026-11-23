@@ -71,7 +71,7 @@ class TenantCatalogContractTest {
     private static final String EMBEDDING_MODEL = "9aa07763-6b4f-4152-9f2b-3ad0e2d2f69f";
 
     private static final Pattern TOKEN = Pattern.compile("\"token\":\"([^\"]+)\"");
-    private static final Pattern DATA_ID = Pattern.compile("\"id\":(\\d+)");
+    private static final Pattern DATA_ID = Pattern.compile("\"id\":(\\d+|\"[^\"]*\")");
     private static final Pattern UUID_VALUE = Pattern.compile(
             "\"([a-zA-Z_]+)\":\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
     private static final Pattern TS_VALUE = Pattern.compile(

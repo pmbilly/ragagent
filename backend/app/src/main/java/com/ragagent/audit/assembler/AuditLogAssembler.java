@@ -30,7 +30,7 @@ public final class AuditLogAssembler {
             return null;
         }
         return new AuditLogItemVo(
-                src.getId(),
+                src.getId() == null ? null : String.valueOf(src.getId()),
                 src.getTenantId(),
                 src.getActorUserId(),
                 src.getActorRole(),

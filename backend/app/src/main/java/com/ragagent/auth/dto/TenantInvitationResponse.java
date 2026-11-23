@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
  * id / tenant_id / invitee_user_id / role / status / expires_at / created_at 恒输出。</p>
  */
 public record TenantInvitationResponse(
-        long id,
+        String id,
         long tenantId,
         String tenantName,
         String inviteeUserId,

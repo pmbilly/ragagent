@@ -7,7 +7,7 @@ import java.util.List;
 
 /** 系统设置响应：字段名/顺序对齐实体既有 JSON；虚拟行 id 归一为 0。 */
 public record SystemSettingResponse(
-        Long id,
+        String id,
         String key,
         JsonNode value,
         String valueType,
@@ -23,7 +23,7 @@ public record SystemSettingResponse(
 
     public static SystemSettingResponse from(SystemSetting row) {
         return new SystemSettingResponse(
-                row.getId() == null ? 0L : row.getId(),
+                row.getId() == null ? "0" : String.valueOf(row.getId()),
                 row.getKey(),
                 row.getValue(),
                 row.getValueType(),

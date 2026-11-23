@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
  * <p>{@code details} 是 jsonb 原样节点，可空且显式输出 null。</p>
  */
 public record AuditLogItemVo(
-        Long id,
+        String id,
         Long tenantId,
         String actorUserId,
         String actorRole,

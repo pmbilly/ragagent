@@ -23,10 +23,10 @@ public final class TenantAPIKeyProjections {
     /** 实体 → 响应投影。null 入参返回零值投影（逐字段语义见类注释 ✓）。 */
     public static TenantAPIKeyResponse from(TenantAPIKey key) {
         if (key == null) {
-            return new TenantAPIKeyResponse(0L, "", "", "", false, null, null, null, null, null);
+            return new TenantAPIKeyResponse("0", "", "", "", false, null, null, null, null, null);
         }
         return new TenantAPIKeyResponse(
-                key.getId() == null ? 0L : key.getId(),
+                key.getId() == null ? "0" : String.valueOf(key.getId()),
                 APIKeyScopeType.normalize(key.getScopeType()),
                 key.getName(),
                 key.getApiKey(),

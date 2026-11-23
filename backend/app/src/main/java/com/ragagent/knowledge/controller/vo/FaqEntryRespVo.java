@@ -29,7 +29,7 @@ import java.util.List;
  * @param match             检索命中信息，非检索场景为空
  */
 public record FaqEntryRespVo(
-        long id,
+        String id,
         String chunkId,
         String knowledgeId,
         String knowledgeBaseId,

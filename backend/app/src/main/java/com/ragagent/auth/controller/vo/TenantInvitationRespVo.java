@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
  * <p>八个可空文本字段空串归一为 null（输出 null，不省略键）。</p>
  */
 public record TenantInvitationRespVo(
-        long id,
+        String id,
         long tenantId,
         String tenantName,
         String inviteeUserId,

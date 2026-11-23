@@ -435,7 +435,7 @@ export async function createSystemUser(req: CreateSystemUserRequest): Promise<Cr
  * via the valueType field (`'int' | 'string' | 'bool'`).
  */
 export interface SystemSettingItem {
-  id: number
+  id: string
   key: string
   /** Raw JSON value — narrow via valueType before rendering. */
   value: unknown

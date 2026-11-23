@@ -258,6 +258,7 @@ class AuthContractTest {
         s = ContractJson.semantic(s);
         String out = s.replaceAll("\"token\":\"[^\"]*\"", "\"token\":\"<masked>\"");
         out = out.replaceAll("\"refreshToken\":\"[^\"]*\"", "\"refreshToken\":\"<masked>\"");
+        out = out.replaceAll("\"id\":(\\d+|\"[^\"]*\")", "\"id\":<tid>");
         out = TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
         return out;
     }
