@@ -31,7 +31,8 @@ from _method_lengths import scan  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASELINE = ROOT / "scripts/method-length.baseline.json"
-THRESHOLD = 150
+# 2026-11-23 由 150 收紧到 80（蓝图 3.11 的北极星是 40，分档逼近）。
+THRESHOLD = 80
 GROWTH_SLACK = 10
 
 
@@ -50,7 +51,7 @@ def load_baseline():
 
 def render(methods: dict[str, tuple[int, str]]) -> str:
     data = {
-        "note": ">150 行方法基线：只许减；新增必须人工登记理由；--write 不新增条目。",
+        "note": ">80 行方法基线（2026-11-23 自 150 收紧）：只许减；新增必须人工登记理由；--write 不新增条目。",
         "threshold": THRESHOLD,
         "growthSlack": GROWTH_SLACK,
         "methods": {key: {"lines": lines, "reason": reason}

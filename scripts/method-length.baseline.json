@@ -1,47 +1,243 @@
 {
-  "note": ">150 行方法基线：只许减；新增必须人工登记理由；--write 不新增条目。",
-  "threshold": 150,
+  "note": ">80 行方法基线（2026-11-23 自 150 收紧）：只许减；新增必须人工登记理由；--write 不新增条目。",
+  "threshold": 80,
   "growthSlack": 10,
   "methods": {
     "backend/agent-engine/src/main/java/com/ragagent/agent/ActPhase.java#runToolCallInner": {
       "lines": 153,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngine.java#executeInner": {
+      "lines": 84,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/AgentEngineFactoryImpl.java#create": {
+      "lines": 108,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/agent-engine/src/main/java/com/ragagent/agent/ReActIteration.java#runReActIterationBody": {
-      "lines": 174,
+      "lines": 163,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/ThinkPhase.java#callLLMWithRetry": {
+      "lines": 147,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/agent-engine/src/main/java/com/ragagent/agent/ThinkPhase.java#streamLLMToEventBus": {
       "lines": 151,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/ThinkPhase.java#streamThinkingToEventBus": {
+      "lines": 131,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/tool/ParamCaster.java#castValue": {
+      "lines": 95,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/agent-engine/src/main/java/com/ragagent/agent/tool/ToolRegistry.java#execute": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agentmanagement/service/AgentSuggestedQuestions.java#getSuggestedQuestions": {
+      "lines": 131,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/app/src/main/java/com/ragagent/agenttools/knowledge/GetDocumentInfoTool.java#execute": {
       "lines": 196,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/GrepChunksTool.java#aggregateByKnowledge": {
+      "lines": 88,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/GrepChunksTool.java#execute": {
+      "lines": 100,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/KnowledgeSearchTool.java#concurrentSearchByTargets": {
+      "lines": 133,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/KnowledgeSearchTool.java#execute": {
+      "lines": 127,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/ListKnowledgeChunksTool.java#executeByKnowledgePage": {
+      "lines": 139,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/agenttools/knowledge/QueryKnowledgeGraphTool.java#execute": {
       "lines": 240,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/app/src/main/java/com/ragagent/agenttools/knowledge/SearchMemoryTool.java#execute": {
+      "lines": 88,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/sql/SqlGuard.java#validate": {
+      "lines": 131,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/app/src/main/java/com/ragagent/agenttools/sql/SqlSelectDeepChecker.java#deepCheck": {
       "lines": 275,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/sql/SqlTokenizer.java#tokenize": {
+      "lines": 137,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/web/WebSearchTool.java#execute": {
+      "lines": 134,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiDeletePageTool.java#execute": {
+      "lines": 89,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiReadPageTool.java#execute": {
+      "lines": 127,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiReadSourceDocTool.java#execute": {
       "lines": 246,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiRenamePageTool.java#execute": {
+      "lines": 122,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiSearchTool.java#execute": {
+      "lines": 137,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/app/src/main/java/com/ragagent/agenttools/wiki/WikiWritePageTool.java#execute": {
       "lines": 151,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/apikey/controller/filter/APIKeyRoutePolicies.java#registerKnowledgeAndWikiRoutes": {
+      "lines": 137,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/controller/TenantCreateOps.java#createTenant": {
+      "lines": 135,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/auth/controller/filter/AuthFilter.java#doFilterInternal": {
+      "lines": 112,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/channel/feishu/FeishuCallbackOps.java#parseCallback": {
+      "lines": 101,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/channel/feishu/LarkEventConverter.java#convert": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/controller/filter/EmbedAuthFilter.java#doFilterInternal": {
+      "lines": 82,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/service/ImQaRunner.java#runQA": {
+      "lines": 124,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/service/ImStreamPipeline.java#handleMessageStream": {
+      "lines": 132,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/service/ImStreamPipeline.java#subscribeStreamEvents": {
+      "lines": 136,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/channel/service/ImTurnOrchestrator.java#runHandleMessage": {
+      "lines": 109,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/catalog/ConnectorCatalog.java#buildRegistry": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/core/DocxFetcher.java#fetchDocxWithBlocks": {
+      "lines": 143,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/core/DocxMarkdown.java#blocksToMarkdown": {
+      "lines": 84,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/core/FeishuClient.java#readBitableRecords": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/core/FeishuTransport.java#doRequest": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/core/SyncEngine.java#runSync": {
+      "lines": 138,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/feishu/drive/DriveConnector.java#fetchDriveFileContent": {
+      "lines": 99,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/ima/ImaClient.java#callApi": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/ima/ImaConnector.java#fetchOneMedia": {
+      "lines": 85,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/ima/ImaConnector.java#listResources": {
+      "lines": 95,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/ima/ImaConnector.java#walk": {
+      "lines": 104,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/notion/NotionConnector.java#fetchIncremental": {
+      "lines": 122,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/notion/NotionFetchOps.java#buildDatabaseItem": {
+      "lines": 100,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/notion/NotionFetchOps.java#fetchPage": {
+      "lines": 120,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/datasource/connector/notion/NotionMarkdown.java#renderBlock": {
       "lines": 210,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/rss/RssConnector.java#walk": {
+      "lines": 96,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/yuque/YuqueClient.java#doRequest": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/connector/yuque/YuqueConnector.java#listResources": {
+      "lines": 100,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/app/src/main/java/com/ragagent/datasource/connector/yuque/YuqueConnector.java#walk": {
       "lines": 182,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/repository/DataSourceRepository.java#update": {
+      "lines": 81,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/datasource/service/DataSourceItemOps.java#ingestItem": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/datasource/service/DataSourceSyncExecutor.java#handle": {
       "lines": 225,
@@ -51,53 +247,117 @@
       "lines": 157,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/mcp/controller/McpServiceCrudOps.java#updateMCPService": {
-      "lines": 170,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/initialization/service/InitializationConfigService.java#updateConfig": {
+      "lines": 144,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/mcp/service/McpServiceManagement.java#updateMCPService": {
-      "lines": 165,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/chunker/DocumentProfiler.java#profileDocument": {
+      "lines": 100,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/mcp/tool/McpDiscoverTool.java#execute": {
-      "lines": 151,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/chunker/LegacySplitter.java#findSemanticOverlapBoundaryEndingAtOrAfter": {
+      "lines": 103,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/mcp/tool/McpInputSchemaValidator.java#validate": {
-      "lines": 209,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/chunker/LegacySplitter.java#mergeUnits": {
+      "lines": 114,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/memory/service/MemoryRecallOps.java#recall": {
-      "lines": 152,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/controller/ChunkerPreviewController.java#previewChunking": {
+      "lines": 109,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/controller/SessionStreamController.java#continueStream": {
-      "lines": 177,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/domain/span/SpanTracker.java#beginStage": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#expandShortContextWithNeighbors": {
-      "lines": 223,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/repository/KnowledgeSpanRepository.java#upsert": {
+      "lines": 95,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#resolveParentChunks": {
-      "lines": 169,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkEditService.java#updateDocumentChunk": {
+      "lines": 129,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginIntoChatMessage.java#onEvent": {
-      "lines": 174,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkExtractService.java#runExtract": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginRerank.java#onEvent": {
-      "lines": 212,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/service/chunk/ChunkQuestionService.java#deleteGeneratedQuestion": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
-    "backend/app/src/main/java/com/ragagent/session/service/QaSearchTargets.java#buildSearchTargets": {
-      "lines": 157,
-      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    "backend/app/src/main/java/com/ragagent/knowledge/service/enrichment/KnowledgeSummaryService.java#doRegenerateKnowledgeSummary": {
+      "lines": 105,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/enrichment/KnowledgeSummaryService.java#getSummary": {
+      "lines": 90,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqBatchFieldUpdater.java#updateFields": {
+      "lines": 147,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqBatchOps.java#executeImportBatches": {
+      "lines": 118,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqEntryQueryService.java#searchEntries": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/faq/FaqValidateOps.java#validateReplaceMode": {
+      "lines": 128,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/management/KnowledgeFileService.java#updateImageInfo": {
+      "lines": 106,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/service/parser/ParserEngineCatalog.java#listAll": {
+      "lines": 93,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestBatchHandler.java#newWikiBatchContext": {
+      "lines": 123,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestCitePipeline.java#mergeCitationsIntoItems": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestExtractDedup.java#deduplicateExtractedBatch": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestFinalizePhase.java#runFinalize": {
       "lines": 192,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestIndexOps.java#rebuildIndexPage": {
+      "lines": 99,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestLlmSupport.java#generateWithTemplate": {
+      "lines": 120,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#buildUpdates": {
+      "lines": 133,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#classifyAndMerge": {
+      "lines": 128,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestMapPhase.java#mapOneDocument": {
+      "lines": 102,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestReducePhase.java#generateContent": {
+      "lines": 90,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/ingest/WikiIngestRunSupport.java#runIngestPhases": {
       "lines": 372,
@@ -107,9 +367,321 @@
       "lines": 153,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/page/WikiLinkify.java#computeForbiddenSpans": {
+      "lines": 103,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/page/WikiLintService.java#autoFix": {
+      "lines": 111,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
     "backend/app/src/main/java/com/ragagent/knowledge/wiki/service/page/WikiLintService.java#runLint": {
       "lines": 253,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/controller/McpServiceCrudOps.java#updateMCPService": {
+      "lines": 170,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/oauth/OAuthDiscovery.java#discover": {
+      "lines": 112,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/protocol/DefaultMcpClient.java#initialize": {
+      "lines": 81,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/protocol/StreamableHttpTransport.java#send": {
+      "lines": 82,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/service/McpServiceManagement.java#updateMCPService": {
+      "lines": 165,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpCatalogPagination.java#paginateMcp": {
+      "lines": 122,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpDiscoverTool.java#execute": {
+      "lines": 151,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpInputSchemaValidator.java#validate": {
+      "lines": 197,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/mcp/tool/McpToolWrapper.java#execute": {
+      "lines": 142,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/repository/MemoryItemStore.java#saveItem": {
+      "lines": 90,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryConsolidationService.java#reviewStore": {
+      "lines": 106,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryExtractionLlm.java#buildExtractionPrompt": {
+      "lines": 85,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryExtractionService.java#applyDecisions": {
+      "lines": 89,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryExtractionService.java#handleInScope": {
+      "lines": 120,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryInsightOps.java#observeTopics": {
+      "lines": 106,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryInsightOps.java#searchMemory": {
+      "lines": 84,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryRecallOps.java#recall": {
+      "lines": 152,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryTopicResolver.java#adjudicateTopics": {
+      "lines": 118,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/memory/service/MemoryWritePipeline.java#writeReplacing": {
+      "lines": 98,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/model/controller/ModelDebugController.java#debugChat": {
+      "lines": 103,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/controller/SessionStreamController.java#continueStream": {
+      "lines": 177,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/controller/SteerController.java#steerMessage": {
+      "lines": 101,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/conversation/AgentStreamBridge.java#handleComplete": {
+      "lines": 82,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/conversation/SessionService.java#generateTitle": {
+      "lines": 86,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/qa/QaAttachmentResolver.java#resolveTemporaryAttachments": {
+      "lines": 109,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/qa/QaRequestParser.java#parseQARequest": {
+      "lines": 101,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/qa/QaTurnExecutor.java#startAsyncRunner": {
+      "lines": 107,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/qa/TurnStreamPump.java#run": {
+      "lines": 84,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#expandShortContextWithNeighbors": {
+      "lines": 223,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/MergeParentOps.java#resolveParentChunks": {
+      "lines": 169,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginChatCompletionStream.java#consumeStream": {
+      "lines": 114,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginDataAnalysis.java#onEvent": {
+      "lines": 110,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginExpansionOps.java#runQueryExpansion": {
+      "lines": 110,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginIntoChatMessage.java#onEvent": {
+      "lines": 174,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginQueryUnderstand.java#onEvent": {
+      "lines": 101,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginRerank.java#onEvent": {
+      "lines": 212,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginRerank.java#rerank": {
+      "lines": 99,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginSearch.java#onEvent": {
+      "lines": 93,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginSearchEntity.java#onEvent": {
+      "lines": 86,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginSearchOps.java#searchModelGroup": {
+      "lines": 109,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginSearchParallel.java#onEvent": {
+      "lines": 88,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/plugin/PluginWebFetch.java#onEvent": {
+      "lines": 88,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/rag/support/ReferencesSupport.java#prepareMessagesWithModelContext": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentConfigAssembler.java#buildAgentConfig": {
+      "lines": 105,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentEngineAssembler.java#planTools": {
+      "lines": 112,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/AgentToolWikiBackends.java#wikiPages": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/QaChatManageOverrides.java#applyAgentOverridesToChatManage": {
+      "lines": 96,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/QaSearchTargets.java#buildSearchTargets": {
+      "lines": 157,
+      "reason": "存量基线（M1 首次登记，2026-10-20）"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java#knowledgeQA": {
+      "lines": 137,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java#knowledgeQAByEvent": {
+      "lines": 96,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/SessionKnowledgeQaService.java#searchKnowledge": {
+      "lines": 113,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/SteerRunCoordinator.java#claimNextSteerFollowUp": {
+      "lines": 114,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/service/suggestion/MessageSuggestionService.java#ensureFollowUpsInner": {
+      "lines": 93,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/session/support/ToolResultPersist.java#compactToolSummary": {
+      "lines": 85,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/storage/fileserve/FileTransport.java#parseRange": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/storage/fileserve/FileTransport.java#serveContent": {
+      "lines": 103,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/vectorstore/dto/VectorStoreTypes.java#all": {
+      "lines": 101,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/websearch/dto/WebSearchProviderTypes.java#all": {
+      "lines": 118,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/framework/src/main/java/com/ragagent/framework/text/JdkHtmlToMarkdown.java#openTag": {
+      "lines": 96,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/framework/src/main/java/com/ragagent/framework/web/RbacInterceptor.java#preHandle": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/embedding/EmbedderFactory.java#newEmbedderInner": {
+      "lines": 89,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java#modelWebFetchOutput": {
+      "lines": 102,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelcontext/ModelOutput.java#renderKnowledgeChunks": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/OllamaChat.java#chatStream": {
+      "lines": 94,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/RemoteApiRequestOps.java#buildBodyFromConverted": {
+      "lines": 82,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/RemoteApiStreamOps.java#processToolCallsDelta": {
+      "lines": 92,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java#parseAnthropicSse": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/adapter/provider/chat/anthropic/AnthropicChat.java#processAnthropicStream": {
+      "lines": 85,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/model-runtime/src/main/java/com/ragagent/modelruntime/tracing/LangfuseChatClient.java#chatStream": {
+      "lines": 105,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/HybridResultOps.java#processSearchResults": {
+      "lines": 122,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/HybridSearchService.java#hybridSearch": {
+      "lines": 126,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/elasticsearch/ElasticsearchV8WriteOps.java#copyIndices": {
+      "lines": 94,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/opensearch/OpenSearchWriteOps.java#copyIndices": {
+      "lines": 82,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/qdrant/QdrantWriteOps.java#copyIndices": {
+      "lines": 105,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/engine/weaviate/WeaviateWriteOps.java#copyIndices": {
+      "lines": 83,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/retrieval-engine/src/main/java/com/ragagent/retrieval/support/KeywordScoreNormalizer.java#normalizeKeywordScores": {
+      "lines": 88,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
     }
   }
 }
