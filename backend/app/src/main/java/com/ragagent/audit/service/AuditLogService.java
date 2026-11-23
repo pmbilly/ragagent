@@ -129,7 +129,7 @@ public class AuditLogService {
      * 免得探测型客户端把表刷爆。</p>
      *
      * <p>非持久化的告警日志行 {@code [rbac] role insufficient: ...} 仍然每次拒绝都打
-     * （在 {@code RbacInterceptor} 里）——去重只压制<b>落库</b>，不压制 stderr 可观测性。</p>
+     * （在 {@code RoutePolicyInterceptor} 里）——去重只压制<b>落库</b>，不压制 stderr 可观测性。</p>
      *
      * <p><b>requestPath 用路由模板而非原始 URL</b>：否则攻击者遍历 URL 里的 UUID 会
      * 让每个请求都拿到新的去重键，窗口失效、表被撑爆。原始 URL 保留在 Details 的

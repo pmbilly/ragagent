@@ -226,7 +226,7 @@ public class FileProxyService implements FileProxyPort {
 
     /**
      * API-Key 主体的拒绝
-     * （DenyAPIKeyPrincipal）在控制器里先行；Admin 角色门由 RbacInterceptor 承担
+     * （DenyAPIKeyPrincipal）在控制器里先行；Admin 角色门由 RoutePolicyInterceptor 承担
      * （对 API-Key 主体短路，见其 apiKey 分支）。
      */
     public void presignedPreview(HttpServletRequest request, HttpServletResponse response,

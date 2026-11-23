@@ -168,7 +168,7 @@ class W5aSundryRoutesContractTest {
                 "{\"name\":\"" + "a".repeat(129) + "\"}"), 400, "w5a-tenant-put-longname.json");
         assertGolden(putJson("/api/v1/tenants/10002", owner,
                 "{\"name\": 123}"), 400, "w5a-tenant-put-badjson.json");
-        // Viewer PUT → OWNER 角色门（RbacInterceptor 规则的直击场景）
+        // Viewer PUT → OWNER 角色门（RoutePolicyInterceptor 规则的直击场景）
         assertGolden(putJson("/api/v1/tenants/10002", viewer,
                 "{\"name\":\"nope\"}"), 403, "w5a-tenant-put-nonowner.json");
         // 自助创建 → 删除。URL 里的新租户 id ≠ 活动租户 → PathTenantMatch 403

@@ -17,12 +17,14 @@ import com.ragagent.audit.domain.AuditLog;
 import com.ragagent.audit.repository.AuditLogRepository;
 import com.ragagent.audit.service.AuditLogService;
 import com.ragagent.audit.service.RbacDeniedAuditorRegistrar;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
 import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
-import com.ragagent.framework.web.RbacInterceptor;
+import com.ragagent.framework.web.DeniedAuditorRegistry;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +37,8 @@ import org.springframework.web.servlet.HandlerMapping;
 /**
  * RBAC 拒绝审计落库的回补测试。
  *
- * <p>链路：{@link RbacInterceptor} 拒绝分支 →
- * {@link RbacInterceptor#setDeniedAuditor} 注册的钩子 →
+ * <p>链路：{@link RoutePolicyInterceptor} 拒绝分支 →
+ * {@link RoutePolicyInterceptor#setDeniedAuditor} 注册的钩子 →
  * {@link AuditLogService#logDenied} → {@link AuditLogRepository} 落库。</p>
  *
  * <p>断言四件事：</p>
@@ -57,7 +59,7 @@ class RbacDeniedAuditTest {
 
     @AfterEach
     void cleanup() {
-        RbacInterceptor.setDeniedAuditor(null);
+        DeniedAuditorRegistry.setDeniedAuditor(null);
         APIKeyScopeContext.clear();
         TenantContext.clear();
     }
@@ -93,7 +95,7 @@ class RbacDeniedAuditTest {
         List<AuditLog> written = captureCreatedRows(repo);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("GET", "/api/v1/tenants/*/audit-log", TenantRole.ADMIN, false);
         TenantContext.set(10002L, TenantContext.webUserPrincipal("u-viewer"), "viewer",
                 false, "u-viewer", false);
@@ -130,7 +132,7 @@ class RbacDeniedAuditTest {
         List<AuditLog> written = captureCreatedRows(repo);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("DELETE", "/api/v1/knowledge-bases/*", TenantRole.ADMIN, false);
         TenantContext.set(7L, TenantContext.webUserPrincipal("u"), "viewer", false, "u", false);
 
@@ -147,7 +149,7 @@ class RbacDeniedAuditTest {
         AuditLogRepository repo = mock(AuditLogRepository.class);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("GET", "/api/v1/tenants/*/audit-log", TenantRole.ADMIN, false);
         TenantContext.set(7L, TenantContext.webUserPrincipal("u-admin"), "admin", false, "u-admin", false);
 
@@ -162,7 +164,7 @@ class RbacDeniedAuditTest {
         AuditLogRepository repo = mock(AuditLogRepository.class);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(false))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(false))
                 .addRule("GET", "/api/v1/tenants/*/audit-log", TenantRole.ADMIN, false);
         TenantContext.set(7L, TenantContext.webUserPrincipal("u-viewer"), "viewer", false, "u-viewer", false);
 
@@ -180,12 +182,15 @@ class RbacDeniedAuditTest {
         AuditLogRepository repo = mock(AuditLogRepository.class);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("GET", "/api/v1/tenants/*/audit-log", TenantRole.ADMIN, false);
+        // 合一后 API-Key 主体走能力判定（原 APIKeyGate 职责）：补一条"对任何有效 Key 开放"的策略，
+        // 否则空 authorizer 会 default-deny。语义等价于原双拦截器里 APIKeyGate 放行 + Rbac 短路。
+        rbac.registerGin("GET", "/api/v1/tenants/:id/audit-log", APIKeyRoutePolicy.any());
         TenantContext.set(7L, TenantContext.webUserPrincipal("u-viewer"), "viewer", false, "u-viewer", false);
         APIKeyScopeContext.set(TenantAPIKeyScope.empty());
 
-        assertThat(rbac.preHandle(request("GET", "/api/v1/tenants/7/audit-log", null),
+        assertThat(rbac.preHandle(request("GET", "/api/v1/tenants/7/audit-log", "/api/v1/tenants/{id}/audit-log"),
                 new MockHttpServletResponse(), new Object())).isTrue();
         verify(repo, never()).create(any(AuditLog.class));
     }
@@ -199,7 +204,7 @@ class RbacDeniedAuditTest {
                 any(OffsetDateTime.class))).thenReturn(0L);
         installRegistrar(repo);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("GET", "/api/v1/tenants/*/audit-log", TenantRole.ADMIN, false);
         TenantContext.set(7L, TenantContext.webUserPrincipal("u-viewer"), "viewer", false, "u-viewer", false);
 
@@ -216,9 +221,9 @@ class RbacDeniedAuditTest {
     /** 未注册实现 bean 时退化为空操作。 */
     @Test
     void missingAuditorDegradesToNoOp() throws Exception {
-        RbacInterceptor.setDeniedAuditor(null);
+        DeniedAuditorRegistry.setDeniedAuditor(null);
 
-        RbacInterceptor rbac = new RbacInterceptor(props(true))
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(props(true))
                 .addRule("POST", "/api/v1/knowledge-bases", TenantRole.CONTRIBUTOR, false);
         TenantContext.set(7L, TenantContext.webUserPrincipal("u-viewer"), "viewer", false, "u-viewer", false);
 
@@ -243,7 +248,7 @@ class RbacDeniedAuditTest {
         registrar.destroy();
 
         // 复位后调用不炸、也不落库
-        RbacInterceptor.deniedAuditor().logDenied(
+        DeniedAuditorRegistry.deniedAuditor().logDenied(
                 7L, "u", "viewer", "admin", "/api/v1/x", "GET", "/api/v1/x");
         assertThat(written).isEmpty();
     }

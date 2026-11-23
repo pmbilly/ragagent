@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * POST /me/invitations/{invId}/accept、POST /me/invitations/{invId}/decline、
  * POST /me/invitations/accept-by-token。
  *
- * <p><b>角色语义</b>：租户侧读 Viewer+、写 Owner+（RbacInterceptor）；/me 收件箱
+ * <p><b>角色语义</b>：租户侧读 Viewer+、写 Owner+（RoutePolicyInterceptor）；/me 收件箱
  * 五条<b>无角色门</b>（只挂 Auth），"只有被邀请人能操作"由 service 层把守。
  * 注意 accept-by-token 也是**已登录**路由（与 /auth/register-by-invite 的公开+限流不同）。</p>
  *

@@ -1,4 +1,4 @@
-package com.ragagent.framework.web;
+package com.ragagent.config.route;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-class RbacInterceptorHeadTest {
+class RoutePolicyInterceptorHeadTest {
 
     @AfterEach
     void clearContext() {
@@ -20,7 +20,7 @@ class RbacInterceptorHeadTest {
     @Test
     void headInheritsGetRoleFloor() throws Exception {
         TenantContext.set(1L, TenantContext.webUserPrincipal("u"), "viewer", false, "u", false);
-        RbacInterceptor rbac = new RbacInterceptor(new TenantProperties(true, true, 10));
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
         rbac.addRule("GET", "/api/v1/protected", TenantRole.ADMIN, false);
 
         MockHttpServletRequest head = new MockHttpServletRequest("HEAD", "/api/v1/protected");
@@ -35,7 +35,7 @@ class RbacInterceptorHeadTest {
     @Test
     void unmatchedApiPathIsDeniedByDefault() throws Exception {
         TenantContext.set(1L, TenantContext.webUserPrincipal("u"), "admin", false, "u", false);
-        RbacInterceptor rbac = new RbacInterceptor(new TenantProperties(true, true, 10));
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/unmapped");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -50,7 +50,7 @@ class RbacInterceptorHeadTest {
     @Test
     void explicitPublicRuleAllowsRoute() throws Exception {
         TenantContext.set(1L, TenantContext.webUserPrincipal("u"), "viewer", false, "u", false);
-        RbacInterceptor rbac = new RbacInterceptor(new TenantProperties(true, true, 10));
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
         rbac.addPublicRule("GET", "/api/v1/public/**");
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/public/ping");
@@ -62,7 +62,7 @@ class RbacInterceptorHeadTest {
     @Test
     void rbacDisabledAllowsUnmatchedApiPath() throws Exception {
         TenantContext.set(1L, TenantContext.webUserPrincipal("u"), "viewer", false, "u", false);
-        RbacInterceptor rbac = new RbacInterceptor(new TenantProperties(false, true, 10));
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(new TenantProperties(false, true, 10));
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/unmapped");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -85,7 +85,7 @@ class RbacInterceptorHeadTest {
     @Test
     void nonApiPathIsNotSubjectToDefaultDeny() throws Exception {
         TenantContext.set(1L, TenantContext.webUserPrincipal("u"), "viewer", false, "u", false);
-        RbacInterceptor rbac = new RbacInterceptor(new TenantProperties(true, true, 10));
+        RoutePolicyInterceptor rbac = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/assets/app.js");
         MockHttpServletResponse response = new MockHttpServletResponse();

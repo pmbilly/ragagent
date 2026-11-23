@@ -4,9 +4,6 @@ package com.ragagent.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ragagent.auth.apikey.controller.filter.APIKeyAuthChannel;
-import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
 import com.ragagent.auth.apikey.controller.filter.APIKeyScopeCleanupFilter;
 import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
 import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
@@ -15,13 +12,13 @@ import com.ragagent.auth.controller.filter.AuthFilter;
 import com.ragagent.auth.controller.filter.WsAuthSupport;
 import com.ragagent.auth.service.UserService;
 import com.ragagent.auth.system.service.DeploymentCapabilitiesHolder;
+import com.ragagent.config.route.RoutePolicyInterceptor;
 import com.ragagent.framework.config.DeploymentProperties;
 import com.ragagent.framework.config.SecurityHeaderProperties;
 import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.jsonbind.JsonMappers;
 import com.ragagent.framework.tracing.langfuse.LangfuseHttpInterceptor;
 import com.ragagent.framework.web.ApiResultInterceptor;
-import com.ragagent.framework.web.RbacInterceptor;
 import com.ragagent.framework.web.RequestIdFilter;
 import com.ragagent.framework.web.SecurityHeadersFilter;
 import java.util.List;
@@ -65,9 +62,11 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private final TenantProperties tenantProperties;
+    private final RoutePolicyInterceptor routePolicyInterceptor;
 
-    public WebConfig(TenantProperties tenantProperties) {
+    public WebConfig(TenantProperties tenantProperties, RoutePolicyInterceptor routePolicyInterceptor) {
         this.tenantProperties = tenantProperties;
+        this.routePolicyInterceptor = routePolicyInterceptor;
     }
 
     /**
@@ -148,30 +147,12 @@ public class WebConfig implements WebMvcConfigurer {
      * 拦截器链装配。拦截器运行在 servlet filter（Auth）之后、controller 之前；
      * 生效顺序由 order() 决定：ApiResult(-100，信封打标) → APIKeyGate(-1，能力维度) →
      * AllowFileServe / DenyAPIKey / rbac（同 0，按登记序）→ Langfuse(10)。
-     * RBAC 角色下限矩阵本身在 {@link RbacRoutePolicies#registerAll} 登记
+     * RBAC 角色下限矩阵本身在 {@link com.ragagent.config.route.RoutePolicyWiring} 登记
      * （登记顺序即语义：静态段规则先于 /{id} 通配，首个命中生效）。
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // API Key 能力维度的门禁。
-        // 必须**排在角色维度的 RbacInterceptor 之前**：能力判定先于角色判定，
-        // 且 RbacInterceptor 对 API Key 主体短路（见其 apiKeyShortCircuit）。
-        APIKeyRouteAuthorizer apiKeyAuthorizer =
-                new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(apiKeyAuthorizer);
-        registry.addInterceptor(new APIKeyGateInterceptor(apiKeyAuthorizer))
-                .addPathPatterns("/api/v1/**")
-                // /api/v1/files/presigned 与 presigned-preview 不走组级 APIKeyGate——
-                // presigned 靠 HMAC 自证、preview 显式
-                // DenyAPIKeyPrincipal（FileProxyController 内，403）。
-                .excludePathPatterns("/api/v1/files/**")
-                // 沙箱终端 WS 不走组级 APIKeyGate——票据自鉴权。
-                .excludePathPatterns("/api/v1/sessions/*/sandbox/terminal")
-                .order(-1);
-
-        // 角色维度的守卫：规则矩阵（登记顺序即语义）集中在 RbacRoutePolicies。
-        RbacInterceptor rbac = new RbacInterceptor(tenantProperties);
-        RbacRoutePolicies.registerAll(rbac);
+        // 角色下限 + API-Key 能力维度的统一守卫：规则矩阵集中在 RoutePolicyWiring 装配。
 
         // /files 与 KB 图片代理的 API-Key 自带守卫——这两个路由不在 /api/v1 组的门禁下，
         // KB 受限 Key 拒绝、full-access 与 retrieve 放行，JWT 直通。
@@ -185,7 +166,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/v1/files/presigned-preview")
                 .order(0);
 
-        registry.addInterceptor(rbac).addPathPatterns("/api/v1/sessions/**",
+        registry.addInterceptor(routePolicyInterceptor).addPathPatterns("/api/v1/sessions/**",
                 "/api/v1/messages/**",
                 "/api/v1/models/**",
                 "/api/v1/knowledge-bases/**", "/api/v1/knowledge/**",

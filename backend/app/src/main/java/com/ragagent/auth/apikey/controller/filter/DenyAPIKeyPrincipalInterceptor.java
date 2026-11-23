@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * 无条件拒绝 API-Key 主体。
  *
  * <p><b>解决的是"门禁绕过"这一类 bug</b>：注册在 engine 根上（{@code /api/v1}
- * 分组之外）的路由不经过 {@link APIKeyGateInterceptor}；而 JWT 的角色守卫
+ * 分组之外）的路由不经过 {@link com.ragagent.config.route.RoutePolicyInterceptor}；而 JWT 的角色守卫
  * （RequireRole / RequireSystemAdmin / RequireOwnershipOrRole）对 API-Key 主体是
  * **短路放行**的——它们假设门禁已经判过了。两者叠加的结果就是：一条没挂门禁的路由，
  * 会对任何有效 Key 放行，**连 full-access 都不需要是**。
@@ -21,7 +21,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * <p>当前已登记的路由：{@code GET /api/v1/files/presigned-preview}
  * （由 {@code WebConfig} 注册）。保留类型是为了让后续
  * 同类路由接入时不必重新推导这条规则——
- * API-Key 的 default-deny 语义由 {@link APIKeyGateInterceptor} 的"未声明即拒绝"
+ * API-Key 的 default-deny 语义由 {@link com.ragagent.config.route.RoutePolicyInterceptor} 的"未声明即拒绝"
  * 承担（例：{@code POST /api/v1/agent/tool-approvals/:pending_id}
  * 就没有声明策略，因此 API Key 一律 403）。</p>
  */

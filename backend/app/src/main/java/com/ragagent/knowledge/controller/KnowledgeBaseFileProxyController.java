@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 消费 RequireKBAccess 的<b>精确 KB grant</b>：文件必须属于 KB 属主租户、在
  * {@code exports/} 命名空间下、且有该 KB 内存活文档的显式绑定
  * （IsReferencedByKnowledgeBase——文本提到 handle 不算所有权证据）。</p>
- * → AllowFileServeAPIKey → g.Viewer()（RbacInterceptor 规则）→ KBAccessRead
+ * → AllowFileServeAPIKey → g.Viewer()（RoutePolicyInterceptor 规则）→ KBAccessRead
  * → ResolveKBFile → serveAuthorizedFile。</p>
  */
 @RestController

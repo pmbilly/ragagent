@@ -1,6 +1,6 @@
 package com.ragagent.audit.service;
 
-import com.ragagent.framework.web.RbacInterceptor;
+import com.ragagent.framework.web.DeniedAuditorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 /**
  * 把 {@link AuditLogService} 接进 RBAC 拒绝分支。
  *
- * <p><b>为什么需要这个注册器</b>：{@code RbacInterceptor} 由
+ * <p><b>为什么需要这个注册器</b>：{@code RoutePolicyInterceptor} 由
  * {@code config/WebConfig} 直接 {@code new} 出来（不是 Spring bean），拿不到依赖注入；
- * 所以这里提供进程级装配点 {@link RbacInterceptor#setDeniedAuditor}。</p>
+ * 所以这里提供进程级装配点 {@link com.ragagent.framework.web.DeniedAuditorRegistry#setDeniedAuditor}。</p>
  *
  * <p>背景：此前 RBAC 拒绝只记日志、不落库，本注册器补上落库一环。</p>
  *
@@ -32,7 +32,7 @@ public class RbacDeniedAuditorRegistrar implements InitializingBean, DisposableB
 
     @Override
     public void afterPropertiesSet() {
-        RbacInterceptor.setDeniedAuditor((tenantId, actorUserId, actorRole, requiredRole,
+        DeniedAuditorRegistry.setDeniedAuditor((tenantId, actorUserId, actorRole, requiredRole,
                                           requestPath, requestMethod, rawPath) -> {
             // 路由模板为空时才用原始路径做去重键
             // （Spring 侧 rule.pattern() 恒非空，这一层是防御性等价）。
@@ -45,6 +45,6 @@ public class RbacDeniedAuditorRegistrar implements InitializingBean, DisposableB
 
     @Override
     public void destroy() {
-        RbacInterceptor.setDeniedAuditor(null);
+        DeniedAuditorRegistry.setDeniedAuditor(null);
     }
 }

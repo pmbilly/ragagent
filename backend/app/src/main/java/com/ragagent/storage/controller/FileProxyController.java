@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li><b>GET /api/v1/files/presigned-preview</b>：APIKeyGateInterceptor 对
  *       /api/v1/files/** 排除（WebConfig）→ 显式 DenyAPIKeyPrincipal 先行
  *       （403），RequireRole(Admin) 次之（对 API-Key 主体短路）；
- *       角色门由 RbacInterceptor 的
+ *       角色门由 RoutePolicyInterceptor 的
  *       ADMIN 规则承担（对 API-Key 主体同样短路）。</li>
  *   <li><b>GET+HEAD /r/{token}</b>：完全无鉴权，短时令牌自证；AuthFilter 的 /r/ 前缀让路。</li>
  * </ul>

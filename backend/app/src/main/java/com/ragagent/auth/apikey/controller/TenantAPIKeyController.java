@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>另有两道路由守卫（本模块不注册，由框架侧承担）：</p>
  * <ul>
  *   <li>URL 的 {@code :id} 必须等于调用者的活动租户（跨空间超管除外），
- *       由 {@code RbacInterceptor} 对 {@code /api/v1/tenants/{id}/**} 的
+ *       由 {@code RoutePolicyInterceptor} 对 {@code /api/v1/tenants/{id}/**} 的
  *       租户匹配校验自动保证；</li>
  *   <li><b>API Key 主体对这四个端点 default-deny</b>——它们不走 {@code apiKeyRoute}
  *       包装，门禁查不到策略即 403（否则一把 Key 能给自己扩权），

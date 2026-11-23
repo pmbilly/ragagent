@@ -2,11 +2,12 @@ package com.ragagent.auth.apikey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.auth.apikey.controller.filter.AllowFileServeAPIKeyInterceptor;
 import com.ragagent.auth.apikey.controller.filter.DenyAPIKeyPrincipalInterceptor;
+import com.ragagent.config.route.APIKeyRouteAuthorizer;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
+import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.tenant.APIKeyCapability;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
@@ -49,6 +50,14 @@ class APIKeyGateTest {
      *
      * @return 是否被放行（未进拦截器视为放行）
      */
+    /** 把独立 authorizer 的策略复制进统一拦截器（RoutePolicyInterceptor 内部持有自己的 authorizer 实例）。 */
+    private static RoutePolicyInterceptor interceptorWith(APIKeyRouteAuthorizer source) {
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        source.snapshot().forEach((method, byPath) ->
+                byPath.forEach((path, policy) -> interceptor.register(method, path, policy)));
+        return interceptor;
+    }
+
     private static boolean runGate(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                    String method, String pattern) throws Exception {
         if (scope != null) {
@@ -57,7 +66,7 @@ class APIKeyGateTest {
         MockHttpServletRequest request = new MockHttpServletRequest(method, concretePath(pattern));
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
         MockHttpServletResponse response = new MockHttpServletResponse();
-        boolean allowed = new APIKeyGateInterceptor(authorizer).preHandle(request, response, new Object());
+        boolean allowed = interceptorWith(authorizer).preHandle(request, response, new Object());
         return allowed && response.getStatus() == 200;
     }
 
@@ -85,7 +94,7 @@ class APIKeyGateTest {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/agents");
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/v1/agents");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        boolean allowed = new APIKeyGateInterceptor(a).preHandle(request, response, new Object());
+        boolean allowed = interceptorWith(a).preHandle(request, response, new Object());
         assertThat(allowed).isFalse();
         assertThat(response.getStatus()).isEqualTo(403);
         assertThat(response.getContentAsString())

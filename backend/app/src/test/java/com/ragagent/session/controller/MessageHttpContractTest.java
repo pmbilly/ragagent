@@ -9,15 +9,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.auth.api.UserPreferences;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.config.route.APIKeyRouteAuthorizer;
+import com.ragagent.config.route.APIKeyRoutePolicies;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
+import com.ragagent.framework.config.TenantProperties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
@@ -383,8 +385,9 @@ class MessageHttpContractTest {
      */
     @Test
     void messageRoutesAreRegisteredWithTheirPolicies() {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        APIKeyRouteAuthorizer a = interceptor.authorizer();
 
         APIKeyRoutePolicy history = APIKeyRoutePolicy.messageHistory(APIKeyRoutePolicy.fullAccess());
         APIKeyRoutePolicy chat = APIKeyRoutePolicy.chat(APIKeyRoutePolicy.fullAccess());

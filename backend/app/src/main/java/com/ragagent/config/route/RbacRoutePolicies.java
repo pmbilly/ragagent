@@ -1,14 +1,13 @@
-package com.ragagent.config;
+package com.ragagent.config.route;
 
 import com.ragagent.framework.tenant.TenantRole;
-import com.ragagent.framework.web.RbacInterceptor;
 
 /**
  * RBAC 规则表（集中登记所有带角色下限的路由声明，以及显式公开/自服务路由）。
  *
  * <p>与 {@code APIKeyRoutePolicies} 在角色维度互为镜像：Java 侧路由注册分散在各控制器的
  * {@code @RequestMapping} 上，没有等价的"同一条语句"钩子，所以角色下限矩阵集中到本类——
- * <b>一处声明，启动时由组合根（{@code WebConfig}）一次性灌进 {@link RbacInterceptor}</b>。</p>
+ * <b>一处声明，启动时由组合根（{@code WebConfig}）一次性灌进 {@link RoutePolicyInterceptor}</b>。</p>
  *
  * <h2>登记顺序即语义（重要）</h2>
  * <p>拦截器用 AntPathMatcher 匹配，取<b>首个</b>命中：静态段规则（如
@@ -32,14 +31,14 @@ final class RbacRoutePolicies {
      * {@code rbac} 注册为拦截器。条目顺序必须与路由声明的静态段/通配段关系一致
      * （首个命中生效）。</p>
      */
-    static void registerAll(RbacInterceptor rbac) {
+    static void registerAll(RoutePolicyInterceptor rbac) {
         registerModels(rbac); registerKnowledge(rbac); registerChunksFaqTags(rbac);
         registerMcp(rbac); registerWikiAuditSystem(rbac); registerSessionsMessagesMemory(rbac);
         registerDataSources(rbac); registerInfrastructure(rbac); registerTenantsAndKeys(rbac);
         registerMisc(rbac); registerAgentsAndInit(rbac); registerEmbedAndIm(rbac);
         registerPublic(rbac);
     }
-    private static void registerModels(RbacInterceptor rbac) {
+    private static void registerModels(RoutePolicyInterceptor rbac) {
         // /models 组
         rbac.addRule("GET", "/api/v1/models", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/models/providers", TenantRole.VIEWER, false);
@@ -52,7 +51,7 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/models/*", TenantRole.VIEWER, false);
     }
 
-    private static void registerKnowledge(RbacInterceptor rbac) {
+    private static void registerKnowledge(RoutePolicyInterceptor rbac) {
 // 知识库
         rbac.addRule("POST", "/api/v1/knowledge-bases", TenantRole.CONTRIBUTOR, false);
         rbac.addRule("GET", "/api/v1/knowledge-bases", TenantRole.VIEWER, false);
@@ -114,7 +113,7 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/knowledge/*", TenantRole.VIEWER, false);
     }
 
-    private static void registerChunksFaqTags(RbacInterceptor rbac) {
+    private static void registerChunksFaqTags(RoutePolicyInterceptor rbac) {
 // chunks 读组：读 = Viewer+；写无角色门，ownership 守卫在 ChunkController 内判定
         rbac.addRule("GET", "/api/v1/chunks/by-id/*", TenantRole.VIEWER, false);
         rbac.addRule("GET", "/api/v1/chunks/*/*/revisions", TenantRole.VIEWER, false);
@@ -159,7 +158,7 @@ final class RbacRoutePolicies {
         rbac.addRule("DELETE", "/api/v1/knowledge-bases/*/tags/*", TenantRole.VIEWER, false);
     }
 
-    private static void registerMcp(RbacInterceptor rbac) {
+    private static void registerMcp(RoutePolicyInterceptor rbac) {
 // MCP 服务
         // 更具体的路径必须排在 /mcp-services/* 之前（首个命中生效）
         rbac.addRule("POST", "/api/v1/mcp-services", TenantRole.ADMIN, false);
@@ -188,7 +187,7 @@ final class RbacRoutePolicies {
         // 注意：/api/v1/mcp-oauth/callback 是**公开路由**（靠一次性 state 自证），不注册规则
     }
 
-    private static void registerWikiAuditSystem(RbacInterceptor rbac) {
+    private static void registerWikiAuditSystem(RoutePolicyInterceptor rbac) {
 // Wiki
         // 注意路径前缀是 /knowledgebase（**无连字符**，与知识库的 /knowledge-bases 不同）
         // 写端点是"Admin 或创建者本人"，**没有 Contributor 下限**
@@ -253,7 +252,7 @@ final class RbacRoutePolicies {
         rbac.addSystemAdminRule("POST", "/api/v1/system/admin/tenants/apply-default-storage-quota");
     }
 
-    private static void registerSessionsMessagesMemory(RbacInterceptor rbac) {
+    private static void registerSessionsMessagesMemory(RoutePolicyInterceptor rbac) {
 // 会话：sessions 是 per-user 资源，handler 内自查 ownership；组内全部端点
         // Viewer+（把已吊销账号挡在门外），无逐路由差异 → 全部 VIEWER 下限。
         rbac.addRule("GET", "/api/v1/sessions/continue-stream/*", TenantRole.VIEWER, false);
@@ -331,7 +330,7 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/memory/consolidate", TenantRole.VIEWER, false);
     }
 
-    private static void registerDataSources(RbacInterceptor rbac) {
+    private static void registerDataSources(RoutePolicyInterceptor rbac) {
 // 数据源
         // 读端（types / 列表 / 详情 / 同步日志）Viewer+，其余（CRUD、校验、资源枚举、
         // 同步控制、凭据子资源）Admin+。数据源持有外部服务凭据、并能触发改动整个
@@ -356,7 +355,7 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/datasource/*", TenantRole.VIEWER, false);
     }
 
-    private static void registerInfrastructure(RbacInterceptor rbac) {
+    private static void registerInfrastructure(RoutePolicyInterceptor rbac) {
 // 基础设施配置三组：
         // 租户级基础设施，读 Viewer+、写与连通测试 Admin+（无 ownership 守卫）。
         // 静态段（types/test/*/credentials/*/default）先于 /x/* 通配登记（首个命中生效）。
@@ -392,14 +391,14 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/storage-backends/*", TenantRole.VIEWER, false);
     }
 
-    private static void registerTenantsAndKeys(RbacInterceptor rbac) {
+    private static void registerTenantsAndKeys(RoutePolicyInterceptor rbac) {
 // 跨空间租户目录：
         // 跨租户守卫（flag + CanAccessAllTenants，不受 EnableRBAC 调制）。
         // POST /tenants 不登记规则——只挂认证（自助创建对普通用户开放）。
         // GET /tenants 同样**无角色门**（只回活动空间自身）→ 不登记规则。
         // tenants CRUD 的 per-id 三条：
         // GET=Viewer+（读空间设置）；PUT/DELETE=Owner+（改/删空间）。
-        // PathTenantMatch 对 /api/v1/tenants/{id}/** 自动生效（RbacInterceptor 内建），
+        // PathTenantMatch 对 /api/v1/tenants/{id}/** 自动生效（RoutePolicyInterceptor 内建），
         // "Invalid workspace ID" 的 handler 检查是死代码。
         rbac.addRule("GET", "/api/v1/tenants/*", TenantRole.VIEWER, false);
         rbac.addRule("PUT", "/api/v1/tenants/*", TenantRole.OWNER, false);
@@ -420,7 +419,7 @@ final class RbacRoutePolicies {
         // 空间成员 / 邀请 / API-Principal：
         // 列表=Viewer+（任意成员可看名册）；一切变更=Owner+（**不是**
         // ADMIN 下限——成员/角色是租户内最高影响操作）；/leave=Viewer+（成员可自助退出）。
-        // PathTenantMatch 对 /api/v1/tenants/{id}/** 自动生效（RbacInterceptor 内建）。
+        // PathTenantMatch 对 /api/v1/tenants/{id}/** 自动生效（RoutePolicyInterceptor 内建）。
         // /api/v1/me/invitations** 无角色门（只挂认证）→ 不登记规则、
         // 拦截器 pattern 也未覆盖 /me/**。
         rbac.addRule("GET", "/api/v1/tenants/*/members", TenantRole.VIEWER, false);
@@ -438,7 +437,7 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/tenants/*/api-principal-test-token", TenantRole.OWNER, false);
     }
 
-    private static void registerMisc(RbacInterceptor rbac) {
+    private static void registerMisc(RoutePolicyInterceptor rbac) {
 // 收藏与 chunker 调试面：
         // 收藏是"做收藏动作的人"的资源（不属资源创建者），Viewer+ 即可；
         // preview 是 KB 编辑器调试面板的只读端点。
@@ -465,7 +464,7 @@ final class RbacRoutePolicies {
         rbac.addRule("GET", "/api/v1/skills/catalog/*/files/content", TenantRole.ADMIN, false);
     }
 
-    private static void registerAgentsAndInit(RbacInterceptor rbac) {
+    private static void registerAgentsAndInit(RoutePolicyInterceptor rbac) {
 // ── agents CRUD 家族 ──
         // 静态段先于 /agents/* 通配登记（AntPathMatcher 取首个命中）。
         // placeholders/type-presets/list/get：Viewer+；create/copy：Contributor+；
@@ -504,7 +503,7 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/initialization/extract/fabri-text", TenantRole.ADMIN, false);
     }
 
-    private static void registerEmbedAndIm(RbacInterceptor rbac) {
+    private static void registerEmbedAndIm(RoutePolicyInterceptor rbac) {
 // ── embed 管理面 + im channels 清单面 ──
         // 管理端点：写（create/update/delete/rotate/toggle）Admin+，读（list/get/
         // preview/stats）Viewer+；wechat 扫码组全 Admin+（成功扫码会把个人
@@ -530,7 +529,7 @@ final class RbacRoutePolicies {
         rbac.addRule("POST", "/api/v1/wechat/qrcode/status", TenantRole.ADMIN, false);
     }
 
-    private static void registerPublic(RbacInterceptor rbac) {
+    private static void registerPublic(RoutePolicyInterceptor rbac) {
 // ── 公开/自服务路由（C9b）──
         // 无角色下限，但并非“无鉴权”：登录态由 AuthFilter、渠道 token 由 EmbedAuthFilter、
         // 文件由签名、邀请由 token、webhook 由签名、会话/消息由所有权守卫负责。

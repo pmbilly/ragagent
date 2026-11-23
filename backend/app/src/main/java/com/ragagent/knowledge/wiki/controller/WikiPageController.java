@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 读端点：Viewer+ 角色 + KB 读权限  （同租户可读；跨租户经 org-share / shared-agent 只读授予）
  * 写端点：创建者本人或 Admin+（否则 403）+ KB 写权限
  * </pre>
- * <p>Java 的 {@code RbacInterceptor} 只能表达"角色下限"，无法表达 KB 访问的
+ * <p>Java 的 {@code RoutePolicyInterceptor} 只能表达"角色下限"，无法表达 KB 访问的
  * "own / org-shared / via shared agent" 解析，故 <b>KB 访问与所有权判定由 {@link WikiKbAccessGuard} 承接</b>，
  * 角色下限仍由 WebConfig 注册的规则负责。跨空间授予路径本仓不实现——非本租户一律拒绝。</p>
  *

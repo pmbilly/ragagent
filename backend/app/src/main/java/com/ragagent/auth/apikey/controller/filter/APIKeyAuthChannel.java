@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  *   <li>{@link TenantContext}：tenantId / principal（api_tenant、api_platform 或
  *       api_external_user）/ role（viewer，full-access 租户 Key 为 owner）/ 用户 ID
  *       （租户首位用户，无则合成 {@code system-<tenantId>}；平台 Key 恒合成身份）；</li>
- *   <li>{@link APIKeyScopeContext}：供 {@link APIKeyGateInterceptor} 与下游
+ *   <li>{@link APIKeyScopeContext}：供 {@link com.ragagent.config.route.RoutePolicyInterceptor} 与下游
  *       KB 白名单判定使用。这是"JWT 直通 / API Key 受门禁"的判定依据。</li>
  * </ul>
  *

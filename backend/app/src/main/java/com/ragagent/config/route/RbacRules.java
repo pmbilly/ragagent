@@ -1,4 +1,4 @@
-package com.ragagent.framework.web;
+package com.ragagent.config.route;
 
 import com.ragagent.framework.tenant.TenantRole;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import org.springframework.util.AntPathMatcher;
  * RBAC 规则表与匹配：登记「方法 + Ant 路径 → 角色下限」，并按请求选出命中的规则。
  *
  * <p>只做匹配、不做判定——角色阶梯、系统管理员绕过、API Key 主体等决策仍在
- * {@link RbacInterceptor} 里，那里才拿得到当前主体。</p>
+ * {@link RoutePolicyInterceptor} 里，那里才拿得到当前主体。</p>
  *
  * <p><b>HEAD 兜底</b>：Spring 对 GET 自动派生 HEAD。若 HEAD 不按 GET 规则兜底，
  * 它会成为绕过方法级角色下限的旁路（只返回头，但泄露存在性与元数据），因此

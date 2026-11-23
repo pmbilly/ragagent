@@ -92,6 +92,7 @@ graph TD
 | `MybatisPlusConfig` | 持久层插件链：分页 + 全表写防护 + 租户过滤探测 + 软删过滤探测 |
 | `RetrievalEngineWiringConfig` | 检索引擎注册表与环境店注册（`RETRIEVE_DRIVER` 按段注册） |
 | `RuntimeSnapshotWiring` | 启动期只读快照（语言默认值、上传限额、AES 密钥、SSRF 白名单等） |
+| `RoutePolicyWiring` | 统一路由策略装配：375 条角色下限 + 291 条 API-Key 策略灌进同一个 RoutePolicyInterceptor（原 RbacInterceptor 与 APIKeyGateInterceptor 合一） |
 | `WebConfig` | Web 壳：Jackson / CORS / 请求 ID 过滤器与拦截器链（API Key 闸门、信封、RBAC、追踪） |
 
 **域内装配（`domains`，11 个）**——装配的是本域实现或本域数据，因此留在域内；上移会把域内类型拉进组合根：

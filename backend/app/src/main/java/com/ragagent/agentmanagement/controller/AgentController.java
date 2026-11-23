@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p>守卫层次：写路由在 controller 内做归属校验（行存在且非 Admin+ 且非创建者 →
  * 403 纯字符串；行不存在 → 放行给 handler 出 404）；读/列表 Viewer 下限由
- * RbacInterceptor 承担。</p>
+ * RoutePolicyInterceptor 承担。</p>
  *
  * <p>响应外壳：本类标注 {@link ApiResult} ⇒ 成功体统一 {@code {code,message,data}}
  * （由 {@code ApiResultAdvice} 施加，方法只返回载荷）；错误体同形（{@code GlobalExceptionHandler}

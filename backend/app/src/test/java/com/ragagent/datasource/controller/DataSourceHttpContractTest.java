@@ -12,18 +12,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.auth.api.UserPreferences;
-import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.config.route.APIKeyRouteAuthorizer;
+import com.ragagent.config.route.APIKeyRoutePolicies;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
 import com.ragagent.datasource.domain.DataSourceSyncTaskQueue;
 import com.ragagent.datasource.domain.connector.ConnectorHttp;
+import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.security.SsrfGuard;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
@@ -806,8 +807,9 @@ class DataSourceHttpContractTest {
      */
     @Test
     void allDataSourceRoutesAreRegisteredWithTheSamePolicy() {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        APIKeyRouteAuthorizer a = interceptor.authorizer();
 
         List<String[]> routes = List.of(
                 new String[] {"GET", "/api/v1/datasource/types"},
@@ -843,8 +845,9 @@ class DataSourceHttpContractTest {
      */
     @Test
     void scopedApiKeyIsDeniedOnEveryDataSourceRoute() throws Exception {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        APIKeyRouteAuthorizer a = interceptor.authorizer();
 
         TenantAPIKeyScope scoped =
                 new TenantAPIKeyScope(
@@ -875,7 +878,7 @@ class DataSourceHttpContractTest {
                     .BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
             org.springframework.mock.web.MockHttpServletResponse response =
                     new org.springframework.mock.web.MockHttpServletResponse();
-            boolean allowed = new APIKeyGateInterceptor(authorizer)
+            boolean allowed = interceptorWith(authorizer)
                     .preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
@@ -1006,4 +1009,14 @@ class DataSourceHttpContractTest {
     private static String normalizeFeed(String s) {
         return FEED_URL == null ? s : s.replace(FEED_URL, RECORDED_FEED_URL);
     }
+    /** 把独立 authorizer 的策略复制进统一拦截器（RoutePolicyInterceptor 内部持有自己的 authorizer 实例）。 */
+    private static com.ragagent.config.route.RoutePolicyInterceptor interceptorWith(
+            com.ragagent.config.route.APIKeyRouteAuthorizer source) {
+        var interceptor = new com.ragagent.config.route.RoutePolicyInterceptor(
+                new com.ragagent.framework.config.TenantProperties(true, true, 10));
+        source.snapshot().forEach((method, byPath) ->
+                byPath.forEach((path, policy) -> interceptor.register(method, path, policy)));
+        return interceptor;
+    }
+
 }

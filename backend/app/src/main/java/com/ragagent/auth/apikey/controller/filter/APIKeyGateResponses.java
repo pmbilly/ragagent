@@ -16,12 +16,12 @@ import org.springframework.http.MediaType;
  * 与 {@code GuardForbiddenException} 属于同一类"守卫式 403"。
  * 这里只有一个键，无键序歧义。</p>
  */
-final class APIKeyGateResponses {
+public final class APIKeyGateResponses {
 
     private static final ObjectMapper MAPPER = JsonMappers.lenient();
 
     /** gate / file-serve 的 403 文案。 */
-    static final String SCOPE_FORBIDDEN = "Forbidden: API key scope does not allow this operation";
+    public static final String SCOPE_FORBIDDEN = "Forbidden: API key scope does not allow this operation";
 
     /** DenyAPIKeyPrincipal 的 403 文案。 */
     static final String API_KEY_DENIED = "Forbidden: API keys cannot access this endpoint";
@@ -30,7 +30,7 @@ final class APIKeyGateResponses {
     }
 
     /** 写 403 + 纯字符串 error 信封，返回 false 便于 {@code return writeForbidden(...);}。 */
-    static boolean writeForbidden(HttpServletResponse response, int status, String message) throws IOException {
+    public static boolean writeForbidden(HttpServletResponse response, int status, String message) throws IOException {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", message);
         response.setStatus(status);

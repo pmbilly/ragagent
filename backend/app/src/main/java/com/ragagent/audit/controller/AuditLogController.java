@@ -255,7 +255,7 @@ public class AuditLogController {
     /**
      * 角色未附加或非法时<b>回落 Viewer</b>（fail-closed）。
      *
-     * <p>⚠️ 与 {@code RbacInterceptor} 里的 {@code TenantRole.fromString} 写法有意不同：
+     * <p>⚠️ 与 {@code RoutePolicyInterceptor} 里的 {@code TenantRole.fromString} 写法有意不同：
      * 那边不回落到 Viewer（UNKNOWN 的 level 0 对任何角色下限都更严）。本控制器需要
      * Viewer 回落，才能放行"创建者本人但未附加角色"这类路径。</p>
      */

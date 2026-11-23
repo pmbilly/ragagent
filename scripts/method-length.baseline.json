@@ -115,10 +115,6 @@
       "lines": 151,
       "reason": "存量基线（M1 首次登记，2026-10-20）"
     },
-    "backend/app/src/main/java/com/ragagent/auth/apikey/controller/filter/APIKeyRoutePolicies.java#registerKnowledgeAndWikiRoutes": {
-      "lines": 137,
-      "reason": "2026-11-23 阈值 150→80 收紧批收编"
-    },
     "backend/app/src/main/java/com/ragagent/auth/controller/TenantCreateOps.java#createTenant": {
       "lines": 135,
       "reason": "2026-11-23 阈值 150→80 收紧批收编"
@@ -153,6 +149,10 @@
     },
     "backend/app/src/main/java/com/ragagent/channel/service/ImTurnOrchestrator.java#runHandleMessage": {
       "lines": 109,
+      "reason": "2026-11-23 阈值 150→80 收紧批收编"
+    },
+    "backend/app/src/main/java/com/ragagent/config/route/APIKeyRoutePolicies.java#registerKnowledgeAndWikiRoutes": {
+      "lines": 137,
       "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/app/src/main/java/com/ragagent/datasource/catalog/ConnectorCatalog.java#buildRegistry": {
@@ -613,10 +613,6 @@
     },
     "backend/framework/src/main/java/com/ragagent/framework/text/JdkHtmlToMarkdown.java#openTag": {
       "lines": 96,
-      "reason": "2026-11-23 阈值 150→80 收紧批收编"
-    },
-    "backend/framework/src/main/java/com/ragagent/framework/web/RbacInterceptor.java#preHandle": {
-      "lines": 83,
       "reason": "2026-11-23 阈值 150→80 收紧批收编"
     },
     "backend/model-runtime/src/main/java/com/ragagent/embedding/EmbedderFactory.java#newEmbedderInner": {

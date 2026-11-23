@@ -47,7 +47,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 /**
  * MCP OAuth HTTP 层契约。
  *
- * <p>用 standalone MockMvc（不装 Filter 链）：鉴权/RBAC 由 AuthFilter 与 RbacInterceptor
+ * <p>用 standalone MockMvc（不装 Filter 链）：鉴权/RBAC 由 AuthFilter 与 RoutePolicyInterceptor
  * 承担，路由注册是主会话的工作，本用例只钉住 <b>controller 自身的端点契约</b>：
  * 响应信封、状态码、重定向 fragment 的字节形态。</p>
  *

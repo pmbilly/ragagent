@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * GET/POST /tenants/{id}/members、PUT/DELETE /tenants/{id}/members/{userId}、
  * POST /tenants/{id}/leave。
  *
- * <p>角色门禁与 PathTenantMatch 在 RbacInterceptor，controller 不复查角色。
+ * <p>角色门禁与 PathTenantMatch 在 RoutePolicyInterceptor，controller 不复查角色。
  * 本类还承载成员/邀请两组共用的绑定与分页辅助
  * （parseTenantId / parseListPagination / addMemberAndRespond）。</p>
  *

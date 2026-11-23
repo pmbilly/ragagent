@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  *       yaml + 本地化；PUT 分发器不支持该 key → 400）</li>
  * </ul>
  *
- * <p>跨空间守卫（all/search）在 {@code RbacInterceptor.addCrossTenantRule}；
+ * <p>跨空间守卫（all/search）在 {@code RoutePolicyInterceptor.addCrossTenantRule}；
  * 角色下限（kv GET=Viewer+、PUT=Admin+）在 {@code WebConfig}；
  * 三条敏感 key 的 admin 门在本类 {@code canViewIntegrationSecrets()}。</p>
  */

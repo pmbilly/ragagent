@@ -24,7 +24,7 @@ final class WikiKbAccessGuard {
     /**
      * KB 访问与所有权判定。
      *
-     * <p>判定顺序与中间件链一致（角色下限由 WebConfig 的 RbacInterceptor 先行）：</p>
+     * <p>判定顺序与中间件链一致（角色下限由 WebConfig 的 RoutePolicyInterceptor 先行）：</p>
      * <ol>
      *   <li>API-Key 数据面 KB 白名单：KB 受限 Key 指向白名单外 → 403；
      *       web 用户 / full-access Key 恒放行。在 KB 查找<b>之前</b>做。</li>

@@ -2,9 +2,11 @@ package com.ragagent.auth.apikey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
+import com.ragagent.config.route.APIKeyRouteAuthorizer;
+import com.ragagent.config.route.APIKeyRoutePolicies;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
+import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.tenant.APIKeyCapability;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import java.util.List;
@@ -114,9 +116,9 @@ class APIKeyRouteAuthorizerTest {
     // ── 策略表覆盖 ──
 
     private static APIKeyRouteAuthorizer catalog() {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
-        return a;
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        return interceptor.authorizer();
     }
 
     private static APIKeyRoutePolicy policy(APIKeyRouteAuthorizer a, String method, String path) {

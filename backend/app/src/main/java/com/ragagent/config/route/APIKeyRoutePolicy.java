@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.controller.filter;
+package com.ragagent.config.route;
 
 import com.ragagent.framework.tenant.APIKeyCapability;
 import java.util.ArrayList;

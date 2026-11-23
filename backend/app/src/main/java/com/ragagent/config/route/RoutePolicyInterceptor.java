@@ -1,6 +1,8 @@
-package com.ragagent.framework.web;
+package com.ragagent.config.route;
 
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.apikey.controller.filter.APIKeyGateResponses;
 import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.error.AppError;
 import com.ragagent.framework.error.BizException;
@@ -10,6 +12,9 @@ import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import com.ragagent.framework.tenant.TenantContext;
 import com.ragagent.framework.tenant.TenantRole;
+import com.ragagent.framework.web.ApiResponse;
+import com.ragagent.framework.web.ApiResultSupport;
+import com.ragagent.framework.web.DeniedAuditorRegistry;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,109 +24,85 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * 路由级 RBAC 拦截器（角色下限 / 系统管理员守卫 / 跨空间守卫）。
+ * 统一路由策略拦截器：原 {@code RbacInterceptor}（角色下限）与
+ * {@code APIKeyGateInterceptor}（API-Key 能力维度）合一。
  *
- * 判定顺序：
- *  1. 命中规则且角色达标（TenantRole level 比较）→ 放行
- *  2. 跨空间超管（{@code EnableCrossTenantAccess && CanAccessAllTenants}）→ 放行
- *  3. 显式公开/自服务规则（{@link #addPublicRule}）→ 放行（鉴权由其它守卫负责）
- *  4. {@code /api/v1/**} 的真实控制器方法未命中任何规则 → 403
- *     {@code {"error":"Forbidden: no route policy"}}；未映射路径仍由 Spring 返回 404
- *  5. EnableRBAC=false（滚动窗口）→ 记日志放行
- *  6. 否则 403 {"error":"Forbidden: insufficient workspace role"}
+ * <p><b>分派顺序</b>（与原双拦截器链语义逐字等价）：</p>
+ * <ol>
+ *   <li>ASYNC 派发跳过（SseEmitter completeError 的重入不做二次鉴权）；</li>
+ *   <li>PathTenantMatch（URL 租户 == 活动租户，先于一切主体分派）；</li>
+ *   <li>API-Key 主体 → 仅当路径落在原 APIKeyGate 覆盖面内才做能力判定
+ *       （{@code /api/v1/**} 排除 {@code /api/v1/files/**} 与沙箱终端），
+ *       覆盖面相匹配的规则与文案与原 APIKeyGateInterceptor 一致；
+ *       不在覆盖面内则按原 RbacInterceptor 对 API-Key 主体短路放行；</li>
+ *   <li>web（JWT）主体 → 角色下限矩阵（375 条，登记顺序即语义，首个命中生效）。</li>
+ * </ol>
  *
- * API-key 主体在此短路放行（能力维度由 APIKeyGate 全权判定），
- * 见下方的 {@code APIKeyScopeContext.present()} 分支；系统管理员与所有权守卫
- * 随对应模块（system admin / KB / agent）落在各自入口。
+ * <p><b>注册接口</b>：同时实现原 RbacInterceptor 的
+ * {@code addRule/addSystemAdminRule/addPublicRule} 与原 APIKeyRouteAuthorizer 的
+ * {@code register/registerGin}，使两张策略表（RbacRoutePolicies 375 条 +
+ * APIKeyRoutePolicies 291 条）的注册调用逐字不变，仅 {@code registerAll} 的
+ * 参数类型换为本类。</p>
  *
- * <p>HEAD 未命中时按 GET 规则/公开规则兜底：Spring 对 GET 自动派生 HEAD，
- * 不能让它成为绕过方法级角色下限的旁路。</p>
- *
- * <p><b>拒绝审计</b>：拒绝分支会调用
- * {@link DeniedAuditor}，把拒绝落成一条 durable 的 {@code rbac.access_denied}
- * 审计行。服务内部有 1 分钟
- * 滑动窗口去重，所以被打的端点不会以线速刷表。</p>
+ * <p><b>拒绝审计</b>：拒绝分支经 {@code DeniedAuditorRegistry}
+ * （framework/web 的进程级注册点，避免与 audit 域形成包级环）。</p>
  */
-public class RbacInterceptor implements HandlerInterceptor {
+public class RoutePolicyInterceptor implements HandlerInterceptor {
 
-    /** 外壳序列化用（消息为常量，序列化不会失败；失败有字符串回落兜底）。 */
-    private static final com.fasterxml.jackson.databind.ObjectMapper ENVELOPE_JSON =
+    private static final ObjectMapper ENVELOPE_JSON =
             JsonMappers.lenient();
 
-    private static final Logger log = LoggerFactory.getLogger(RbacInterceptor.class);
+    private static final Logger log = LoggerFactory.getLogger(RoutePolicyInterceptor.class);
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
 
-    /**
-     * 拒绝审计回调。
-     *
-     * <p>{@code requestPath} 传<b>路由模板</b>——这是 Spring 侧对 gin {@code c.FullPath()}
-     * 的等价物（用 {@code HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE}，拿不到时才回落到
-     * RBAC 规则的 Ant 模式），目的见 AuditLogService 的注释（防止遍历 URL 里的 UUID
-     * 绕过去重窗口）。{@code rawPath} 是原始 URI，只在与模板不同时才会被服务写进
-     * Details 的 {@code raw_path}。</p>
-     *
-     * <p>⚠️ 路由模板用 Spring 的 {@code {id}} 记法
-     * （{@code /api/v1/tenants/{id}/audit-log}）。
-     * 去重键仍然稳定（同一路由恒得同一串）。</p>
-     */
-    @FunctionalInterface
-    public interface DeniedAuditor {
-        void logDenied(long tenantId, String actorUserId, String actorRole,
-                       String requiredRole, String requestPath, String requestMethod, String rawPath);
-    }
-
-    /** 未注册审计实现时的空操作。 */
-    private static final DeniedAuditor NOOP_AUDITOR =
-            (tenantId, actorUserId, actorRole, requiredRole, requestPath, requestMethod, rawPath) -> {};
-
-    /**
-     * 进程级注册点。本拦截器由 {@code WebConfig} 直接 {@code new} 出来（不是 Spring bean），
-     * 拿不到依赖注入，所以审计实现由 {@code com.ragagent.audit.service.RbacDeniedAuditorRegistrar}
-     * 在启动时注册进来。
-     */
-    private static volatile DeniedAuditor deniedAuditor = NOOP_AUDITOR;
-
-    public static void setDeniedAuditor(DeniedAuditor auditor) {
-        deniedAuditor = auditor == null ? NOOP_AUDITOR : auditor;
-    }
-
-    public static DeniedAuditor deniedAuditor() {
-        return deniedAuditor;
-    }
-
     private final RbacRules rbac = new RbacRules();
+    private final APIKeyRouteAuthorizer authorizer = new APIKeyRouteAuthorizer();
     private final TenantProperties tenantProperties;
 
-    public RbacInterceptor(TenantProperties tenantProperties) {
+    public RoutePolicyInterceptor(TenantProperties tenantProperties) {
         this.tenantProperties = tenantProperties;
     }
 
-    public RbacInterceptor addRule(String method, String pattern, TenantRole minRole, boolean orSystemAdmin) {
+    // ── 注册接口：web 角色规则（RbacRoutePolicies 灌入，375 条） ──
+
+    public RoutePolicyInterceptor addRule(String method, String pattern, TenantRole minRole, boolean orSystemAdmin) {
         rbac.addRule(method, pattern, minRole, orSystemAdmin);
         return this;
     }
 
-    /**
-     * 仅系统管理员可访问。
-     * 用于 {@code /api/v1/system/**} 这类平台级端点——租户角色再高也不放行。
-     */
-    public RbacInterceptor addSystemAdminRule(String method, String pattern) {
+    /** 仅系统管理员可访问（平台级端点，租户角色再高也不放行）。 */
+    public RoutePolicyInterceptor addSystemAdminRule(String method, String pattern) {
         rbac.addSystemAdminRule(method, pattern);
         return this;
     }
 
-    /**
-     * 登记公开/自服务路由：不设角色下限，跳过 RBAC；鉴权仍由其它守卫负责。
-     * <p>默认拒绝只对 {@code /api/v1/**} 生效，未登记且无规则的 API 路径返回 403。</p>
-     */
-    public RbacInterceptor addPublicRule(String method, String pattern) {
+    /** 公开/自服务路由：不设角色下限，鉴权由其它守卫负责。 */
+    public RoutePolicyInterceptor addPublicRule(String method, String pattern) {
         rbac.addPublicRule(method, pattern);
         return this;
     }
+
+    // ── 注册接口：API-Key 策略（APIKeyRoutePolicies 灌入，291 条） ──
+
+    public void register(String method, String fullPath, APIKeyRoutePolicy policy) {
+        authorizer.register(method, fullPath, policy);
+    }
+
+    public void registerGin(String method, String ginFullPath, APIKeyRoutePolicy policy) {
+        authorizer.registerGin(method, ginFullPath, policy);
+    }
+
+    /** 只读查询面：守卫与测试用（registeredRoutes/declaredNodes/snapshot 等）。 */
+    public APIKeyRouteAuthorizer authorizer() {
+        return authorizer;
+    }
+
+    // ── 请求分派 ──
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -132,28 +113,45 @@ public class RbacInterceptor implements HandlerInterceptor {
         if (request.getDispatcherType() == DispatcherType.ASYNC) {
             return true;
         }
-        // URL 里的租户 id 必须等于活动租户。
-        // 自动对所有 /api/v1/tenants/{id}/** 生效（漏配规则的代价是越权读取别人的审计/密钥列表）。
-        // 必须先于 API-Key 短路执行（对 Key 主体同样生效）——
-        // 否则持有 A 空间 Key 的调用方可把 URL 里的 id 换成 B 空间去增删对方成员/邀请。
+        // URL 里的租户 id 必须等于活动租户（对 Key 主体同样生效，先于主体分派）。
         if (!checkPathTenantMatch(request, response)) {
             return false;
         }
-        // API-Key 主体直接放行——能力维度由 APIKeyGate 全权判定，
-        // 否则 full-access Key 会被这里的角色下限拦住
         if (APIKeyScopeContext.present()) {
+            return handleApiKeyPrincipal(request, response);
+        }
+        return handleWebPrincipal(request, response, handler);
+    }
+
+    /**
+     * API-Key 主体分派：仅当路径落在原 APIKeyGateInterceptor 覆盖面内才做能力判定；
+     * 不在覆盖面（{@code /api/v1/files/**}、沙箱终端）按原 RbacInterceptor 短路放行。
+     */
+    private boolean handleApiKeyPrincipal(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String uri = request.getRequestURI();
+        if (!isApiKeyGateCoveredPath(uri)) {
             return true;
         }
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String fullPath = pattern == null ? uri : pattern.toString();
+        if (authorizer.authorize(APIKeyScopeContext.current(), request.getMethod(), fullPath)) {
+            return true;
+        }
+        return APIKeyGateResponses.writeForbidden(response, 403, APIKeyGateResponses.SCOPE_FORBIDDEN);
+    }
 
+    /** web（JWT）主体的角色下限判定（原 RbacInterceptor.preHandle 的 web 部分）。 */
+    private boolean handleWebPrincipal(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws IOException {
         RbacRules.Rule rule = rbac.match(request.getMethod(), request.getRequestURI());
         if (rule == null) {
             if (rbac.isPublic(request.getMethod(), request.getRequestURI())) {
                 return true;
             }
-            // 只对“真实控制器方法”默认拒绝；未映射路径继续由 Spring 返回 404
-            // （否则 removed-route 契约测试会从 404 变成 403，掩盖“路由已删除”的事实）。
+            // 只对"真实控制器方法"默认拒绝；未映射路径继续由 Spring 返回 404。
             if (request.getRequestURI().startsWith("/api/v1/")
-                    && handler instanceof org.springframework.web.method.HandlerMethod) {
+                    && handler instanceof HandlerMethod) {
                 if (!tenantProperties.isRbacEnforced()) {
                     log.warn("[rbac] unmatched route (logged but not enforced): user={} path={}",
                             TenantContext.currentUserId(), request.getRequestURI());
@@ -161,7 +159,6 @@ public class RbacInterceptor implements HandlerInterceptor {
                 }
                 return denyUnmatched(request, response);
             }
-            // 非 API 路径（静态资源、健康检查、文件签名 URL）不在默认拒绝面。
             return true;
         }
         if (check(rule)) {
@@ -170,12 +167,9 @@ public class RbacInterceptor implements HandlerInterceptor {
         log.warn("[rbac] role insufficient: user={} have={} need={} path={}",
                 TenantContext.currentUserId(), TenantContext.currentRole(),
                 rule.minRole().value(), request.getRequestURI());
-        // 拒绝时写一条 durable 审计行。
-        // 非持久化的告警行（上一行 log.warn）依然每次拒绝都打——去重只压制落库。
-        // 审计失败绝不能把一次 403 变成 500。
         try {
             Long tenantId = TenantContext.currentTenantId();
-            deniedAuditor.logDenied(
+            DeniedAuditorRegistry.deniedAuditor().logDenied(
                     tenantId == null ? 0L : tenantId,
                     TenantContext.currentUserId(),
                     TenantContext.currentRole(),
@@ -189,17 +183,9 @@ public class RbacInterceptor implements HandlerInterceptor {
         response.setStatus(403);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        // 两种守卫的文案不同，golden 钉住：
-        // RequireRole → "Forbidden: insufficient workspace role"；
-        // RequireSystemAdmin → "Forbidden: system administrator required"。
         String message = rule.sysAdminOnly()
                 ? "Forbidden: system administrator required"
                 : "Forbidden: insufficient workspace role";
-        // 统一响应外壳：命中 @ApiResult 控制器时输出 {code,message,data}。
-        // 本拦截器注册在 ApiResultInterceptor（order=-100）**之后** ⇒ 打标已就位，直接读它即可；
-        // 非迁移路由（无打标）保持历史纯字符串形态不变。
-        // 反例（打标还没发生，形态注定不变）：AuthFilter 等 Filter 跑在 DispatcherServlet 之前，
-        // 见 docs/api/README.md 「响应外壳」的例外。
         if (ApiResultSupport.isActive(request)) {
             response.getWriter().write(forbiddenEnvelope(message));
             return false;
@@ -208,39 +194,15 @@ public class RbacInterceptor implements HandlerInterceptor {
         return false;
     }
 
-    /** 403 的统一外壳体（{@code {code:1002,message,data:null}}）；序列化失败回落到等价字符串。 */
-    private static String forbiddenEnvelope(String message) {
-        try {
-            return ENVELOPE_JSON.writeValueAsString(
-                    ApiResponse.fail(ErrorCode.FORBIDDEN.value(), message));
-        } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException e) {
-            return "{\"code\":1002,\"message\":\"" + message + "\",\"data\":null}";
+    /** 原 APIKeyGateInterceptor 的覆盖面：/api/v1/** 排除 /files 与沙箱终端。 */
+    private static boolean isApiKeyGateCoveredPath(String uri) {
+        if (!uri.startsWith("/api/v1/")) {
+            return false;
         }
-    }
-
-    /**
-     * 取当前请求的路由模板（Spring 匹配的 URL pattern，非原始 URI）。
-     *
-     * <p>拦截器 preHandle 跑在 handler mapping 之后，所以
-     * {@code BEST_MATCHING_PATTERN_ATTRIBUTE} 已经就位；理论上拿不到时（未映射路径）
-     * 回落到本拦截器命中的 Ant 规则模式——无论如何都<b>不能</b>退回原始 URI，
-     * 那会让 URL 里的 UUID 变成新的去重键。</p>
-     */
-    private static String routeTemplate(HttpServletRequest request, RbacRules.Rule rule) {
-        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (pattern instanceof String s && !s.isEmpty()) {
-            return s;
+        if (MATCHER.match("/api/v1/files/**", uri)) {
+            return false;
         }
-        return rule.pattern();
-    }
-
-    /** 未命中任何规则时的审计模板：拿不到 Spring 模板就记 {@code unmatched}，不回落到原始 URI。 */
-    private static String routeTemplate(HttpServletRequest request) {
-        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (pattern instanceof String s && !s.isEmpty()) {
-            return s;
-        }
-        return "unmatched";
+        return !MATCHER.match("/api/v1/sessions/*/sandbox/terminal", uri);
     }
 
     private boolean denyUnmatched(HttpServletRequest request, HttpServletResponse response)
@@ -249,7 +211,7 @@ public class RbacInterceptor implements HandlerInterceptor {
                 TenantContext.currentUserId(), request.getRequestURI());
         try {
             Long tenantId = TenantContext.currentTenantId();
-            deniedAuditor.logDenied(
+            DeniedAuditorRegistry.deniedAuditor().logDenied(
                     tenantId == null ? 0L : tenantId,
                     TenantContext.currentUserId(),
                     TenantContext.currentRole(),
@@ -276,6 +238,8 @@ public class RbacInterceptor implements HandlerInterceptor {
         // API-key 主体由 APIKeyGate 全权判定（能力 + KB 白名单 + default-deny），
         // 角色阶梯不适用于机器主体——角色下限规则短路放行；
         // sysAdminOnly 规则只放行平台 Key、拒绝租户 Key。
+        // 注：preHandle 里 API-Key 主体已分派走，此处 apiKeyScope 恒为 null；
+        // 分支保留作防御（若未来改动分派顺序，本方法仍正确）。
         TenantAPIKeyScope apiKeyScope =
                 APIKeyScopeContext.current();
         if (apiKeyScope != null) {
@@ -290,7 +254,6 @@ public class RbacInterceptor implements HandlerInterceptor {
             return true;
         }
         if (rule.sysAdminOnly()) {
-            // 仅系统管理员：租户角色不参与判定
             if (TenantContext.isSystemAdmin()) {
                 return true;
             }
@@ -318,17 +281,7 @@ public class RbacInterceptor implements HandlerInterceptor {
 
     /**
      * 对 {@code /api/v1/tenants/{id}/**} 强制 URL 里的租户 == 调用方活动租户。
-     *
-     * <p><b>门控范围</b>：仅当最佳匹配模板的租户段是 {@code {...}} 占位符
-     * （形如 {@code /api/v1/tenants/{id}/...}）才执行；静态段路由
-     * （{@code /tenants/all}、{@code /tenants/search}、{@code /tenants/kv/{key}}）不查——
-     * 若对所有首段强制数字解析，会把 "all"/"kv" 误判成 400。</p>
-     *
-     * <p>没有这层时，租户 A 的 Owner 可以把 URL 里的 id 换成租户 B 去读对方的
-     * 审计日志 / API Key 列表——角色下限（Owner）照样满足。</p>
-     *
-     * <p>错误形态：空 → 400、非正整数 → 400、上下文无租户 → 401（fail closed）、
-     * 不匹配 → 403；跨租户超管放行。</p>
+     * 语义与原 RbacInterceptor.checkPathTenantMatch 逐字一致。
      */
     private boolean checkPathTenantMatch(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -338,7 +291,6 @@ public class RbacInterceptor implements HandlerInterceptor {
         }
         Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         if (!(pattern instanceof String p) || !p.startsWith("/api/v1/tenants/{")) {
-            // 静态段路由（/all、/search、/kv/{key}）或拿不到模板：不在占位符组，不查
             return true;
         }
         String rest = uri.substring("/api/v1/tenants/".length());
@@ -360,14 +312,12 @@ public class RbacInterceptor implements HandlerInterceptor {
 
         Long ctxTenantId = TenantContext.currentTenantId();
         if (ctxTenantId == null || ctxTenantId == 0) {
-            // Auth 中间件本应已设置；没设置时**失败关闭**，而不是把"无上下文"当成匹配
             log.warn("[rbac] path-tenant-match: no tenant in ctx, path={}", uri);
             throw new BizException(AppError.unauthorized("workspace context missing"));
         }
         if (pathTenantId == ctxTenantId) {
             return true;
         }
-        // 平台 Key 等价跨租户超管，放行
         TenantAPIKeyScope keyScope =
                 APIKeyScopeContext.current();
         if (keyScope != null && keyScope.isPlatform()) {
@@ -377,5 +327,31 @@ public class RbacInterceptor implements HandlerInterceptor {
                 TenantContext.currentUserId(), ctxTenantId, pathTenantId, uri);
         throw new BizException(AppError.forbidden(
                 "Access denied: URL workspace does not match the active workspace"));
+    }
+
+    private static String routeTemplate(HttpServletRequest request, RbacRules.Rule rule) {
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (pattern instanceof String s && !s.isEmpty()) {
+            return s;
+        }
+        return rule.pattern();
+    }
+
+    private static String routeTemplate(HttpServletRequest request) {
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (pattern instanceof String s && !s.isEmpty()) {
+            return s;
+        }
+        return "unmatched";
+    }
+
+    /** 403 的统一外壳体（{@code {code:1002,message,data:null}}）；序列化失败回落到等价字符串。 */
+    private static String forbiddenEnvelope(String message) {
+        try {
+            return ENVELOPE_JSON.writeValueAsString(
+                    ApiResponse.fail(ErrorCode.FORBIDDEN.value(), message));
+        } catch (RuntimeException | JsonProcessingException e) {
+            return "{\"code\":1002,\"message\":\"" + message + "\",\"data\":null}";
+        }
     }
 }

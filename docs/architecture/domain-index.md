@@ -11,7 +11,7 @@
 |---|---:|---:|---:|---|
 | **产品能力** | 6 | 1014 | 21 | 直接产生用户价值、按产品需求演进的业务能力。 |
 | **集成适配** | 5 | 641 | 15 | 对接外部系统/渠道，变更主要由第三方 API 与协议驱动。 |
-| **控制面** | 2 | 215 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
+| **控制面** | 2 | 211 | 9 | 租户、身份、系统设置与审计，变更主要由安全合规驱动。 |
 | **能力配置** | 2 | 72 | 5 | 模型/检索等运行时能力的配置面，本身不实现运行时。 |
 | **初始化向导** | 1 | 11 | 1 | 首次配置的编排面，只调契约端口，不承载业务规则。 |
 
@@ -30,7 +30,7 @@
 | `datasource` | 集成适配 | 147 | 2 | — | `views/knowledge/settings/DataSourceSettings.vue` |
 | `storage` | 集成适配 | 103 | 3 | — | `views/settings/StorageBackendSettings.vue` |
 | `websearch` | 集成适配 | 68 | 3 | — | `views/settings/WebSearchSettings.vue` |
-| `auth` | 控制面 | 182 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
+| `auth` | 控制面 | 178 | 8 | — | `views/auth · views/settings/TenantMembers.vue · views/settings/panels/PlatformAPIKeys.vue · views/settings/panels` |
 | `audit` | 控制面 | 33 | 1 | — | `views/settings/panels/SystemAuditLog.vue` |
 | `model` | 能力配置 | 47 | 4 | — | `views/settings/ModelSettings.vue` |
 | `vectorstore` | 能力配置 | 25 | 1 | — | `views/settings/VectorStoreSettings.vue` |

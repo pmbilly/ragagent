@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * <p><b>为什么必须有它</b>：Servlet 容器复用工作线程。若上一请求以 API Key 认证
  * 并把 scope 留在 ThreadLocal 上，同一线程的下一个 JWT 请求会被
- * {@link APIKeyGateInterceptor} 误判为 API Key 主体 → 未声明的路由全部 403。
+ * {@link com.ragagent.config.route.RoutePolicyInterceptor} 误判为 API Key 主体 → 未声明的路由全部 403。
  * 所以 ThreadLocal 必须显式清理，这是请求收尾不可少的一环。</p>
  *
  * <p>注册位置：**AuthFilter 之前**（否则认证阶段写入的 scope 会被上一请求的清理动作

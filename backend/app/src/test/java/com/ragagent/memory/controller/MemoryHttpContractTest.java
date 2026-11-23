@@ -10,16 +10,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.ragagent.TestSchema;
 import com.ragagent.agent.fixtures.ContractJson;
 import com.ragagent.auth.api.UserPreferences;
-import com.ragagent.auth.apikey.controller.filter.APIKeyGateInterceptor;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRouteAuthorizer;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicies;
-import com.ragagent.auth.apikey.controller.filter.APIKeyRoutePolicy;
 import com.ragagent.auth.domain.Tenant;
 import com.ragagent.auth.domain.TenantMember;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.mapper.TenantMapper;
 import com.ragagent.auth.mapper.TenantMemberMapper;
 import com.ragagent.auth.mapper.UserMapper;
+import com.ragagent.config.route.APIKeyRouteAuthorizer;
+import com.ragagent.config.route.APIKeyRoutePolicies;
+import com.ragagent.config.route.APIKeyRoutePolicy;
+import com.ragagent.config.route.RoutePolicyInterceptor;
+import com.ragagent.framework.config.TenantProperties;
 import com.ragagent.framework.tenant.APIKeyScopeContext;
 import com.ragagent.framework.tenant.TenantAPIKeyScope;
 import java.util.List;
@@ -595,8 +596,9 @@ class MemoryHttpContractTest {
      */
     @Test
     void allMemoryRoutesAreRegisteredAsFullAccessOnly() {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        APIKeyRouteAuthorizer a = interceptor.authorizer();
 
         List<String[]> routes = List.of(
                 new String[] {"GET", "/api/v1/memory/settings"},
@@ -627,8 +629,9 @@ class MemoryHttpContractTest {
     /** 上面那张表的**行为**验证：任何 scoped Key（含 chat / retrieve / ingest）都被门禁挡住。 */
     @Test
     void gateDeniesEveryScopedKeyOnEveryMemoryRoute() throws Exception {
-        APIKeyRouteAuthorizer a = new APIKeyRouteAuthorizer();
-        APIKeyRoutePolicies.registerAll(a);
+        RoutePolicyInterceptor interceptor = new RoutePolicyInterceptor(new TenantProperties(true, true, 10));
+        APIKeyRoutePolicies.registerAll(interceptor);
+        APIKeyRouteAuthorizer a = interceptor.authorizer();
 
         List<String> scopedCapabilities = List.of("chat", "retrieve", "ingest", "manage_kbs");
         for (String capability : scopedCapabilities) {
@@ -645,7 +648,7 @@ class MemoryHttpContractTest {
                 "full-access 必须放行");
     }
 
-    /** 行为验证：直接驱动 {@link APIKeyGateInterceptor}。 */
+    /** 行为验证：直接驱动 {@link com.ragagent.config.route.RoutePolicyInterceptor}。 */
     private static boolean gateAllows(APIKeyRouteAuthorizer authorizer, TenantAPIKeyScope scope,
                                       String method, String pattern) throws Exception {
         APIKeyScopeContext.set(scope);
@@ -654,7 +657,7 @@ class MemoryHttpContractTest {
             request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, pattern);
             MockHttpServletResponse response = new MockHttpServletResponse();
             boolean allowed =
-                    new APIKeyGateInterceptor(authorizer).preHandle(request, response, new Object());
+                    interceptorWith(authorizer).preHandle(request, response, new Object());
             return allowed && response.getStatus() == 200;
         } finally {
             APIKeyScopeContext.clear();
@@ -766,4 +769,14 @@ class MemoryHttpContractTest {
         String out = UUID_PATTERN.matcher(s).replaceAll("\"<uuid>\"");
         return TS_PATTERN.matcher(out).replaceAll("\"<ts>\"");
     }
+    /** 把独立 authorizer 的策略复制进统一拦截器（RoutePolicyInterceptor 内部持有自己的 authorizer 实例）。 */
+    private static com.ragagent.config.route.RoutePolicyInterceptor interceptorWith(
+            com.ragagent.config.route.APIKeyRouteAuthorizer source) {
+        var interceptor = new com.ragagent.config.route.RoutePolicyInterceptor(
+                new com.ragagent.framework.config.TenantProperties(true, true, 10));
+        source.snapshot().forEach((method, byPath) ->
+                byPath.forEach((path, policy) -> interceptor.register(method, path, policy)));
+        return interceptor;
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.ragagent.auth.apikey.controller.filter;
+package com.ragagent.config.route;
 
 import com.ragagent.framework.tenant.APIKeyCapability;
 
@@ -38,9 +38,9 @@ public final class APIKeyRoutePolicies {
      *
      * <p>由组合根（{@code WebConfig}）在装配时调用一次。
      * 调用方随后把同一个 authorizer 交给
-     * {@link APIKeyGateInterceptor} 注册为 {@code /api/v1/**} 的拦截器。</p>
+     * {@link com.ragagent.config.route.RoutePolicyInterceptor} 注册为 {@code /api/v1/**} 的拦截器。</p>
      */
-    public static void registerAll(APIKeyRouteAuthorizer authorizer) {
+    public static void registerAll(RoutePolicyInterceptor authorizer) {
         registerAuthRoutes(authorizer);
         registerModelRoutes(authorizer);
         registerKnowledgeAndWikiRoutes(authorizer);
@@ -68,7 +68,7 @@ public final class APIKeyRoutePolicies {
      * 也就没有组级策略——presigned-preview 显式 DenyAPIKeyPrincipal，
      * /files 用路由级 AllowFileServeAPIKey（见 FileProxyService）。</p>
      */
-    private static void registerFileRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerFileRoutes(RoutePolicyInterceptor a) {
         a.registerGin("GET", "/api/v1/knowledge-bases/:id/files",
                 APIKeyRoutePolicy.retrieve(APIKeyRoutePolicy.fullAccess()));
         a.registerGin("GET", "/api/v1/sessions/:id/messages/:message_id/files",
@@ -77,7 +77,7 @@ public final class APIKeyRoutePolicies {
 
     /** agents CRUD + initialization + embed/im 管理面（原 registerOrganizationRoutes 尾段；
      *  organizations 与 shares 端点族随空间分享裁撤）。 */
-    private static void registerAgentAndInfraRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerAgentAndInfraRoutes(RoutePolicyInterceptor a) {
         // ── agents 组 ──
         // agents 组 base=fullAccess；读面 read_agents/manage_agents/chat/full 任一；
         // 写面 manage_agents/full 任一；suggested-questions 注册在组外但能力同读面。
@@ -158,7 +158,7 @@ public final class APIKeyRoutePolicies {
      * Key default-deny（不能给自己扩权），刻意不登记。</p>
      *
      */
-    private static void registerSystemRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerSystemRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy system = APIKeyRoutePolicy.manageVectorStores(APIKeyRoutePolicy.fullAccess());
         final String base = "/api/v1/system";
         a.registerGin("GET", base + "/info", system);
@@ -219,7 +219,7 @@ public final class APIKeyRoutePolicies {
      * {@code POST /tenants/{id}/leave}（自助退出是"人的动作"，机器主体无从谈起）；
      * {@code /me/invitations**} 五条收件箱路由（按登录用户自证）。</p>
      */
-    private static void registerTenantMemberRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerTenantMemberRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy members = APIKeyRoutePolicy.manageMembers(APIKeyRoutePolicy.fullAccess());
         a.registerGin("GET", "/api/v1/tenants/:id/members", members);
         a.registerGin("POST", "/api/v1/tenants/:id/members", members);
@@ -284,7 +284,7 @@ public final class APIKeyRoutePolicies {
      * <p><b>刻意不登记</b>：{@code /api/v1/web-search/providers}（早期版本运行时 provider
      * 列表，注册在组门禁之外）→ Key default-deny。</p>
      */
-    private static void registerInfraConfigRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerInfraConfigRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy wsp = APIKeyRoutePolicy.manageWebSearch(APIKeyRoutePolicy.fullAccess());
         final String wspBase = "/api/v1/web-search-providers";
         a.registerGin("GET", wspBase + "/types", wsp);
@@ -330,10 +330,10 @@ public final class APIKeyRoutePolicies {
      * 的处置完全同构（"full-access 或显式带该能力"）。</p>
      *
      * <p><b>17 条</b>。读端与写端
-     * 都在这一条策略下；角色维度（Viewer / Admin）由 {@code RbacInterceptor} 另行把关，
+     * 都在这一条策略下；角色维度（Viewer / Admin）由 {@code RoutePolicyInterceptor} 另行把关，
      * 两个维度互相独立（能力判定先于角色判定）。</p>
      */
-    private static void registerDataSourceRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerDataSourceRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy ds = APIKeyRoutePolicy.manageDataSources(APIKeyRoutePolicy.fullAccess());
         final String base = "/api/v1/datasource";
         a.registerGin("GET", base + "/types", ds);
@@ -369,7 +369,7 @@ public final class APIKeyRoutePolicies {
      * {@code chat(fullAccess())}（scoped Key 凭 {@code chat} 能力即可进），
      * 这边是纯 full-access。两者的差别是有意的，别顺手统一。</p>
      */
-    private static void registerMemoryRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerMemoryRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy memory = APIKeyRoutePolicy.fullAccess();
         final String base = "/api/v1/memory";
         a.registerGin("GET", base + "/settings", memory);
@@ -397,7 +397,7 @@ public final class APIKeyRoutePolicies {
      * {@code apiKeyChat(apiKeyFullAccess())}：一把 scoped key 因此能跑完整的对话流程
      * （建/管自己的会话）而无需全租户权限。消息 / steer / 附件 / 产物端点同策略。</p>
      */
-    private static void registerSessionRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerSessionRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy sessions = APIKeyRoutePolicy.chat(APIKeyRoutePolicy.fullAccess());
         a.registerGin("GET", "/api/v1/sessions/continue-stream/:session_id", sessions);
         // 会话 CRUD + 置顶
@@ -449,7 +449,7 @@ public final class APIKeyRoutePolicies {
      * （租户级聊天历史元数据），{@code /load} 与 DELETE 要 {@code chat}
      * （操作自己会话里的消息，所有权由 message service 把关）。</p>
      */
-    private static void registerMessageRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerMessageRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy full = APIKeyRoutePolicy.fullAccess();
         APIKeyRoutePolicy history = APIKeyRoutePolicy.messageHistory(full);
         APIKeyRoutePolicy chat = APIKeyRoutePolicy.chat(full);
@@ -464,7 +464,7 @@ public final class APIKeyRoutePolicies {
      * {@code GET /api/v1/auth/me} 用 {@code apiKeyAny()}——
      * 任何有效 Key（含 scoped）都能读自己的身份，这是集成方探测"我这把 key 是谁"的入口。
      */
-    private static void registerAuthRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerAuthRoutes(RoutePolicyInterceptor a) {
         a.registerGin("GET", "/api/v1/auth/me", APIKeyRoutePolicy.any());
     }
 
@@ -476,7 +476,7 @@ public final class APIKeyRoutePolicies {
      * 语义是"要么 full-access，要么显式带 manage_models"——
      * 只带 {@code ingest} 的 Key 连 {@code GET /models} 都读不了。</p>
      */
-    private static void registerModelRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerModelRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy models = APIKeyRoutePolicy.manageModels(APIKeyRoutePolicy.fullAccess());
         a.registerGin("GET", "/api/v1/models/providers", models);
         a.registerGin("POST", "/api/v1/models", models);
@@ -502,7 +502,7 @@ public final class APIKeyRoutePolicies {
      *       <b>不是</b> ingest 的升级版——"能改内容"与"能管知识库"是两件事。</li>
      * </ul>
      */
-    private static void registerKnowledgeAndWikiRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerKnowledgeAndWikiRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy kbRead = APIKeyRoutePolicy.retrieve(APIKeyRoutePolicy.fullAccess());
         APIKeyRoutePolicy kbManage = APIKeyRoutePolicy.manageKnowledgeBases(APIKeyRoutePolicy.fullAccess());
         APIKeyRoutePolicy kbIngest = APIKeyRoutePolicy.ingest(APIKeyRoutePolicy.fullAccess());
@@ -649,7 +649,7 @@ public final class APIKeyRoutePolicies {
      * <p>{@code /api/v1/mcp-oauth/callback} 是**公开路由**（靠一次性 state 自证），
      * 不走门禁，因此这里不登记。</p>
      */
-    private static void registerMcpRoutes(APIKeyRouteAuthorizer a) {
+    private static void registerMcpRoutes(RoutePolicyInterceptor a) {
         APIKeyRoutePolicy mcp = APIKeyRoutePolicy.manageMcpServices(APIKeyRoutePolicy.fullAccess());
         a.registerGin("POST", "/api/v1/mcp-services", mcp);
         a.registerGin("GET", "/api/v1/mcp-services", mcp);

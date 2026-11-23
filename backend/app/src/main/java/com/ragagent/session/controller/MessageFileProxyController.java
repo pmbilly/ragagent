@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * MessageReferencesFile 的整 token 匹配）。</p>
  *
  * <p>中间件链：APIKeyGate（chat+fullAccess 策略，见 APIKeyRoutePolicies）
- * → RBAC viewer 规则（RbacInterceptor）→ handler。</p>
+ * → RBAC viewer 规则（RoutePolicyInterceptor）→ handler。</p>
  *
  * <p><b>已知收紧</b>：跨租户消息文件的 shared-agent / org-shared KB 两条授予路径
  * 未实现——owner ≠ caller 恒 403，方向偏保守。</p>

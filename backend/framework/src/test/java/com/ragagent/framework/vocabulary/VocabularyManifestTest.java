@@ -22,7 +22,7 @@ class VocabularyManifestTest {
     private static final List<String> VOCABULARY_ALLOW =
             List.of();
 
-    /** tenant 白名单：请求级租户上下文（原 access 包并入）+ 租户配置载荷与 API Key 模型（RbacInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
+    /** tenant 白名单：请求级租户上下文（原 access 包并入）+ 租户配置载荷与 API Key 模型（RoutePolicyInterceptor→TenantAPIKeyScope 钉链，随 Sa-Token 批整链迁 auth）。 */
     private static final List<String> TENANT_ALLOW =
             List.of("APIKeyCapability", "APIKeyScopeContext", "APIKeyScopeType",
                     "APIPrincipalConfig", "StorageEngineConfig", "TenantAPIKeyScope",
