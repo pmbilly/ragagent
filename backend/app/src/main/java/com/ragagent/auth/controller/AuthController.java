@@ -3,6 +3,15 @@ package com.ragagent.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ragagent.auth.api.SystemSettingGateway;
 import com.ragagent.auth.api.UserPreferences;
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.AuthConfigRespVo;
+import com.ragagent.auth.controller.vo.AuthLoginRespVo;
+import com.ragagent.auth.controller.vo.CurrentUserRespVo;
+import com.ragagent.auth.controller.vo.InvitationLookupRespVo;
+import com.ragagent.auth.controller.vo.OidcAuthUrlRespVo;
+import com.ragagent.auth.controller.vo.OidcConfigRespVo;
+import com.ragagent.auth.controller.vo.TokenPairRespVo;
+import com.ragagent.auth.controller.vo.UserInfoVo;
 import com.ragagent.auth.dto.AuthConfigResponse;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.ChangePasswordRequest;
@@ -12,13 +21,10 @@ import com.ragagent.auth.dto.InvitationLookupResponse;
 import com.ragagent.auth.dto.InvitationLookupView;
 import com.ragagent.auth.dto.LoginRequest;
 import com.ragagent.auth.dto.Membership;
-import com.ragagent.auth.dto.OidcAuthUrlResponse;
-import com.ragagent.auth.dto.OidcConfigResponse;
 import com.ragagent.auth.dto.RegisterByInviteRequest;
 import com.ragagent.auth.dto.RegisterRequest;
 import com.ragagent.auth.dto.TenantResponse;
 import com.ragagent.auth.dto.TenantRowView;
-import com.ragagent.auth.dto.TokenPairResponse;
 import com.ragagent.auth.dto.UpdatePreferencesRequest;
 import com.ragagent.auth.dto.UserCapabilities;
 import com.ragagent.auth.dto.UserInfo;
@@ -163,7 +169,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthLoginResponse> login(
+    public ResponseEntity<AuthLoginRespVo> login(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false) LoginRequest req) {
         log.info("Start user login");
 
@@ -240,7 +246,7 @@ public class AuthController {
     // ── POST /auto-setup ───────────────────────────────────────────────────
 
     @PostMapping("/auto-setup")
-    public ResponseEntity<AuthLoginResponse> autoSetup() {
+    public ResponseEntity<AuthLoginRespVo> autoSetup() {
         if (!"lite".equals(edition)) {
             throw new BizException(AppError.forbidden("auto-setup is only available in lite edition"));
         }
@@ -270,14 +276,14 @@ public class AuthController {
                 user.getTenantId() == null ? 0L : user.getTenantId(),
                 tenantNameOrEmpty(tenant), TenantRole.OWNER.value()));
         return ResponseEntity.ok(
-                buildAuthLoginResponse(user, tenant, memberships, tokens[0], tokens[1]));
+                AuthAssembler.toLoginVo(buildAuthLoginResponse(user, tenant, memberships, tokens[0], tokens[1])));
     }
 
     // ── POST /register-by-invite + /invitations/lookup ─────────────────────
     // （均不受 invite_only 门控——token 即授权）
 
     @PostMapping("/invitations/lookup")
-    public ResponseEntity<InvitationLookupResponse> lookupInvitation(
+    public ResponseEntity<InvitationLookupRespVo> lookupInvitation(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     InvitationLookupRequest req) {
         String token = UnicodeText.trim(req.token());
@@ -299,11 +305,11 @@ public class AuthController {
                 // 对照 .UTC().Format("2006-01-02T15:04:05Z07:00")：UTC、无小数秒、Z 结尾
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
                         .format(inv.expiresAt().withOffsetSameInstant(ZoneOffset.UTC)));
-        return ResponseEntity.ok(resp);
+        return ResponseEntity.ok(AuthAssembler.toInvitationLookupVo(resp));
     }
 
     @PostMapping("/register-by-invite")
-    public ResponseEntity<AuthLoginResponse> registerByInvite(
+    public ResponseEntity<AuthLoginRespVo> registerByInvite(
             @Valid @RejectEmptyBody @NonNullBody @RequestBody(required = false)
                     RegisterByInviteRequest req) {
         List<String> bindingErrors = new ArrayList<>();
@@ -350,15 +356,15 @@ public class AuthController {
         List<Membership> memberships = List.of(
                 new Membership(inv.tenantId(), tenantNameOrEmpty(tenant), inv.role()));
         return ResponseEntity.status(201).body(
-                buildAuthLoginResponse(completedUser, tenant, memberships, tokens[0], tokens[1]));
+                AuthAssembler.toLoginVo(buildAuthLoginResponse(completedUser, tenant, memberships, tokens[0], tokens[1])));
     }
 
     // ── GET /config（无鉴权公共读） ─────────────────────────────────────────
 
     @GetMapping("/config")
-    public ResponseEntity<AuthConfigResponse> getAuthConfig() {
-        return ResponseEntity.ok(new AuthConfigResponse(
-                userService.complexPasswordEnabled(), resolveRegistrationMode(), edition));
+    public ResponseEntity<AuthConfigRespVo> getAuthConfig() {
+        return ResponseEntity.ok(AuthAssembler.toAuthConfigVo(new AuthConfigResponse(
+                userService.complexPasswordEnabled(), resolveRegistrationMode(), edition)));
     }
 
     // ── GET /validate ──────────────────────────────────────────────────────
@@ -366,7 +372,7 @@ public class AuthController {
     // 这里的 400/401 分支在过滤器之后不可达，仅为协议完整性保留。
 
     @GetMapping("/validate")
-    public ResponseEntity<UserInfo> validateToken(
+    public ResponseEntity<UserInfoVo> validateToken(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || authHeader.isEmpty()) {
             throw new BizException(AppError.validation("Authorization header is required"));
@@ -382,13 +388,13 @@ public class AuthController {
             throw new BizException(AppError.unauthorized("Token validation failed")
                     .withDetails(e.getMessage()));
         }
-        return ResponseEntity.ok(UserInfo.from(vt.user(), vt.user().isCanAccessAllTenants()));
+        return ResponseEntity.ok(AuthAssembler.toUserInfoVo(UserInfo.from(vt.user(), vt.user().isCanAccessAllTenants())));
     }
 
     // ── GET /me ────────────────────────────────────────────────────────────
 
     @GetMapping("/me")
-    public ResponseEntity<CurrentUserResponse> getCurrentUser() {
+    public ResponseEntity<CurrentUserRespVo> getCurrentUser() {
         var user = userService.getCurrentUser();
         if (user == null) {
             throw new BizException(AppError.unauthorized("Failed to get user information")
@@ -418,13 +424,13 @@ public class AuthController {
 
         // preferenceDefaults：browser_search_instructions 随浏览器连接裁撤后已无条目，
         // 保留空 map 以维持响应形状。
-        return ResponseEntity.ok(new CurrentUserResponse(
+        return ResponseEntity.ok(AuthAssembler.toCurrentUserVo(new CurrentUserResponse(
                 new UserCapabilities(autoAcceptInvitation, canCreateTenant),
                 memberships,
                 new LinkedHashMap<>(),
                 tenant == null ? null : TenantResponse.from(tenant, contextRoleHasAdmin()),
                 tenant == null,
-                userInfo));
+                userInfo)));
     }
 
     // ── PUT /me/preferences ────────────────────────────────────────────────
@@ -474,12 +480,12 @@ public class AuthController {
 
 
     @GetMapping("/oidc/config")
-    public ResponseEntity<OidcConfigResponse> getOidcConfig() {
+    public ResponseEntity<OidcConfigRespVo> getOidcConfig() {
         return oidcOps.getOidcConfig();
     }
 
     @GetMapping("/oidc/url")
-    public ResponseEntity<OidcAuthUrlResponse> getOidcAuthorizationUrl(
+    public ResponseEntity<OidcAuthUrlRespVo> getOidcAuthorizationUrl(
             @RequestParam(value = "redirect_uri", required = false) String redirectUri,
             HttpServletRequest request, HttpServletResponse response) {
         return oidcOps.getOidcAuthorizationUrl(redirectUri, request, response);
@@ -592,20 +598,20 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenPairResponse> refreshToken(
+    public ResponseEntity<TokenPairRespVo> refreshToken(
             @RequestBody(required = false) String rawBody) {
         return sessionOps.refreshToken(rawBody);
     }
 
     @PostMapping("/switch-tenant")
-    public ResponseEntity<AuthLoginResponse> switchTenant(
+    public ResponseEntity<AuthLoginRespVo> switchTenant(
             @RequestBody(required = false) String rawBody) {
         return sessionOps.switchTenant(rawBody);
     }
     /** login 用的响应组装。 */
-    private AuthLoginResponse toResponse(LoginResult r) {
-        return buildAuthLoginResponse(r.user(), r.activeTenant(),
-                r.memberships(), r.token(), r.refreshToken());
+    private AuthLoginRespVo toResponse(LoginResult r) {
+        return AuthAssembler.toLoginVo(buildAuthLoginResponse(
+                r.user(), r.activeTenant(), r.memberships(), r.token(), r.refreshToken()));
     }
 
     /** 取用户在指定空间的成员角色；无成员或角色无效返回空串。 */

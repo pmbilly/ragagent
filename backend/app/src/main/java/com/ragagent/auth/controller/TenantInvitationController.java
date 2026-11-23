@@ -1,6 +1,8 @@
 package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.TenantInvitationRespVo;
 import com.ragagent.auth.dto.TenantInvitationResponse;
 import com.ragagent.auth.dto.TenantRowView;
 import com.ragagent.auth.service.TenantInvitationReadService;
@@ -174,7 +176,7 @@ public class TenantInvitationController {
 
     /** POST /tenants/{id}/invite-links（Owner+，多用途共享链接；201 + 带 invite_url） */
     @PostMapping("/api/v1/tenants/{id}/invite-links")
-    public ResponseEntity<TenantInvitationResponse> createInviteLink(@PathVariable String id,
+    public ResponseEntity<TenantInvitationRespVo> createInviteLink(@PathVariable String id,
                                                                 HttpServletRequest request) {
         long tenantId = TenantMemberController.parseTenantId(id);
         JsonNode body = TenantMemberController.bindJson(TenantMemberController.rawBody(request));
@@ -188,7 +190,7 @@ public class TenantInvitationController {
 
         var result = readService.createShareLinkResponse(
                 tenantId, role, invitedBy, message);
-        return ResponseEntity.status(201).body(result);
+        return ResponseEntity.status(201).body(AuthAssembler.toInvitationVo(result));
     }
 
     // ── 收件箱（/me/invitations*，登录即可、无角色门） ────────────────────────

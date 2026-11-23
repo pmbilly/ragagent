@@ -2,6 +2,9 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.APIPrincipalConfigRespVo;
+import com.ragagent.auth.controller.vo.APIPrincipalTestTokenRespVo;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigRequest;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalConfigResponse;
 import com.ragagent.auth.dto.APIPrincipalDtos.APIPrincipalTestTokenRequest;
@@ -68,15 +71,15 @@ public class TenantAPIPrincipalController {
 
     /** GET /tenants/{id}/api-principal-config（Owner+） */
     @GetMapping("/api/v1/tenants/{id}/api-principal-config")
-    public APIPrincipalConfigResponse getAPIPrincipalConfig(@PathVariable String id) {
+    public APIPrincipalConfigRespVo getAPIPrincipalConfig(@PathVariable String id) {
         long tenantId = parseTenantId(id);
         TenantRowView tenant = loadTenant(tenantId);
-        return configForResponse(tenant.apiPrincipalConfigValue());
+        return AuthAssembler.toApiPrincipalConfigVo(configForResponse(tenant.apiPrincipalConfigValue()));
     }
 
     /** PUT /tenants/{id}/api-principal-config（Owner+；*** = 保留存量密钥） */
     @PutMapping("/api/v1/tenants/{id}/api-principal-config")
-    public APIPrincipalConfigResponse updateAPIPrincipalConfig(@PathVariable String id, HttpServletRequest request) {
+    public APIPrincipalConfigRespVo updateAPIPrincipalConfig(@PathVariable String id, HttpServletRequest request) {
         long tenantId = parseTenantId(id);
         String rawBody = TenantMemberController.rawBody(request);
         APIPrincipalConfigRequest req = bindRequest(rawBody);
@@ -117,12 +120,12 @@ public class TenantAPIPrincipalController {
         tenant.setApiPrincipalConfigValue(cfg);
 
         TenantRowView updated = tenantService.updateTenant(tenant);
-        return configForResponse(updated.apiPrincipalConfigValue());
+        return AuthAssembler.toApiPrincipalConfigVo(configForResponse(updated.apiPrincipalConfigValue()));
     }
 
     /** POST /tenants/{id}/api-principal-test-token（Owner+；HS256，TTL 15min 缺省 / 1h 上限） */
     @PostMapping("/api/v1/tenants/{id}/api-principal-test-token")
-    public APIPrincipalTestTokenResponse createAPIPrincipalTestToken(
+    public APIPrincipalTestTokenRespVo createAPIPrincipalTestToken(
             @PathVariable String id, HttpServletRequest request) {
         long tenantId = parseTenantId(id);
         APIPrincipalTestTokenRequest req = bindTestTokenRequest(TenantMemberController.rawBody(request));
@@ -169,12 +172,12 @@ public class TenantAPIPrincipalController {
                     .withDetails(e.getMessage()));
         }
 
-        return new APIPrincipalTestTokenResponse(
+        return AuthAssembler.toApiPrincipalTestTokenVo(new APIPrincipalTestTokenResponse(
                 token,
                 DEFAULT_TOKEN_HEADER,
                 (int) ttl.getSeconds(),
                 expiresAt.getEpochSecond(),
-                externalUserId);
+                externalUserId));
     }
 
     // ── 辅助 ───────────────────────────────────────────────────────────────

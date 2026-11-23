@@ -2,7 +2,8 @@ package com.ragagent.auth.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ragagent.auth.dto.TenantMemberResponse;
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.TenantMemberRespVo;
 import com.ragagent.auth.service.TenantMemberReadService;
 import com.ragagent.auth.service.TenantMemberService;
 import com.ragagent.auth.service.TenantRbacException;
@@ -74,7 +75,7 @@ public class TenantMemberController {
 
     /** POST /tenants/{id}/members（Owner+，直加路径；201 + TenantMemberResponse） */
     @PostMapping("/api/v1/tenants/{id}/members")
-    public org.springframework.http.ResponseEntity<TenantMemberResponse> addMember(
+    public org.springframework.http.ResponseEntity<TenantMemberRespVo> addMember(
             @PathVariable String id, HttpServletRequest request) {
         long tenantId = parseTenantId(id);
         JsonNode body = bindJson(rawBody(request));
@@ -93,7 +94,8 @@ public class TenantMemberController {
         String invitedBy = invitedByForCaller(TenantContext.currentUserId());
         TenantMemberReadService.PreparedResponse r = readService.addByEmail(
                 trimToEmpty(email), tenantId, role, invitedBy);
-        return org.springframework.http.ResponseEntity.status(r.status()).body(r.body());
+        return org.springframework.http.ResponseEntity.status(r.status())
+                .body(AuthAssembler.toMemberVo(r.body()));
     }
 
     /** PUT /tenants/{id}/members/{userId}（Owner+，改角色；ErrLastOwner → 409） */

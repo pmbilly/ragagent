@@ -1,5 +1,8 @@
 package com.ragagent.auth.controller;
 
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.OidcAuthUrlRespVo;
+import com.ragagent.auth.controller.vo.OidcConfigRespVo;
 import com.ragagent.auth.dto.OidcAuthUrlResponse;
 import com.ragagent.auth.dto.OidcConfigResponse;
 import com.ragagent.auth.service.OidcService;
@@ -31,16 +34,17 @@ final class AuthOidcOps {
 
     // ── GET /oidc/config（无鉴权公共读） ────────────────────────────────────
 
-    ResponseEntity<OidcConfigResponse> getOidcConfig() {
+    ResponseEntity<OidcConfigRespVo> getOidcConfig() {
         boolean enabled = service.oidcConfig != null && service.oidcConfig.isEnable();
         String providerDisplayName = service.oidcConfig == null ? ""
                 : UnicodeText.trim(service.oidcConfig.getProviderDisplayName());
-        return ResponseEntity.ok(new OidcConfigResponse(enabled, providerDisplayName));
+        return ResponseEntity.ok(
+                AuthAssembler.toOidcConfigVo(new OidcConfigResponse(enabled, providerDisplayName)));
     }
 
     // ── GET /oidc/url ───────────────────────────────────────────────────────
 
-    ResponseEntity<OidcAuthUrlResponse> getOidcAuthorizationUrl(
+    ResponseEntity<OidcAuthUrlRespVo> getOidcAuthorizationUrl(
             @RequestParam(value = "redirect_uri", required = false) String redirectUri,
             HttpServletRequest request, HttpServletResponse response) {
         String trimmed = UnicodeText.trim(redirectUri == null ? "" : redirectUri);
@@ -50,8 +54,8 @@ final class AuthOidcOps {
         OidcService.AuthorizationUrl result = authorizationUrlOr403(trimmed);
         // 绑定 state nonce 到浏览器，防授权码被重放到受害者回调
         setOidcNonceCookie(request, response, result.nonce());
-        return ResponseEntity.ok(new OidcAuthUrlResponse(result.providerDisplayName(),
-                result.authorizationUrl(), result.state()));
+        return ResponseEntity.ok(AuthAssembler.toOidcAuthUrlVo(new OidcAuthUrlResponse(
+                result.providerDisplayName(), result.authorizationUrl(), result.state())));
     }
 
     // ── GET /oidc/start（直接 302 到 IdP） ─────────────────────────────────

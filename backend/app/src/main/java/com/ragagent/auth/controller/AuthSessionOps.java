@@ -2,6 +2,9 @@ package com.ragagent.auth.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ragagent.auth.assembler.AuthAssembler;
+import com.ragagent.auth.controller.vo.AuthLoginRespVo;
+import com.ragagent.auth.controller.vo.TokenPairRespVo;
 import com.ragagent.auth.domain.User;
 import com.ragagent.auth.dto.AuthLoginResponse;
 import com.ragagent.auth.dto.TenantResponse;
@@ -54,7 +57,7 @@ final class AuthSessionOps {
 
     // ── refresh ──
 
-    ResponseEntity<TokenPairResponse> refreshToken(
+    ResponseEntity<TokenPairRespVo> refreshToken(
             @RequestBody(required = false) String rawBody) {
         log.info("Start token refresh");
         RefreshTokenRequest req = bindRefreshBody(rawBody);
@@ -68,7 +71,8 @@ final class AuthSessionOps {
         } catch (UserService.RefreshTokenException e) {
             throw new BizException(AppError.unauthorized("Token refresh failed").withDetails(e.getMessage()));
         }
-        return ResponseEntity.ok(new TokenPairResponse(tokens[0], tokens[1]));
+        return ResponseEntity.ok(
+                AuthAssembler.toTokenPairVo(new TokenPairResponse(tokens[0], tokens[1])));
     }
 
     RefreshTokenRequest bindRefreshBody(String rawBody) {
@@ -117,7 +121,7 @@ final class AuthSessionOps {
 
     // ── switch-tenant ──
 
-    ResponseEntity<AuthLoginResponse> switchTenant(
+    ResponseEntity<AuthLoginRespVo> switchTenant(
             @RequestBody(required = false) String rawBody) {
         long tenantId = bindSwitchTenantRequest(rawBody);
         String currentRefreshToken = extractSwitchRefreshToken(rawBody);
@@ -134,8 +138,8 @@ final class AuthSessionOps {
             log.warn("SwitchTenant failed user={} target={}", user.getId(), tenantId, e);
             throw new BizException(AppError.forbidden("workspace switch failed").withDetails(e.getMessage()));
         }
-        return ResponseEntity.ok(new AuthLoginResponse(result.user(), activeTenantResponse(result),
-                result.memberships(), result.token(), result.refreshToken()));
+        return ResponseEntity.ok(AuthAssembler.toLoginVo(new AuthLoginResponse(result.user(),
+                activeTenantResponse(result), result.memberships(), result.token(), result.refreshToken())));
     }
 
     TenantResponse activeTenantResponse(LoginResult result) {
